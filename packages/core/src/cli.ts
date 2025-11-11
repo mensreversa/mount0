@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 
+import { exec } from 'child_process';
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import { fileURLToPath } from 'url';
 import { FuseBridge } from './bridge';
 import { MountConfig } from './config';
 import { FileSystem } from './filesystem';
@@ -51,7 +53,6 @@ async function mount(mountpoint: string, configModule: string) {
 }
 
 async function unmount(mountpoint: string) {
-  const { exec } = require('child_process');
   return new Promise<void>((resolve, reject) => {
     exec(`fusermount -u "${mountpoint}"`, (err: Error | null) => {
       if (err) {
@@ -139,6 +140,10 @@ async function main() {
   }
 }
 
-if (require.main === module) {
+const currentFile = fileURLToPath(import.meta.url);
+if (
+  process.argv[1] === currentFile ||
+  path.resolve(process.argv[1]) === path.resolve(currentFile)
+) {
   main();
 }

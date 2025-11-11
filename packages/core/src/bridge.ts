@@ -1,7 +1,10 @@
+import { createRequire } from 'module';
+import * as v8 from 'v8';
 import { FileSystem } from './filesystem';
 import { FileStat } from './types';
 
-const mount0_fuse = require('../build/Release/mount0_fuse.node');
+const requireNative = createRequire(import.meta.url);
+const mount0_fuse = requireNative('../build/Release/mount0_fuse.node');
 
 export class FuseBridge {
   private fs: FileSystem;
@@ -51,9 +54,8 @@ export class FuseBridge {
         }
       );
 
-      const v8 = require('v8');
       while (!done) {
-        v8.runMicrotasks();
+        (v8 as any).runMicrotasks();
         if (!done) {
           process.nextTick(() => {});
           if (typeof setImmediate !== 'undefined') {
@@ -116,7 +118,7 @@ export class FuseBridge {
         }
 
         case 'read': {
-          const [path, buffer, offset, length] = args;
+          const [path, _buffer, offset, length] = args;
           const handle = { path, fd: 0, flags: 0 };
           const resultBuffer = Buffer.alloc(length);
           const bytesRead = await this.fs.read(handle, resultBuffer, offset, length);
