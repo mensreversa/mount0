@@ -12,7 +12,7 @@
     "build:ts": "tsc",
     "build:native": "node-gyp rebuild",
     "clean": "node-gyp clean && rm -rf dist",
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "npm run build:ts && npm run build:native || npm run build:ts",
     "lint": "eslint src/**/*.ts",
     "format": "prettier --write \"src/**/*.{ts,js,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,js,json}\"",
@@ -36,7 +36,7 @@
     "ts-jest": "^29.4.5",
     "typescript": "^5.9.3"
   },
-  "gypfile": true,
+  "gypfile": false,
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node",

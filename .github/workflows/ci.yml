@@ -23,8 +23,20 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
+      - name: Install FUSE (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew install macfuse || brew install --cask macfuse || true
+
+      - name: Install FUSE (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfuse3-dev || true
+
       - name: Install dependencies
         run: npm ci
+        continue-on-error: false
 
       - name: Lint
         run: npm run lint
@@ -53,6 +65,11 @@ jobs:
         with:
           node-version: '22.x'
           cache: 'npm'
+
+      - name: Install FUSE (Linux)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfuse3-dev || true
 
       - name: Install dependencies
         run: npm ci
