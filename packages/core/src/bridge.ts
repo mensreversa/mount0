@@ -118,7 +118,7 @@ export class FuseBridge {
         }
 
         case 'read': {
-          const [path, _buffer, offset, length] = args;
+          const [path, , offset, length] = args;
           const handle = { path, fd: 0, flags: 0 };
           const resultBuffer = Buffer.alloc(length);
           const bytesRead = await this.fs.read(handle, resultBuffer, offset, length);
