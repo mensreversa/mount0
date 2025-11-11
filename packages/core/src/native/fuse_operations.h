@@ -3,7 +3,13 @@
 
 #include <node_api.h>
 #include <errno.h>
-#define FUSE_USE_VERSION 35
+#ifndef FUSE_USE_VERSION
+#ifdef _WIN32
+#define FUSE_USE_VERSION 30  // WinFsp supports API 30
+#else
+#define FUSE_USE_VERSION 35  // Latest FUSE 3.x API (libfuse3 3.17.1+)
+#endif
+#endif
 #include <fuse3/fuse.h>
 
 class fuse_operations_wrapper {

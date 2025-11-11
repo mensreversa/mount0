@@ -2,11 +2,12 @@
 
 > High-performance virtual filesystem for developers
 
-Mount0 is a powerful TypeScript library that enables you to mount remote resources (S3 buckets, FTP servers, SSH file systems, WebDAV, Samba shares, and more) as local filesystems using FUSE (Filesystem in Userspace). Built with performance and developer experience in mind, mount0 bridges the gap between web services and traditional file access.
+Mount0 is a powerful TypeScript library that enables you to mount remote resources (S3 buckets, FTP servers, SSH file systems, WebDAV, Samba shares, and more) as local filesystems using FUSE (Filesystem in Userspace) on macOS/Linux and WinFsp on Windows. Built with performance and developer experience in mind, mount0 bridges the gap between web services and traditional file access.
 
 ## Features
 
-- 🚀 **High Performance**: Native FUSE bindings with zero-copy streaming
+- 🚀 **High Performance**: Native FUSE/WinFsp bindings with zero-copy streaming
+- 🪟 **Cross-Platform**: Supports macOS, Linux, and Windows
 - 🔌 **Multiple Backends**: Support for S3, FTP, SSH, WebDAV, Samba, and custom providers
 - 💾 **Caching**: Built-in caching layer with configurable strategies
 - 🔄 **Parallel Operations**: Concurrent file operations for improved throughput
@@ -17,10 +18,10 @@ Mount0 is a powerful TypeScript library that enables you to mount remote resourc
 ## Requirements
 
 - **Node.js**: v20.x or higher
-- **FUSE**:
-  - macOS: [macFUSE](https://osxfuse.github.io/) (install via `brew install macfuse`)
-  - Linux: `libfuse3-dev` (install via `sudo apt-get install libfuse3-dev`)
-  - Windows: Not currently supported (FUSE limitations)
+- **FUSE/WinFsp**:
+  - **macOS**: [macFUSE](https://osxfuse.github.io/) 4.10.1+ (includes libfuse3 3.17.1+) - install via `brew install macfuse`
+  - **Linux**: `libfuse3-dev` 3.17.1+ (install via `sudo apt-get install libfuse3-dev`)
+  - **Windows**: [WinFsp](https://winfsp.dev/) (download and install from [winfsp.dev](https://winfsp.dev/rel/))
 
 ## Installation
 
@@ -197,8 +198,12 @@ This is a monorepo containing multiple packages:
 ### Prerequisites
 
 - Node.js 20.x or higher
-- FUSE development headers (see Requirements)
+- FUSE/WinFsp development headers (see Requirements)
+  - macOS: macFUSE
+  - Linux: libfuse3-dev
+  - Windows: WinFsp (installed to default location)
 - TypeScript 5.x
+- **Windows only**: Visual Studio Build Tools or Visual Studio with C++ workload
 
 ### Setup
 
@@ -225,14 +230,27 @@ npm run format
 
 ### Building Native Module
 
-The core package includes native FUSE bindings. To build:
+The core package includes native FUSE/WinFsp bindings. To build:
+
+**macOS/Linux:**
 
 ```bash
 cd packages/core
 npm run build:native
 ```
 
-Note: The native build is optional. If FUSE headers are not found, only the TypeScript build will be executed.
+**Windows:**
+
+1. Install [WinFsp](https://winfsp.dev/rel/) (download the installer)
+2. Ensure WinFsp is installed to the default location (`C:\Program Files\WinFsp`)
+3. Build the native module:
+
+```bash
+cd packages/core
+npm run build:native
+```
+
+Note: The native build is optional. If FUSE/WinFsp headers are not found, only the TypeScript build will be executed.
 
 ## Examples
 

@@ -23,7 +23,7 @@
           ],
           "cflags": [
             "-D_FILE_OFFSET_BITS=64",
-            "-DFUSE_USE_VERSION=30"
+            "-DFUSE_USE_VERSION=35"
           ]
         }],
         ["OS=='linux'", {
@@ -32,8 +32,24 @@
           ],
           "cflags": [
             "-D_FILE_OFFSET_BITS=64",
-            "-DFUSE_USE_VERSION=30"
+            "-DFUSE_USE_VERSION=35"
           ]
+        }],
+        ["OS=='win'", {
+          "include_dirs": [
+            "<!@(node -p \"require('path').join(process.env.ProgramFiles || 'C:\\\\Program Files', 'WinFsp', 'inc', 'fuse')\")"
+          ],
+          "libraries": [
+            "<!@(node -p \"require('path').join(process.env.ProgramFiles || 'C:\\\\Program Files', 'WinFsp', 'lib', 'x64', 'winfsp-x64.lib')\")"
+          ],
+          "msvs_settings": {
+            "VCCLCompilerTool": {
+              "AdditionalOptions": [
+                "/std:c++17",
+                "/DFUSE_USE_VERSION=30"
+              ]
+            }
+          }
         }]
       ],
       "xcode_settings": {
