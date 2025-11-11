@@ -1,0 +1,54 @@
+{
+  "name": "@mount0/core",
+  "version": "0.1.0",
+  "description": "High-performance virtual filesystem for developers",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "mount0": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "npm run build:ts && npm run build:native || true",
+    "build:ts": "tsc",
+    "build:native": "node-gyp rebuild",
+    "clean": "node-gyp clean && rm -rf dist",
+    "prepublishOnly": "npm run build",
+    "lint": "eslint src/**/*.ts",
+    "format": "prettier --write \"src/**/*.{ts,js,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,js,json}\"",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "keywords": [
+    "fuse",
+    "filesystem",
+    "virtual",
+    "zero-copy"
+  ],
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.10.0",
+    "jest": "^30.2.0",
+    "node-gyp": "^12.0.0",
+    "ts-jest": "^29.4.5",
+    "typescript": "^5.9.3"
+  },
+  "gypfile": true,
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "roots": [
+      "<rootDir>/test"
+    ],
+    "testMatch": [
+      "**/*.test.ts"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.ts",
+      "!src/**/*.d.ts"
+    ]
+  }
+}

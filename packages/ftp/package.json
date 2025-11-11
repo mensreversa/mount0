@@ -1,0 +1,27 @@
+{
+  "name": "@mount0/ftp",
+  "version": "0.1.0",
+  "description": "FTP filesystem provider for mount0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint src/**/*.ts",
+    "format": "prettier --write \"src/**/*.{ts,js,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,js,json}\"",
+    "test": "jest"
+  },
+  "keywords": [
+    "ftp",
+    "filesystem",
+    "mount0"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@mount0/core": "file:../core"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "typescript": "^5.9.3"
+  }
+}

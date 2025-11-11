@@ -1,0 +1,73 @@
+{
+  "name": "mount0",
+  "version": "0.1.0",
+  "description": "High-performance virtual filesystem for developers",
+  "type": "module",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "prepare": "husky install",
+    "install:all": "npm install && npm install --prefix examples/basic && npm install --prefix benchmark",
+    "install:examples": "npm install --prefix examples/basic",
+    "install:benchmark": "npm install --prefix benchmark",
+    "build:core": "cd packages/core && npm run build",
+    "build:s3": "cd packages/s3 && npm run build",
+    "build:samba": "cd packages/samba && npm run build",
+    "build:ftp": "cd packages/ftp && npm run build",
+    "build:ssh": "cd packages/ssh && npm run build",
+    "build:webdav": "cd packages/webdav && npm run build",
+    "build": "npm run build:core || (npm run build:core:ts && echo 'Warning: Native build skipped (FUSE headers not found)') && npm run build:s3 && npm run build:samba && npm run build:ftp && npm run build:ssh && npm run build:webdav",
+    "build:core:ts": "cd packages/core && npm run build:ts",
+    "clean": "rm -rf packages/*/dist",
+    "format": "prettier --write \"packages/**/*.{ts,tsx,js,json,md}\" \"examples/**/*.{ts,tsx,js,json,md}\" \"*.{md,json}\"",
+    "format:check": "prettier --check \"packages/**/*.{ts,tsx,js,json,md}\" \"examples/**/*.{ts,tsx,js,json,md}\" \"*.{md,json}\"",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "test:watch": "npm run test:watch --workspaces --if-present",
+    "test:coverage": "npm run test:coverage --workspaces --if-present",
+    "docs": "typedoc",
+    "docs:build": "typedoc",
+    "update": "ncu -u",
+    "update:workspaces": "ncu -u --workspaces",
+    "update:all": "npm run update && npm run update:workspaces"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{js,json,md}": [
+      "prettier --write"
+    ]
+  },
+  "keywords": [
+    "fuse",
+    "filesystem",
+    "virtual"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mensreversa/mount0.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mensreversa/mount0/issues"
+  },
+  "homepage": "https://github.com/mensreversa/mount0#readme",
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "eslint": "^9.39.1",
+    "globals": "^16.5.0",
+    "typescript-eslint": "^8.46.4",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.6",
+    "npm-check-updates": "^19.1.2",
+    "prettier": "^3.6.2",
+    "prettier-plugin-organize-imports": "^4.3.0",
+    "typedoc": "^0.28.14",
+    "typescript": "^5.9.3"
+  }
+}

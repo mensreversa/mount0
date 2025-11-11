@@ -1,0 +1,18 @@
+{
+  "name": "basic-example",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Basic example usage of @mount0/core",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "dev": "tsx watch src/index.ts"
+  },
+  "dependencies": {
+    "@mount0/core": "file:../../packages/core"
+  },
+  "devDependencies": {
+    "@types/node": "^24.7.1",
+    "tsx": "^4.20.6"
+  }
+}

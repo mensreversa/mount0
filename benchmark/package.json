@@ -1,0 +1,21 @@
+{
+  "name": "mount0-benchmark",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Performance benchmarks for mount0",
+  "type": "module",
+  "scripts": {
+    "bench": "tsx src/index.ts",
+    "bench:read": "tsx src/read.ts",
+    "bench:write": "tsx src/write.ts",
+    "bench:operations": "tsx src/operations.ts"
+  },
+  "dependencies": {
+    "@mount0/core": "file:../packages/core"
+  },
+  "devDependencies": {
+    "@types/node": "^24.7.1",
+    "tsx": "^4.20.6"
+  }
+}
+
