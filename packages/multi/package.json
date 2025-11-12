@@ -1,6 +1,7 @@
 {
   "name": "@mount0/multi",
   "version": "0.1.0",
+  "type": "module",
   "description": "Multi-provider strategies for mount0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

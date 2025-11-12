@@ -22,8 +22,6 @@ export class FuseBridge {
 
     const defaultOptions: Record<string, string> = {
       allow_other: '0',
-      default_permissions: '1',
-      auto_unmount: '1',
     };
 
     const mergedOptions = { ...defaultOptions, ...options };

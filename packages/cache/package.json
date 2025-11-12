@@ -1,6 +1,7 @@
 {
   "name": "@mount0/cache",
   "version": "0.1.0",
+  "type": "module",
   "description": "Cache filesystem providers for mount0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

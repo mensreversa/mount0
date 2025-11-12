@@ -2,6 +2,7 @@
   "name": "@mount0/core",
   "version": "0.1.0",
   "description": "High-performance virtual filesystem for developers",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

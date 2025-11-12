@@ -1,6 +1,7 @@
 {
   "name": "@mount0/encrypted",
   "version": "0.1.0",
+  "type": "module",
   "description": "Encrypted filesystem provider for mount0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

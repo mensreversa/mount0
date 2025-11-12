@@ -1,6 +1,7 @@
 {
   "name": "@mount0/raid",
   "version": "0.1.0",
+  "type": "module",
   "description": "RAID filesystem providers for mount0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

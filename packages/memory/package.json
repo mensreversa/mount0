@@ -1,6 +1,7 @@
 {
   "name": "@mount0/memory",
   "version": "0.1.0",
+  "type": "module",
   "description": "In-memory filesystem provider for mount0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
