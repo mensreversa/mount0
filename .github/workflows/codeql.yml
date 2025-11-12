@@ -42,7 +42,7 @@ jobs:
         run: npm ci
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
           build-mode: ${{ matrix.language == 'cpp' && 'manual' || 'none' }}
@@ -54,5 +54,5 @@ jobs:
           npm run build:native || npm run build:ts
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
 
