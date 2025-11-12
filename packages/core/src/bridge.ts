@@ -42,12 +42,15 @@ export class FuseBridge {
   }
 
   private handleOperationSync(op: string, ...args: any[]): any {
-    this.debugLog(`[${op}] called with args:`, JSON.stringify(args, (key, value) => {
-      if (value instanceof Buffer) {
-        return `<Buffer ${value.length} bytes>`;
-      }
-      return value;
-    }));
+    this.debugLog(
+      `[${op}] called with args:`,
+      JSON.stringify(args, (key, value) => {
+        if (value instanceof Buffer) {
+          return `<Buffer ${value.length} bytes>`;
+        }
+        return value;
+      })
+    );
 
     const result = this.handleOperation(op, ...args);
 
@@ -80,14 +83,14 @@ export class FuseBridge {
       if (syncError) {
         // Map Node.js error codes to errno values (same as in handleOperation)
         const errnoMap: Record<string, number> = {
-          ENOENT: 2,    // No such file or directory
-          EIO: 5,       // Input/output error
-          EACCES: 13,   // Permission denied
-          EEXIST: 17,   // File exists
-          ENOTDIR: 20,  // Not a directory
-          EISDIR: 21,   // Is a directory
-          EINVAL: 22,   // Invalid argument
-          ENOSPC: 28,   // No space left on device
+          ENOENT: 2, // No such file or directory
+          EIO: 5, // Input/output error
+          EACCES: 13, // Permission denied
+          EEXIST: 17, // File exists
+          ENOTDIR: 20, // Not a directory
+          EISDIR: 21, // Is a directory
+          EINVAL: 22, // Invalid argument
+          ENOSPC: 28, // No space left on device
         };
         const errno = syncError.errno || (syncError.code && errnoMap[syncError.code]) || 5;
         this.debugLog(`[${op}] failed (sync):`, {
@@ -95,9 +98,13 @@ export class FuseBridge {
           code: syncError.code,
           errno: syncError.errno,
           mappedErrno: errno,
-          stack: syncError.stack
+          stack: syncError.stack,
         });
-        console.error(`Operation ${op} failed (sync):`, syncError.message || syncError, `(errno: ${errno})`);
+        console.error(
+          `Operation ${op} failed (sync):`,
+          syncError.message || syncError,
+          `(errno: ${errno})`
+        );
         return -errno;
       }
 
@@ -255,23 +262,23 @@ export class FuseBridge {
     } catch (err: any) {
       // Map Node.js error codes to errno values
       const errnoMap: Record<string, number> = {
-        ENOENT: 2,    // No such file or directory
-        EIO: 5,       // Input/output error
-        EACCES: 13,   // Permission denied
-        EEXIST: 17,   // File exists
-        ENOTDIR: 20,  // Not a directory
-        EISDIR: 21,   // Is a directory
-        EINVAL: 22,   // Invalid argument
-        ENOSPC: 28,   // No space left on device
+        ENOENT: 2, // No such file or directory
+        EIO: 5, // Input/output error
+        EACCES: 13, // Permission denied
+        EEXIST: 17, // File exists
+        ENOTDIR: 20, // Not a directory
+        EISDIR: 21, // Is a directory
+        EINVAL: 22, // Invalid argument
+        ENOSPC: 28, // No space left on device
       };
-      
+
       const errno = err.errno || (err.code && errnoMap[err.code]) || 5; // Default to EIO
       this.debugLog(`[${op}] failed:`, {
         error: err.message || err,
         code: err.code,
         errno: err.errno,
         mappedErrno: errno,
-        stack: err.stack
+        stack: err.stack,
       });
       console.error(`Operation ${op} failed:`, err.message || err, `(errno: ${errno})`);
       return -errno;
