@@ -1,4 +1,5 @@
-import { LocalProvider, mount0 } from '@mount0/core';
+import { mount0 } from '@mount0/core';
+import { LocalProvider } from '@mount0/local';
 
 async function main() {
   const mountpoint = process.argv[2] || '/tmp/mount0';

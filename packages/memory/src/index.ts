@@ -1,5 +1,4 @@
-import { FilesystemProvider } from '../provider';
-import { DirEntry, FileHandle, FileStat } from '../types';
+import { DirEntry, FileHandle, FileStat, FilesystemProvider } from '@mount0/core';
 
 interface MemoryNode {
   stat: FileStat;
@@ -233,7 +232,7 @@ export class MemoryProvider implements FilesystemProvider {
     const node = this.resolvePath(path);
     if (!node) throw new Error('File not found');
     if (node.content) {
-      node.content = node.content.slice(0, length);
+      node.content = Buffer.from(node.content.subarray(0, length));
       node.stat.size = length;
       node.stat.mtime = Math.floor(Date.now() / 1000);
     }

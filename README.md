@@ -10,7 +10,9 @@ Mount0 is a powerful TypeScript library that enables you to mount remote resourc
 - 🪟 **Cross-Platform**: Supports macOS, Linux, and Windows
 - 🔌 **Multiple Backends**: Support for S3, FTP, SSH, WebDAV, Samba, and custom providers
 - 💾 **Caching**: Built-in caching layer with configurable strategies
-- 🔄 **Parallel Operations**: Concurrent file operations for improved throughput
+- 🔄 **Multi-Provider**: Failover and quorum strategies for high availability
+- 🛡️ **RAID Support**: RAID 0, 1, 5, and 6 implementations for redundancy and performance
+- 🔐 **Encryption**: Transparent encryption/decryption for secure storage
 - 📦 **TypeScript First**: Full TypeScript support with comprehensive type definitions
 - 🛠️ **Extensible**: Easy to create custom filesystem providers
 - 🎯 **Simple API**: Clean, intuitive API for mounting and managing filesystems
@@ -29,7 +31,23 @@ Mount0 is a powerful TypeScript library that enables you to mount remote resourc
 npm install @mount0/core
 ```
 
-For specific backend providers:
+### Core Providers
+
+```bash
+npm install @mount0/local      # Local filesystem provider
+npm install @mount0/memory     # In-memory filesystem provider
+```
+
+### Advanced Providers
+
+```bash
+npm install @mount0/cache      # Caching providers (write-through, write-back)
+npm install @mount0/raid       # RAID providers (RAID 0, 1, 5, 6)
+npm install @mount0/multi     # Multi-provider strategies (failover, quorum)
+npm install @mount0/encrypted  # Encrypted filesystem provider
+```
+
+### Backend Providers
 
 ```bash
 npm install @mount0/s3      # AWS S3 support
@@ -42,7 +60,8 @@ npm install @mount0/samba    # Samba/CIFS support
 ## Quick Start
 
 ```typescript
-import { mount0, LocalProvider } from '@mount0/core';
+import { mount0 } from '@mount0/core';
+import { LocalProvider } from '@mount0/local';
 
 async function main() {
   const fs = mount0();
@@ -69,7 +88,8 @@ main().catch(console.error);
 ### Basic Mounting
 
 ```typescript
-import { mount0, LocalProvider } from '@mount0/core';
+import { mount0 } from '@mount0/core';
+import { LocalProvider } from '@mount0/local';
 
 const fs = mount0();
 fs.handle('/', new LocalProvider('/path/to/data'));
@@ -82,7 +102,9 @@ await loop(); // Keep running
 ### Multiple Backends
 
 ```typescript
-import { mount0, LocalProvider, MemoryProvider } from '@mount0/core';
+import { mount0 } from '@mount0/core';
+import { LocalProvider } from '@mount0/local';
+import { MemoryProvider } from '@mount0/memory';
 
 const fs = mount0();
 fs.handle('/data', new LocalProvider('/var/data'));
@@ -95,12 +117,14 @@ await loop();
 ### With Caching
 
 ```typescript
-import { mount0, LocalProvider, CacheProvider } from '@mount0/core';
+import { mount0 } from '@mount0/core';
+import { LocalProvider } from '@mount0/local';
+import { MemoryProvider } from '@mount0/memory';
+import { WriteThroughCacheProvider } from '@mount0/cache';
 
-const cachedProvider = new CacheProvider({
+const cachedProvider = new WriteThroughCacheProvider({
   master: new LocalProvider('/path/to/data'),
   slave: new MemoryProvider(),
-  strategy: 'write-through',
 });
 
 const fs = mount0();
@@ -110,10 +134,104 @@ const { unmount, loop } = await fs.mount('/mnt/cached');
 await loop();
 ```
 
+Or use write-back caching:
+
+```typescript
+import { mount0 } from '@mount0/core';
+import { LocalProvider } from '@mount0/local';
+import { MemoryProvider } from '@mount0/memory';
+import { WriteBackCacheProvider } from '@mount0/cache';
+
+const cachedProvider = new WriteBackCacheProvider({
+  master: new LocalProvider('/path/to/data'),
+  slave: new MemoryProvider(),
+});
+```
+
+### RAID Storage
+
+```typescript
+import { mount0 } from '@mount0/core';
+import { LocalProvider } from '@mount0/local';
+import { Raid0Provider, Raid1Provider, Raid5Provider, Raid6Provider } from '@mount0/raid';
+
+const fs = mount0();
+
+// RAID 0 (Striping) - Performance
+fs.handle(
+  '/fast',
+  new Raid0Provider({
+    providers: [new LocalProvider('/disk1'), new LocalProvider('/disk2')],
+    stripeSize: 128 * 1024,
+  })
+);
+
+// RAID 1 (Mirroring) - Redundancy
+fs.handle(
+  '/backup',
+  new Raid1Provider({
+    providers: [new LocalProvider('/disk1'), new LocalProvider('/disk2')],
+  })
+);
+
+// RAID 5 (Parity) - Balance of performance and redundancy
+fs.handle(
+  '/data',
+  new Raid5Provider({
+    providers: [
+      new LocalProvider('/disk1'),
+      new LocalProvider('/disk2'),
+      new LocalProvider('/disk3'),
+    ],
+  })
+);
+
+// RAID 6 (Double Parity) - High redundancy
+fs.handle(
+  '/critical',
+  new Raid6Provider({
+    providers: [
+      new LocalProvider('/disk1'),
+      new LocalProvider('/disk2'),
+      new LocalProvider('/disk3'),
+      new LocalProvider('/disk4'),
+    ],
+  })
+);
+```
+
+### Multi-Provider Strategies
+
+```typescript
+import { mount0 } from '@mount0/core';
+import { LocalProvider } from '@mount0/local';
+import { MemoryProvider } from '@mount0/memory';
+import { FirstProvider, MajorityProvider } from '@mount0/multi';
+
+const fs = mount0();
+
+// Failover - Try providers sequentially
+fs.handle(
+  '/failover',
+  new FirstProvider({
+    providers: [new LocalProvider('/primary'), new LocalProvider('/secondary')],
+  })
+);
+
+// Quorum - Require majority consensus
+fs.handle(
+  '/quorum',
+  new MajorityProvider({
+    providers: [new MemoryProvider(), new MemoryProvider(), new MemoryProvider()],
+  })
+);
+```
+
 ### Combining Providers
 
 ```typescript
-import { mount0, LocalProvider } from '@mount0/core';
+import { mount0 } from '@mount0/core';
+import { LocalProvider } from '@mount0/local';
 import { Raid1Provider } from '@mount0/raid';
 import { EncryptedProvider } from '@mount0/encrypted';
 import { FirstProvider } from '@mount0/multi';
@@ -161,6 +279,9 @@ await loop();
 ### Graceful Shutdown
 
 ```typescript
+import { mount0 } from '@mount0/core';
+import { LocalProvider } from '@mount0/local';
+
 const fs = mount0();
 fs.handle('/', new LocalProvider('/data'));
 
@@ -180,10 +301,16 @@ await loop();
 
 Mount0 is built on a modular architecture:
 
-- **Core**: FUSE bindings and filesystem abstraction
-- **Providers**: Backend implementations (Local, Memory, S3, FTP, etc.)
-- **Cache**: Caching layer with multiple strategies
-- **Parallel**: Concurrent operation support
+- **Core** (`@mount0/core`): FUSE bindings and filesystem abstraction
+- **Basic Providers**:
+  - `@mount0/local`: Local filesystem provider
+  - `@mount0/memory`: In-memory filesystem provider
+- **Advanced Providers**:
+  - `@mount0/cache`: Caching layer with write-through and write-back strategies
+  - `@mount0/raid`: RAID implementations (RAID 0, 1, 5, 6)
+  - `@mount0/multi`: Multi-provider strategies (failover, quorum)
+  - `@mount0/encrypted`: Transparent encryption/decryption
+- **Backend Providers**: Remote storage implementations (S3, FTP, SSH, WebDAV, Samba)
 
 ### Provider Interface
 
@@ -228,7 +355,24 @@ class MyCustomProvider implements FilesystemProvider {
 
 This is a monorepo containing multiple packages:
 
+### Core
+
 - **`@mount0/core`**: Core filesystem functionality and FUSE bindings
+
+### Basic Providers
+
+- **`@mount0/local`**: Local filesystem provider
+- **`@mount0/memory`**: In-memory filesystem provider
+
+### Advanced Providers
+
+- **`@mount0/cache`**: Caching providers (write-through, write-back)
+- **`@mount0/raid`**: RAID providers (RAID 0, 1, 5, 6)
+- **`@mount0/multi`**: Multi-provider strategies (failover, quorum)
+- **`@mount0/encrypted`**: Encrypted filesystem provider
+
+### Backend Providers
+
 - **`@mount0/s3`**: AWS S3 backend provider
 - **`@mount0/ftp`**: FTP backend provider
 - **`@mount0/ssh`**: SSH/SFTP backend provider
@@ -299,7 +443,7 @@ Note: The native build is optional. If FUSE/WinFsp headers are not found, only t
 See the `examples/` directory for complete examples:
 
 - **Basic**: Simple local filesystem mount
-- **Benchmark**: Performance testing examples
+- **Combined**: Complex combinations of providers (RAID, encryption, caching, multi-provider strategies)
 
 ## Performance
 

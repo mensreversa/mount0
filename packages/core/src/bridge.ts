@@ -122,7 +122,7 @@ export class FuseBridge {
           const handle = { path, fd: 0, flags: 0 };
           const resultBuffer = Buffer.alloc(length);
           const bytesRead = await this.fs.read(handle, resultBuffer, offset, length);
-          return resultBuffer.slice(0, bytesRead);
+          return resultBuffer.subarray(0, bytesRead);
         }
 
         case 'write': {

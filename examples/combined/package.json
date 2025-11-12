@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@mount0/core": "file:../../packages/core",
+    "@mount0/local": "file:../../packages/local",
+    "@mount0/memory": "file:../../packages/memory",
     "@mount0/raid": "file:../../packages/raid",
     "@mount0/encrypted": "file:../../packages/encrypted",
     "@mount0/multi": "file:../../packages/multi"

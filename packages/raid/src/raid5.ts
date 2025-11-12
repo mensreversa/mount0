@@ -64,7 +64,7 @@ export class Raid5Provider extends BaseRaidProvider {
     const info = this.getFileInfo(handle.fd);
     const stripeIndex = Math.floor(offset / this.stripeSize);
     const stripeOffset = offset % this.stripeSize;
-    const stripeData = buffer.slice(0, Math.min(length, this.stripeSize - stripeOffset));
+    const stripeData = buffer.subarray(0, Math.min(length, this.stripeSize - stripeOffset));
 
     const dataIndex = this.getProviderIndex(stripeIndex);
     await this.providers[dataIndex].write(

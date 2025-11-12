@@ -1,0 +1,37 @@
+{
+  "name": "@mount0/cache",
+  "version": "0.1.0",
+  "description": "Cache filesystem providers for mount0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint src/**/*.ts",
+    "format": "prettier --write \"src/**/*.{ts,js,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,js,json}\"",
+    "test": "jest"
+  },
+  "keywords": [
+    "cache",
+    "filesystem",
+    "mount0",
+    "write-through",
+    "write-back"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@mount0/core": "file:../core"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.10.0",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.5",
+    "typescript": "^5.9.3"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "passWithNoTests": true
+  }
+}

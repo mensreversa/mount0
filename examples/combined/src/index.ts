@@ -1,5 +1,7 @@
-import { LocalProvider, MemoryProvider, mount0 } from '@mount0/core';
+import { mount0 } from '@mount0/core';
 import { EncryptedProvider } from '@mount0/encrypted';
+import { LocalProvider } from '@mount0/local';
+import { MemoryProvider } from '@mount0/memory';
 import { FirstProvider, MajorityProvider } from '@mount0/multi';
 import { Raid0Provider, Raid1Provider } from '@mount0/raid';
 

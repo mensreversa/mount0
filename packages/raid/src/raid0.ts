@@ -72,7 +72,7 @@ export class Raid0Provider extends BaseRaidProvider {
       const toWrite = Math.min(remaining, this.stripeSize - stripeOffset);
 
       const providerIndex = this.getProviderIndex(stripeIndex);
-      const stripeData = buffer.slice(bytesWritten, bytesWritten + toWrite);
+      const stripeData = buffer.subarray(bytesWritten, bytesWritten + toWrite);
       await this.providers[providerIndex].write(
         info.handles[providerIndex],
         stripeData,

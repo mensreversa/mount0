@@ -1,23 +1,17 @@
-import { FilesystemProvider } from '../provider';
-import { DirEntry, FileHandle, FileStat } from '../types';
+import { DirEntry, FileHandle, FileStat, FilesystemProvider } from '@mount0/core';
 
-export type CacheStrategy = 'write-through' | 'write-back';
-
-export interface CacheProviderConfig {
+export interface BaseCacheConfig {
   master: FilesystemProvider;
   slave: FilesystemProvider;
-  strategy?: CacheStrategy;
 }
 
-export class CacheProvider implements FilesystemProvider {
-  private master: FilesystemProvider;
-  private slave: FilesystemProvider;
-  private strategy: CacheStrategy;
+export abstract class BaseCacheProvider implements FilesystemProvider {
+  protected master: FilesystemProvider;
+  protected slave: FilesystemProvider;
 
-  constructor(config: CacheProviderConfig) {
+  constructor(config: BaseCacheConfig) {
     this.master = config.master;
     this.slave = config.slave;
-    this.strategy = config.strategy || 'write-through';
   }
 
   async getattr(path: string): Promise<FileStat | null> {
@@ -45,20 +39,6 @@ export class CacheProvider implements FilesystemProvider {
       return await this.slave.read(handle, buffer, offset, length);
     } catch {
       return await this.master.read(handle, buffer, offset, length);
-    }
-  }
-
-  async write(handle: FileHandle, buffer: Buffer, offset: number, length: number): Promise<number> {
-    if (this.strategy === 'write-through') {
-      await Promise.all([
-        this.master.write(handle, buffer, offset, length),
-        this.slave.write(handle, buffer, offset, length).catch(() => {}),
-      ]);
-      return length;
-    } else {
-      await this.slave.write(handle, buffer, offset, length);
-      this.master.write(handle, buffer, offset, length).catch(() => {});
-      return length;
     }
   }
 
@@ -124,4 +104,11 @@ export class CacheProvider implements FilesystemProvider {
       this.slave.close(handle).catch(() => {}),
     ]);
   }
+
+  abstract write(
+    handle: FileHandle,
+    buffer: Buffer,
+    offset: number,
+    length: number
+  ): Promise<number>;
 }

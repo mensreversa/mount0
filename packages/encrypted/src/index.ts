@@ -55,10 +55,10 @@ export class EncryptedProvider implements FilesystemProvider {
 
   private async decrypt(encrypted: Buffer): Promise<Buffer> {
     const key = await this.getKey();
-    const iv = encrypted.slice(0, 16);
+    const iv = encrypted.subarray(0, 16);
     const authTagLength = this.algorithm.includes('gcm') ? 16 : 0;
-    const authTag = authTagLength > 0 ? encrypted.slice(16, 16 + authTagLength) : undefined;
-    const data = encrypted.slice(16 + authTagLength);
+    const authTag = authTagLength > 0 ? encrypted.subarray(16, 16 + authTagLength) : undefined;
+    const data = encrypted.subarray(16 + authTagLength);
 
     const decipher = createDecipheriv(this.algorithm, key, iv);
     if (authTag) {
@@ -87,7 +87,7 @@ export class EncryptedProvider implements FilesystemProvider {
     if (bytesRead < overhead) return 0;
 
     try {
-      const decrypted = await this.decrypt(encryptedBuffer.slice(0, bytesRead));
+      const decrypted = await this.decrypt(encryptedBuffer.subarray(0, bytesRead));
       const toCopy = Math.min(decrypted.length, length);
       decrypted.copy(buffer, 0, 0, toCopy);
       return toCopy;
@@ -97,7 +97,7 @@ export class EncryptedProvider implements FilesystemProvider {
   }
 
   async write(handle: FileHandle, buffer: Buffer, offset: number, length: number): Promise<number> {
-    const encrypted = await this.encrypt(buffer.slice(0, length));
+    const encrypted = await this.encrypt(buffer.subarray(0, length));
     await this.provider.write(handle, encrypted, offset, encrypted.length);
     return length;
   }

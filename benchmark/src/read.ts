@@ -1,35 +1,32 @@
-import { mount, provider, mapping, MemoryProvider } from '@mount0/core';
+import { mount0 } from '@mount0/core';
+import { MemoryProvider } from '@mount0/memory';
 import * as fs from 'fs/promises';
-import * as path from 'path';
 import * as os from 'os';
+import * as path from 'path';
 
 async function benchmarkRead() {
   const mountpoint = path.join(os.tmpdir(), 'mount0-read-bench');
-  
+
   try {
     await fs.mkdir(mountpoint, { recursive: true });
   } catch {}
 
-  const fsInstance = await mount({
-    mountpoint,
-    providers: [
-      provider('memory', new MemoryProvider())
-    ],
-    mappings: [
-      mapping('/', 'memory')
-    ]
-  });
+  const fsInstance = mount0();
+  fsInstance.handle('/', new MemoryProvider());
+
+  const { unmount, loop } = await fsInstance.mount(mountpoint);
+
+  // Run loop in background
+  loop().catch(console.error);
 
   // Create test files first
-  const filesystem = fsInstance.getFilesystem();
   for (let i = 0; i < 1000; i++) {
     try {
-      const handle = await filesystem.create(`/test${i}`, 0o644);
-      await filesystem.close(handle);
+      await fs.writeFile(path.join(mountpoint, `test${i}`), '');
     } catch {}
   }
 
-  await new Promise(resolve => setTimeout(resolve, 500));
+  await new Promise((resolve) => setTimeout(resolve, 500));
 
   console.log('Running read benchmark...\n');
 
@@ -37,7 +34,9 @@ async function benchmarkRead() {
   const start = performance.now();
 
   for (let i = 0; i < iterations; i++) {
-    await filesystem.getattr(`/test${i % 1000}`);
+    try {
+      await fs.stat(path.join(mountpoint, `test${i % 1000}`));
+    } catch {}
   }
 
   const duration = performance.now() - start;
@@ -49,8 +48,8 @@ async function benchmarkRead() {
   console.log(`Throughput: ${opsPerSec} ops/sec`);
   console.log(`Avg Latency: ${(duration / iterations).toFixed(3)}ms`);
 
-  await fsInstance.unmount();
+  await unmount();
+  process.exit(0);
 }
 
 benchmarkRead().catch(console.error);
-

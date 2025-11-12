@@ -1,8 +1,7 @@
+import { DirEntry, FileHandle, FileStat, FilesystemProvider } from '@mount0/core';
 import { Dirent } from 'fs';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { FilesystemProvider } from '../provider';
-import { DirEntry, FileHandle, FileStat } from '../types';
 
 export class LocalProvider implements FilesystemProvider {
   private root: string;
