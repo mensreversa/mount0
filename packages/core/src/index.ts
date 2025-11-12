@@ -1,10 +1,6 @@
-export { FuseBridge } from './bridge';
-export { BackendConfig, MountConfig, PathMapping } from './config';
-export { MountOptions, mapping, mount, provider } from './factory';
-export { FileSystem } from './filesystem';
+export { Mount0, MountOptions, mount0 } from './mount0';
 export { FilesystemProvider } from './provider';
 export { CacheProvider, CacheProviderConfig, CacheStrategy } from './providers/cache';
 export { LocalProvider } from './providers/local';
 export { MemoryProvider } from './providers/memory';
-export { ParallelProvider, ParallelProviderConfig } from './providers/parallel';
 export { DirEntry, FileHandle, FileStat } from './types';

@@ -4,9 +4,6 @@
   "description": "High-performance virtual filesystem for developers",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "bin": {
-    "mount0": "./dist/cli.js"
-  },
   "scripts": {
     "build": "npm run build:ts && npm run build:native || true",
     "build:ts": "tsc",

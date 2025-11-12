@@ -9,7 +9,7 @@ interface MemoryNode {
 
 export class MemoryProvider implements FilesystemProvider {
   private root: MemoryNode;
-  private openFiles: Map<number, { node: MemoryNode; offset: number }>;
+  private openFiles: Map<number, { node: MemoryNode }>;
   private nextFd: number;
   private inoCounter: number;
 
@@ -106,61 +106,40 @@ export class MemoryProvider implements FilesystemProvider {
 
   async open(path: string, flags: number, _mode?: number): Promise<FileHandle> {
     const node = this.resolvePath(path);
-    if (!node) {
-      throw new Error('File not found');
-    }
+    if (!node) throw new Error('File not found');
 
     const fd = this.nextFd++;
-    this.openFiles.set(fd, { node, offset: 0 });
-
-    return {
-      fd,
-      path,
-      flags,
-    };
+    this.openFiles.set(fd, { node });
+    return { fd, path, flags };
   }
 
   async read(handle: FileHandle, buffer: Buffer, offset: number, length: number): Promise<number> {
     const file = this.openFiles.get(handle.fd);
-    if (!file) {
-      throw new Error('File not open');
-    }
+    if (!file) throw new Error('File not open');
 
-    if (!file.node.content) {
-      return 0;
-    }
+    if (!file.node.content) return 0;
 
-    const readOffset = file.offset;
-    const available = file.node.content.length - readOffset;
+    const available = file.node.content.length - offset;
     const toRead = Math.min(length, available);
-
     if (toRead > 0) {
-      file.node.content.copy(buffer, offset, readOffset, readOffset + toRead);
-      file.offset += toRead;
+      file.node.content.copy(buffer, 0, offset, offset + toRead);
     }
-
     return toRead;
   }
 
   async write(handle: FileHandle, buffer: Buffer, offset: number, length: number): Promise<number> {
     const file = this.openFiles.get(handle.fd);
-    if (!file) {
-      throw new Error('File not open');
-    }
+    if (!file) throw new Error('File not open');
 
-    if (!file.node.content) {
-      file.node.content = Buffer.alloc(0);
-    }
+    if (!file.node.content) file.node.content = Buffer.alloc(0);
 
-    const writeOffset = file.offset;
-    const newSize = Math.max(file.node.content.length, writeOffset + length);
+    const newSize = Math.max(file.node.content.length, offset + length);
     const newContent = Buffer.alloc(newSize);
     file.node.content.copy(newContent);
-    buffer.copy(newContent, writeOffset, 0, length);
+    buffer.copy(newContent, offset, 0, length);
     file.node.content = newContent;
     file.node.stat.size = newSize;
     file.node.stat.mtime = Math.floor(Date.now() / 1000);
-    file.offset += length;
 
     return length;
   }
@@ -170,10 +149,7 @@ export class MemoryProvider implements FilesystemProvider {
     const fileName = parts.pop();
     const dirPath = parts.join('/') || '/';
     const dir = dirPath === '/' ? this.root : this.resolvePath(dirPath);
-
-    if (!dir || !dir.children) {
-      throw new Error('Directory not found');
-    }
+    if (!dir?.children) throw new Error('Directory not found');
 
     if (fileName && !dir.children.has(fileName)) {
       dir.children.set(fileName, {
@@ -197,18 +173,11 @@ export class MemoryProvider implements FilesystemProvider {
     }
 
     const node = this.resolvePath(path);
-    if (!node) {
-      throw new Error('Failed to create file');
-    }
+    if (!node) throw new Error('Failed to create file');
 
     const fd = this.nextFd++;
-    this.openFiles.set(fd, { node, offset: 0 });
-
-    return {
-      fd,
-      path,
-      flags: 0o2,
-    };
+    this.openFiles.set(fd, { node });
+    return { fd, path, flags: 0o2 };
   }
 
   async unlink(path: string): Promise<void> {
@@ -216,11 +185,7 @@ export class MemoryProvider implements FilesystemProvider {
     const fileName = parts.pop();
     const dirPath = parts.join('/') || '/';
     const dir = dirPath === '/' ? this.root : this.resolvePath(dirPath);
-
-    if (!dir || !dir.children || !fileName) {
-      throw new Error('File not found');
-    }
-
+    if (!dir?.children || !fileName) throw new Error('File not found');
     dir.children.delete(fileName);
   }
 
@@ -236,54 +201,37 @@ export class MemoryProvider implements FilesystemProvider {
     const dirName = parts.pop();
     const parentPath = parts.join('/') || '/';
     const parent = parentPath === '/' ? this.root : this.resolvePath(parentPath);
-
-    if (!parent || !parent.children || !dirName) {
-      throw new Error('Directory not found');
-    }
+    if (!parent?.children || !dirName) throw new Error('Directory not found');
 
     const dir = parent.children.get(dirName);
-    if (!dir || (dir.children && dir.children.size > 0)) {
-      throw new Error('Directory not empty');
-    }
-
+    if (!dir || dir.children?.size) throw new Error('Directory not empty');
     parent.children.delete(dirName);
   }
 
   async rename(oldpath: string, newpath: string): Promise<void> {
     const oldNode = this.resolvePath(oldpath);
-    if (!oldNode) {
-      throw new Error('Source not found');
-    }
+    if (!oldNode) throw new Error('Source not found');
 
     const oldParts = oldpath.split('/').filter((p) => p);
     const oldName = oldParts.pop();
-    const oldDirPath = oldParts.join('/') || '/';
-    const oldDir = oldDirPath === '/' ? this.root : this.resolvePath(oldDirPath);
-
+    const oldDir = oldParts.length === 0 ? this.root : this.resolvePath(oldParts.join('/'));
     const newParts = newpath.split('/').filter((p) => p);
     const newName = newParts.pop();
-    const newDirPath = newParts.join('/') || '/';
-    const newDir = newDirPath === '/' ? this.root : this.resolvePath(newDirPath);
+    const newDir = newParts.length === 0 ? this.root : this.resolvePath(newParts.join('/'));
 
-    if (!oldDir || !oldDir.children || !oldName || !newDir || !newDir.children || !newName) {
+    if (!oldDir?.children || !oldName || !newDir?.children || !newName) {
       throw new Error('Invalid path');
     }
 
     const node = oldDir.children.get(oldName);
-    if (!node) {
-      throw new Error('Source not found');
-    }
-
+    if (!node) throw new Error('Source not found');
     newDir.children.set(newName, node);
     oldDir.children.delete(oldName);
   }
 
   async truncate(path: string, length: number): Promise<void> {
     const node = this.resolvePath(path);
-    if (!node) {
-      throw new Error('File not found');
-    }
-
+    if (!node) throw new Error('File not found');
     if (node.content) {
       node.content = node.content.slice(0, length);
       node.stat.size = length;

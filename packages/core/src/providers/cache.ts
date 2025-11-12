@@ -21,18 +21,13 @@ export class CacheProvider implements FilesystemProvider {
   }
 
   async getattr(path: string): Promise<FileStat | null> {
-    // Try slave first (cache), then master
-    const stat = (await this.slave.getattr(path)) || (await this.master.getattr(path));
-    if (stat && !(await this.slave.getattr(path))) {
-      // Cache the result
-      // Note: This is a simplified cache - in production, you'd want proper caching logic
-    }
-    return stat;
+    const stat = await this.slave.getattr(path);
+    return stat || this.master.getattr(path);
   }
 
   async readdir(path: string): Promise<DirEntry[]> {
-    const entries = (await this.slave.readdir(path)) || (await this.master.readdir(path));
-    return entries;
+    const entries = await this.slave.readdir(path);
+    return entries.length > 0 ? entries : this.master.readdir(path);
   }
 
   async open(path: string, flags: number, mode?: number): Promise<FileHandle> {
@@ -55,18 +50,15 @@ export class CacheProvider implements FilesystemProvider {
 
   async write(handle: FileHandle, buffer: Buffer, offset: number, length: number): Promise<number> {
     if (this.strategy === 'write-through') {
-      // Write to both master and slave
       await Promise.all([
         this.master.write(handle, buffer, offset, length),
-        this.slave.write(handle, buffer, offset, length).catch(() => {}), // Ignore slave errors
+        this.slave.write(handle, buffer, offset, length).catch(() => {}),
       ]);
       return length;
     } else {
-      // Write-back: write to slave first, master later (async)
-      const result = await this.slave.write(handle, buffer, offset, length);
-      // In production, queue for async write to master
+      await this.slave.write(handle, buffer, offset, length);
       this.master.write(handle, buffer, offset, length).catch(() => {});
-      return result;
+      return length;
     }
   }
 

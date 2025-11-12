@@ -1,0 +1,21 @@
+{
+  "name": "combined-example",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Example combining multiple mount0 providers",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "dev": "tsx watch src/index.ts"
+  },
+  "dependencies": {
+    "@mount0/core": "file:../../packages/core",
+    "@mount0/raid": "file:../../packages/raid",
+    "@mount0/encrypted": "file:../../packages/encrypted",
+    "@mount0/multi": "file:../../packages/multi"
+  },
+  "devDependencies": {
+    "@types/node": "^24.7.1",
+    "tsx": "^4.20.6"
+  }
+}

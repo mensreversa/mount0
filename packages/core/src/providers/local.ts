@@ -82,18 +82,14 @@ export class LocalProvider implements FilesystemProvider {
 
   async read(handle: FileHandle, buffer: Buffer, offset: number, length: number): Promise<number> {
     const fileHandle = this.openFiles.get(handle.fd);
-    if (!fileHandle) {
-      throw new Error('File not open');
-    }
+    if (!fileHandle) throw new Error('File not open');
     const result = await fileHandle.read(buffer, 0, length, offset);
     return result.bytesRead;
   }
 
   async write(handle: FileHandle, buffer: Buffer, offset: number, length: number): Promise<number> {
     const fileHandle = this.openFiles.get(handle.fd);
-    if (!fileHandle) {
-      throw new Error('File not open');
-    }
+    if (!fileHandle) throw new Error('File not open');
     const result = await fileHandle.write(buffer, 0, length, offset);
     return result.bytesWritten;
   }

@@ -42,20 +42,23 @@ npm install @mount0/samba    # Samba/CIFS support
 ## Quick Start
 
 ```typescript
-import { mount, provider, mapping } from '@mount0/core';
-import { LocalProvider } from '@mount0/core';
+import { mount0, LocalProvider } from '@mount0/core';
 
 async function main() {
-  const fs = await mount({
-    mountpoint: '/tmp/mount0',
-    providers: [provider('local', new LocalProvider('/path/to/directory'))],
-    mappings: [mapping('/', 'local')],
-  });
+  const fs = mount0();
+  fs.handle('/', new LocalProvider('/tmp'));
 
+  const { unmount, loop } = await fs.mount('/tmp/mount0');
   console.log('Filesystem mounted at /tmp/mount0');
 
+  // Handle graceful shutdown
+  process.on('SIGINT', async () => {
+    await unmount();
+    process.exit(0);
+  });
+
   // Keep the process alive
-  await fs.loop();
+  await loop();
 }
 
 main().catch(console.error);
@@ -66,72 +69,111 @@ main().catch(console.error);
 ### Basic Mounting
 
 ```typescript
-import { mount, provider, mapping } from '@mount0/core';
-import { LocalProvider } from '@mount0/core';
+import { mount0, LocalProvider } from '@mount0/core';
 
-const fs = await mount({
-  mountpoint: '/mnt/myfs',
-  providers: [provider('backend1', new LocalProvider('/path/to/data'))],
-  mappings: [mapping('/', 'backend1')],
-});
+const fs = mount0();
+fs.handle('/', new LocalProvider('/path/to/data'));
 
+const { unmount, loop } = await fs.mount('/mnt/myfs');
 // Filesystem is now accessible at /mnt/myfs
-await fs.loop(); // Keep running
+await loop(); // Keep running
 ```
 
 ### Multiple Backends
 
 ```typescript
-import { mount, provider, mapping } from '@mount0/core';
-import { LocalProvider } from '@mount0/core';
-import { MemoryProvider } from '@mount0/core';
+import { mount0, LocalProvider, MemoryProvider } from '@mount0/core';
 
-const fs = await mount({
-  mountpoint: '/mnt/multi',
-  providers: [
-    provider('disk', new LocalProvider('/var/data')),
-    provider('cache', new MemoryProvider()),
-  ],
-  mappings: [mapping('/data', 'disk'), mapping('/cache', 'cache')],
-});
+const fs = mount0();
+fs.handle('/data', new LocalProvider('/var/data'));
+fs.handle('/cache', new MemoryProvider());
+
+const { unmount, loop } = await fs.mount('/mnt/multi');
+await loop();
 ```
 
 ### With Caching
 
 ```typescript
-import { mount, provider, mapping } from '@mount0/core';
-import { LocalProvider } from '@mount0/core';
-import { CacheProvider, CacheStrategy } from '@mount0/core';
+import { mount0, LocalProvider, CacheProvider } from '@mount0/core';
 
 const cachedProvider = new CacheProvider({
-  provider: new LocalProvider('/path/to/data'),
-  strategy: CacheStrategy.LRU,
-  maxSize: 100 * 1024 * 1024, // 100MB
-  ttl: 3600, // 1 hour
+  master: new LocalProvider('/path/to/data'),
+  slave: new MemoryProvider(),
+  strategy: 'write-through',
 });
 
-const fs = await mount({
-  mountpoint: '/mnt/cached',
-  providers: [provider('cached', cachedProvider)],
-  mappings: [mapping('/', 'cached')],
-});
+const fs = mount0();
+fs.handle('/', cachedProvider);
+
+const { unmount, loop } = await fs.mount('/mnt/cached');
+await loop();
+```
+
+### Combining Providers
+
+```typescript
+import { mount0, LocalProvider } from '@mount0/core';
+import { Raid1Provider } from '@mount0/raid';
+import { EncryptedProvider } from '@mount0/encrypted';
+import { FirstProvider } from '@mount0/multi';
+
+const fs = mount0();
+
+// RAID 1 for redundancy
+fs.handle(
+  '/backup',
+  new Raid1Provider({
+    providers: [new LocalProvider('/disk1'), new LocalProvider('/disk2')],
+  })
+);
+
+// Encrypted storage
+fs.handle(
+  '/secure',
+  new EncryptedProvider({
+    provider: new LocalProvider('/secure-data'),
+    password: 'my-secret-password',
+  })
+);
+
+// Failover with encryption
+fs.handle(
+  '/encrypted-failover',
+  new FirstProvider({
+    providers: [
+      new EncryptedProvider({
+        provider: new LocalProvider('/primary'),
+        password: 'pass1',
+      }),
+      new EncryptedProvider({
+        provider: new LocalProvider('/secondary'),
+        password: 'pass2',
+      }),
+    ],
+  })
+);
+
+const { unmount, loop } = await fs.mount('/mnt/combined');
+await loop();
 ```
 
 ### Graceful Shutdown
 
 ```typescript
-const fs = await mount({
-  /* ... */
-});
+const fs = mount0();
+fs.handle('/', new LocalProvider('/data'));
+
+const { unmount, loop } = await fs.mount('/mnt/myfs');
 
 // Handle shutdown signals
 process.on('SIGINT', async () => {
   console.log('Unmounting...');
-  await fs.unmount();
+  await unmount();
   process.exit(0);
 });
 
-await fs.loop();
+await loop();
 ```
 
 ## Architecture

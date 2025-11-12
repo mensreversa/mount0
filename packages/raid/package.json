@@ -1,0 +1,37 @@
+{
+  "name": "@mount0/raid",
+  "version": "0.1.0",
+  "description": "RAID filesystem providers for mount0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint src/**/*.ts",
+    "format": "prettier --write \"src/**/*.{ts,js,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,js,json}\"",
+    "test": "jest"
+  },
+  "keywords": [
+    "raid",
+    "filesystem",
+    "mount0",
+    "striping",
+    "parity"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@mount0/core": "file:../core"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.10.0",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.5",
+    "typescript": "^5.9.3"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "passWithNoTests": true
+  }
+}
