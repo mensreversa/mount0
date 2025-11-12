@@ -12,13 +12,23 @@ export class FileSystem {
     this.sortedPaths = Array.from(handlers.keys()).sort((a, b) => b.length - a.length);
   }
 
+  /**
+   * Normalize path to use forward slashes consistently for cross-platform compatibility.
+   * This ensures Unix-style paths work correctly on Windows.
+   */
+  private normalizePath(filePath: string): string {
+    // Normalize the path first, then replace backslashes with forward slashes
+    // This handles both Windows and Unix paths correctly
+    return path.normalize(filePath).replace(/\\/g, '/');
+  }
+
   private findProvider(
     filePath: string
   ): { provider: FilesystemProvider; mountPath: string } | null {
-    const normalized = path.normalize(filePath);
+    const normalized = this.normalizePath(filePath);
 
     for (const mountPath of this.sortedPaths) {
-      const normalizedMount = path.normalize(mountPath);
+      const normalizedMount = this.normalizePath(mountPath);
       if (normalized === normalizedMount || normalized.startsWith(normalizedMount + '/')) {
         const provider = this.handlers.get(mountPath);
         if (provider) {
@@ -155,12 +165,14 @@ export class FileSystem {
   }
 
   private getRelativePath(filePath: string, mountPath: string): string {
-    const normalized = path.normalize(filePath);
-    const normalizedMount = path.normalize(mountPath);
+    const normalized = this.normalizePath(filePath);
+    const normalizedMount = this.normalizePath(mountPath);
 
     if (normalized === normalizedMount) {
       return '/';
     }
-    return normalized.substring(normalizedMount.length);
+    // Remove the mount path prefix and ensure the result starts with /
+    const relative = normalized.substring(normalizedMount.length);
+    return relative.startsWith('/') ? relative : '/' + relative;
   }
 }
