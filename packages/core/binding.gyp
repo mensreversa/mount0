@@ -3,15 +3,14 @@
     {
       "target_name": "mount0_fuse",
       "sources": [
-        "src/native/fuse_bindings.cc",
-        "src/native/fuse_operations.cc"
+        "src/native/fuse_bindings.c"
       ],
       "include_dirs": [
         "<!(node -e \"console.log(require('path').dirname(process.execPath) + '/../../include/node')\")",
         "src/native"
       ],
       "cflags": [
-        "-std=c++17",
+        "-std=c11",
         "-O3",
         "-Wall"
       ],
@@ -53,8 +52,6 @@
         }]
       ],
       "xcode_settings": {
-        "GCC_ENABLE_CPP_RTTI": "YES",
-        "CLANG_CXX_LIBRARY": "libc++",
         "MACOSX_DEPLOYMENT_TARGET": "12.0"
       }
     }
