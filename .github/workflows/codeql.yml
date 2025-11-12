@@ -45,11 +45,7 @@ jobs:
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
-          build-mode: ${{ matrix.language == 'cpp' && 'manual' || 'autobuild' }}
-
-      - name: Autobuild
-        if: matrix.language == 'javascript'
-        uses: github/codeql-action/autobuild@v3
+          build-mode: ${{ matrix.language == 'cpp' && 'manual' || 'none' }}
 
       - name: Build native module (for C++ analysis)
         if: matrix.language == 'cpp'
