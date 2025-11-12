@@ -51,6 +51,8 @@ int fuse_operations_wrapper::GetIntResult(napi_value result, int default_err) {
     napi_get_value_int32(env_, result, &num);
     return num;
   }
+  // If result is undefined or not a number, return error
+  // This should not happen if JavaScript code is correct
   return default_err;
 }
 

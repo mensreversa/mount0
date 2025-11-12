@@ -7,6 +7,10 @@ import { Raid0Provider, Raid1Provider } from '@mount0/raid';
 
 async function main() {
   const mountpoint = process.argv[2] || '/tmp/mount0-combined';
+  const debug = process.env.MOUNT0_DEBUG === '1';
+  if (debug) {
+    console.log('Debug mode enabled (set MOUNT0_DEBUG=1 to enable)');
+  }
   console.log(`Mounting combined filesystem at ${mountpoint}...`);
 
   const fs = mount0();

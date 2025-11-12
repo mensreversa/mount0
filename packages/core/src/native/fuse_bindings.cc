@@ -56,7 +56,7 @@ napi_value InitFuse(napi_env env, napi_callback_info info) {
     }
   }
 
-  fuse_opt_add_arg(&fargs, mountpoint);
+  // Don't add mountpoint to fargs - it's passed separately to fuse_mount()
   struct fuse* fuse_instance = fuse_new(&fargs, g_ops->get_operations(), 
                                         sizeof(struct fuse_operations), nullptr);
   
