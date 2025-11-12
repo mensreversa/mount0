@@ -17,11 +17,8 @@ async function benchmark() {
   const fsInstance = mount0();
   fsInstance.handle('/', new MemoryProvider());
 
-  const { unmount, loop } = await fsInstance.mount(mountpoint);
+  const { unmount } = await fsInstance.mount(mountpoint);
   console.log(`Mounted at ${mountpoint}\n`);
-
-  // Run loop in background
-  loop().catch(console.error);
 
   // Wait a bit for mount to stabilize
   await new Promise((resolve) => setTimeout(resolve, 1000));

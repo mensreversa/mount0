@@ -78,7 +78,7 @@ async function main() {
     })
   );
 
-  const { unmount, loop } = await fs.mount(mountpoint);
+  const { unmount } = await fs.mount(mountpoint);
   console.log(`Mounted at ${mountpoint}`);
   console.log('\nAvailable paths:');
   console.log('  /                    - Simple local filesystem');
@@ -98,8 +98,8 @@ async function main() {
     process.exit(0);
   });
 
-  // Keep the process alive
-  await loop();
+  // Keep the process alive (mount keeps it running)
+  await new Promise(() => {});
 }
 
 main().catch(console.error);

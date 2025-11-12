@@ -19,7 +19,6 @@ export class Mount0 {
     options?: MountOptions
   ): Promise<{
     unmount: () => Promise<void>;
-    loop: () => Promise<void>;
   }> {
     const fs = new FileSystem(this.handlers);
     const bridge = new FuseBridge(fs);
@@ -29,9 +28,6 @@ export class Mount0 {
     return {
       async unmount() {
         await bridge.unmount();
-      },
-      async loop() {
-        await bridge.loop();
       },
     };
   }

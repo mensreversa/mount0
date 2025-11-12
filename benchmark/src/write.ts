@@ -14,10 +14,7 @@ async function benchmarkWrite() {
   const fsInstance = mount0();
   fsInstance.handle('/', new MemoryProvider());
 
-  const { unmount, loop } = await fsInstance.mount(mountpoint);
-
-  // Run loop in background
-  loop().catch(console.error);
+  const { unmount } = await fsInstance.mount(mountpoint);
 
   await new Promise((resolve) => setTimeout(resolve, 500));
 

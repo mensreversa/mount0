@@ -12,7 +12,7 @@ async function main() {
   const fs = mount0();
   fs.handle('/', new LocalProvider('/tmp'));
 
-  const { unmount, loop } = await fs.mount(mountpoint);
+  const { unmount } = await fs.mount(mountpoint);
   console.log(`Mounted at ${mountpoint}`);
 
   // Handle graceful shutdown
@@ -22,8 +22,8 @@ async function main() {
     process.exit(0);
   });
 
-  // Keep the process alive
-  await loop();
+  // Keep the process alive (mount keeps it running)
+  await new Promise(() => {});
 }
 
 main().catch(console.error);

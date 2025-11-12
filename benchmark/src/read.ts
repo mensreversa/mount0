@@ -14,10 +14,7 @@ async function benchmarkRead() {
   const fsInstance = mount0();
   fsInstance.handle('/', new MemoryProvider());
 
-  const { unmount, loop } = await fsInstance.mount(mountpoint);
-
-  // Run loop in background
-  loop().catch(console.error);
+  const { unmount } = await fsInstance.mount(mountpoint);
 
   // Create test files first
   for (let i = 0; i < 1000; i++) {
