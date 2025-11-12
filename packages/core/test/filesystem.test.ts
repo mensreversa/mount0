@@ -12,11 +12,41 @@ import { FileHandle, FileStat } from '../src/types';
 describe('FileSystem', () => {
   describe('Provider Routing', () => {
     test('should route to correct provider', async () => {
+      const stat1: FileStat = {
+        mode: 0o644,
+        size: 0,
+        mtime: 0,
+        ctime: 0,
+        atime: 0,
+        uid: 0,
+        gid: 0,
+        dev: 0,
+        ino: 1,
+        nlink: 1,
+        rdev: 0,
+        blksize: 0,
+        blocks: 0,
+      };
+      const stat2: FileStat = {
+        mode: 0o644,
+        size: 1,
+        mtime: 0,
+        ctime: 0,
+        atime: 0,
+        uid: 0,
+        gid: 0,
+        dev: 0,
+        ino: 2,
+        nlink: 1,
+        rdev: 0,
+        blksize: 0,
+        blocks: 0,
+      };
       const provider1: FilesystemProvider = {
-        getattr: jest.fn().mockResolvedValue({ mode: 0o644, size: 0 } as FileStat),
+        getattr: jest.fn().mockResolvedValue(stat1),
       } as any;
       const provider2: FilesystemProvider = {
-        getattr: jest.fn().mockResolvedValue({ mode: 0o644, size: 1 } as FileStat),
+        getattr: jest.fn().mockResolvedValue(stat2),
       } as any;
 
       const fs = new FileSystem(
@@ -34,11 +64,26 @@ describe('FileSystem', () => {
     });
 
     test('should prefer longest matching path', async () => {
+      const stat: FileStat = {
+        mode: 0o644,
+        size: 0,
+        mtime: 0,
+        ctime: 0,
+        atime: 0,
+        uid: 0,
+        gid: 0,
+        dev: 0,
+        ino: 1,
+        nlink: 1,
+        rdev: 0,
+        blksize: 0,
+        blocks: 0,
+      };
       const provider1: FilesystemProvider = {
         getattr: jest.fn().mockResolvedValue(null),
       } as any;
       const provider2: FilesystemProvider = {
-        getattr: jest.fn().mockResolvedValue({ mode: 0o644, size: 0 } as FileStat),
+        getattr: jest.fn().mockResolvedValue(stat),
       } as any;
 
       const fs = new FileSystem(
@@ -77,19 +122,28 @@ describe('FileSystem', () => {
     });
 
     test('should create and read files', async () => {
+      const handle: FileHandle = { fd: 1, path: '/test.txt', flags: 0o2 };
       const provider: FilesystemProvider = {
-        create: jest.fn().mockResolvedValue({ fd: 1, path: '/test.txt', flags: 0o2 } as FileHandle),
+        create: jest.fn().mockResolvedValue(handle),
         write: jest.fn().mockResolvedValue(13),
-        read: jest.fn().mockImplementation(async (handle, buffer) => {
+        read: jest.fn().mockImplementation(async (h, buffer) => {
           Buffer.from('Hello, World!').copy(buffer);
           return 13;
         }),
         close: jest.fn().mockResolvedValue(undefined),
+        getattr: jest.fn().mockResolvedValue(null),
+        readdir: jest.fn().mockResolvedValue([]),
+        open: jest.fn().mockResolvedValue(handle),
+        unlink: jest.fn().mockResolvedValue(undefined),
+        mkdir: jest.fn().mockResolvedValue(undefined),
+        rmdir: jest.fn().mockResolvedValue(undefined),
+        rename: jest.fn().mockResolvedValue(undefined),
+        truncate: jest.fn().mockResolvedValue(undefined),
       } as any;
 
       const fs = new FileSystem(new Map([['/data', provider]]));
-      const handle = await fs.create('/data/test.txt', 0o644);
-      const fullHandle = { ...handle, path: '/data/test.txt' };
+      const createdHandle = await fs.create('/data/test.txt', 0o644);
+      const fullHandle = { ...createdHandle, path: '/data/test.txt' };
 
       const writeBuffer = Buffer.from('Hello, World!');
       await fs.write(fullHandle, writeBuffer, 0, writeBuffer.length);
@@ -107,6 +161,15 @@ describe('FileSystem', () => {
         mkdir: jest.fn().mockResolvedValue(undefined),
         readdir: jest.fn().mockResolvedValue([{ name: 'subdir', mode: 0o755, ino: 1 }]),
         rmdir: jest.fn().mockResolvedValue(undefined),
+        getattr: jest.fn().mockResolvedValue(null),
+        open: jest.fn().mockResolvedValue({ fd: 1, path: '/', flags: 0 }),
+        read: jest.fn().mockResolvedValue(0),
+        write: jest.fn().mockResolvedValue(0),
+        create: jest.fn().mockResolvedValue({ fd: 1, path: '/', flags: 0 }),
+        unlink: jest.fn().mockResolvedValue(undefined),
+        rename: jest.fn().mockResolvedValue(undefined),
+        truncate: jest.fn().mockResolvedValue(undefined),
+        close: jest.fn().mockResolvedValue(undefined),
       } as any;
 
       const fs = new FileSystem(new Map([['/data', provider]]));
@@ -121,26 +184,48 @@ describe('FileSystem', () => {
     });
 
     test('should handle file operations', async () => {
+      const stat: FileStat = {
+        mode: 0o644,
+        size: 12,
+        mtime: 0,
+        ctime: 0,
+        atime: 0,
+        uid: 0,
+        gid: 0,
+        dev: 0,
+        ino: 1,
+        nlink: 1,
+        rdev: 0,
+        blksize: 0,
+        blocks: 0,
+      };
+      const handle: FileHandle = { fd: 1, path: '/file.txt', flags: 0o2 };
       const provider: FilesystemProvider = {
-        create: jest.fn().mockResolvedValue({ fd: 1, path: '/file.txt', flags: 0o2 } as FileHandle),
-        getattr: jest.fn().mockResolvedValue({ mode: 0o644, size: 12 } as FileStat),
+        create: jest.fn().mockResolvedValue(handle),
+        getattr: jest.fn().mockResolvedValue(stat),
         unlink: jest.fn().mockResolvedValue(undefined),
         rename: jest.fn().mockResolvedValue(undefined),
         truncate: jest.fn().mockResolvedValue(undefined),
         close: jest.fn().mockResolvedValue(undefined),
+        readdir: jest.fn().mockResolvedValue([]),
+        open: jest.fn().mockResolvedValue(handle),
+        read: jest.fn().mockResolvedValue(0),
+        write: jest.fn().mockResolvedValue(0),
+        mkdir: jest.fn().mockResolvedValue(undefined),
+        rmdir: jest.fn().mockResolvedValue(undefined),
       } as any;
 
       const fs = new FileSystem(new Map([['/data', provider]]));
 
-      const handle = await fs.create('/data/file.txt', 0o644);
-      await fs.close({ ...handle, path: '/data/file.txt' });
+      const createdHandle = await fs.create('/data/file.txt', 0o644);
+      await fs.close({ ...createdHandle, path: '/data/file.txt' });
 
-      const stat = await fs.getattr('/data/file.txt');
+      const resultStat = await fs.getattr('/data/file.txt');
       await fs.rename('/data/file.txt', '/data/new.txt');
       await fs.truncate('/data/new.txt', 4);
       await fs.unlink('/data/new.txt');
 
-      expect(stat?.size).toBe(12);
+      expect(resultStat?.size).toBe(12);
       expect(provider.rename).toHaveBeenCalledWith('/file.txt', '/new.txt');
     });
   });
@@ -154,6 +239,17 @@ describe('FileSystem', () => {
     test('should throw when provider operation fails', async () => {
       const provider: FilesystemProvider = {
         open: jest.fn().mockRejectedValue(new Error('File not found')),
+        getattr: jest.fn().mockResolvedValue(null),
+        readdir: jest.fn().mockResolvedValue([]),
+        read: jest.fn().mockResolvedValue(0),
+        write: jest.fn().mockResolvedValue(0),
+        create: jest.fn().mockResolvedValue({ fd: 1, path: '/', flags: 0 }),
+        unlink: jest.fn().mockResolvedValue(undefined),
+        mkdir: jest.fn().mockResolvedValue(undefined),
+        rmdir: jest.fn().mockResolvedValue(undefined),
+        rename: jest.fn().mockResolvedValue(undefined),
+        truncate: jest.fn().mockResolvedValue(undefined),
+        close: jest.fn().mockResolvedValue(undefined),
       } as any;
 
       const fs = new FileSystem(new Map([['/data', provider]]));
