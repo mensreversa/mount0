@@ -14,7 +14,7 @@ async function benchmarkOperations() {
   const fsInstance = mount0();
   fsInstance.handle('/', new MemoryProvider());
 
-  const { unmount } = await fsInstance.mount(mountpoint);
+  await fsInstance.mount(mountpoint);
 
   await new Promise((resolve) => setTimeout(resolve, 500));
 
@@ -77,7 +77,7 @@ async function benchmarkOperations() {
     `\nTotal: ${((createTime + readTime + readdirTime + renameTime + unlinkTime) / 1000).toFixed(2)}s`
   );
 
-  await unmount();
+  await fsInstance.unmount();
   process.exit(0);
 }
 

@@ -17,8 +17,7 @@ import { MemoryProvider } from '@mount0/memory';
 const fs = mount0();
 fs.handle('/cache', new MemoryProvider());
 
-const { unmount, loop } = await fs.mount('/mnt/myfs');
-await loop();
+await fs.mount('/mnt/myfs');
 ```
 
 ## License

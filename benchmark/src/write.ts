@@ -14,7 +14,7 @@ async function benchmarkWrite() {
   const fsInstance = mount0();
   fsInstance.handle('/', new MemoryProvider());
 
-  const { unmount } = await fsInstance.mount(mountpoint);
+  await fsInstance.mount(mountpoint);
 
   await new Promise((resolve) => setTimeout(resolve, 500));
 
@@ -38,7 +38,7 @@ async function benchmarkWrite() {
   console.log(`Avg Latency: ${(duration / iterations).toFixed(3)}ms`);
   console.log(`Data Written: ${((iterations * 1024) / 1024).toFixed(2)} MB`);
 
-  await unmount();
+  await fsInstance.unmount();
   process.exit(0);
 }
 

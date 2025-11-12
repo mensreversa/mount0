@@ -8,28 +8,25 @@ export interface MountOptions {
 
 export class Mount0 {
   private handlers: Map<string, FilesystemProvider> = new Map();
+  private bridge: FuseBridge | null = null;
 
   handle(path: string, provider: FilesystemProvider): this {
     this.handlers.set(path, provider);
     return this;
   }
 
-  async mount(
-    mountpoint: string,
-    options?: MountOptions
-  ): Promise<{
-    unmount: () => Promise<void>;
-  }> {
+  async mount(mountpoint: string, options?: MountOptions): Promise<void> {
     const fs = new FileSystem(this.handlers);
-    const bridge = new FuseBridge(fs);
+    this.bridge = new FuseBridge(fs);
 
-    await bridge.mount(mountpoint, options?.options || {});
+    await this.bridge.mount(mountpoint, options?.options || {});
+  }
 
-    return {
-      async unmount() {
-        await bridge.unmount();
-      },
-    };
+  async unmount(): Promise<void> {
+    if (this.bridge) {
+      await this.bridge.unmount();
+      this.bridge = null;
+    }
   }
 }
 

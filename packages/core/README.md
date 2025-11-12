@@ -17,8 +17,7 @@ import { LocalProvider } from '@mount0/local';
 const fs = mount0();
 fs.handle('/', new LocalProvider('/path/to/data'));
 
-const { unmount, loop } = await fs.mount('/mnt/myfs');
-await loop();
+await fs.mount('/mnt/myfs');
 ```
 
 ## Requirements

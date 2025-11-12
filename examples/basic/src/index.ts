@@ -12,13 +12,13 @@ async function main() {
   const fs = mount0();
   fs.handle('/', new LocalProvider('/tmp'));
 
-  const { unmount } = await fs.mount(mountpoint);
+  await fs.mount(mountpoint);
   console.log(`Mounted at ${mountpoint}`);
 
   // Handle graceful shutdown
   process.on('SIGINT', async () => {
     console.log('\nUnmounting...');
-    await unmount();
+    await fs.unmount();
     process.exit(0);
   });
 

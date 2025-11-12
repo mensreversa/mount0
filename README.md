@@ -67,17 +67,14 @@ async function main() {
   const fs = mount0();
   fs.handle('/', new LocalProvider('/tmp'));
 
-  const { unmount, loop } = await fs.mount('/tmp/mount0');
+  await fs.mount('/tmp/mount0');
   console.log('Filesystem mounted at /tmp/mount0');
 
   // Handle graceful shutdown
   process.on('SIGINT', async () => {
-    await unmount();
+    await fs.unmount();
     process.exit(0);
   });
-
-  // Keep the process alive
-  await loop();
 }
 
 main().catch(console.error);
@@ -94,9 +91,8 @@ import { LocalProvider } from '@mount0/local';
 const fs = mount0();
 fs.handle('/', new LocalProvider('/path/to/data'));
 
-const { unmount, loop } = await fs.mount('/mnt/myfs');
+await fs.mount('/mnt/myfs');
 // Filesystem is now accessible at /mnt/myfs
-await loop(); // Keep running
 ```
 
 ### Multiple Backends
@@ -110,8 +106,7 @@ const fs = mount0();
 fs.handle('/data', new LocalProvider('/var/data'));
 fs.handle('/cache', new MemoryProvider());
 
-const { unmount, loop } = await fs.mount('/mnt/multi');
-await loop();
+await fs.mount('/mnt/multi');
 ```
 
 ### With Caching
@@ -130,8 +125,7 @@ const cachedProvider = new WriteThroughCacheProvider({
 const fs = mount0();
 fs.handle('/', cachedProvider);
 
-const { unmount, loop } = await fs.mount('/mnt/cached');
-await loop();
+await fs.mount('/mnt/cached');
 ```
 
 Or use write-back caching:
@@ -272,8 +266,7 @@ fs.handle(
   })
 );
 
-const { unmount, loop } = await fs.mount('/mnt/combined');
-await loop();
+await fs.mount('/mnt/combined');
 ```
 
 ### Graceful Shutdown
@@ -285,16 +278,14 @@ import { LocalProvider } from '@mount0/local';
 const fs = mount0();
 fs.handle('/', new LocalProvider('/data'));
 
-const { unmount, loop } = await fs.mount('/mnt/myfs');
+await fs.mount('/mnt/myfs');
 
 // Handle shutdown signals
 process.on('SIGINT', async () => {
   console.log('Unmounting...');
-  await unmount();
+  await fs.unmount();
   process.exit(0);
 });
-
-await loop();
 ```
 
 ## Architecture

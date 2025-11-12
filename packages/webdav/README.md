@@ -24,8 +24,7 @@ fs.handle(
   })
 );
 
-const { unmount, loop } = await fs.mount('/mnt/myfs');
-await loop();
+await fs.mount('/mnt/myfs');
 ```
 
 ## License

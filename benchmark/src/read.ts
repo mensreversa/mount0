@@ -14,7 +14,7 @@ async function benchmarkRead() {
   const fsInstance = mount0();
   fsInstance.handle('/', new MemoryProvider());
 
-  const { unmount } = await fsInstance.mount(mountpoint);
+  await fsInstance.mount(mountpoint);
 
   // Create test files first
   for (let i = 0; i < 1000; i++) {
@@ -45,7 +45,7 @@ async function benchmarkRead() {
   console.log(`Throughput: ${opsPerSec} ops/sec`);
   console.log(`Avg Latency: ${(duration / iterations).toFixed(3)}ms`);
 
-  await unmount();
+  await fsInstance.unmount();
   process.exit(0);
 }
 
