@@ -44,11 +44,14 @@ export class RouterProvider implements FilesystemProvider {
 
   async lookup(parent: number, name: string): Promise<FileStat | null> {
     if (parent === 1) {
-      // For root lookups, find the provider for the root path
-      const provider = this.matchProvider('/');
-      if (!provider) return null; // No provider found, file doesn't exist
-      // Call lookup on the provider with parent=1 (root) and the name
-      const stat = await provider.lookup(1, name);
+      // For root lookups, match provider for the path /${name}
+      const path = `/${name}`;
+      const provider = this.matchProvider(path);
+      if (!provider) {
+        throw new Error('No provider found');
+      }
+      // Call getattr(1) on the matched provider
+      const stat = await provider.getattr(1);
       if (stat) {
         this.inoToProvider.set(stat.ino, provider);
       }

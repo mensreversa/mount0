@@ -24,7 +24,7 @@ export class FuseBridge {
         let errno: number;
         if (err.errno !== undefined && err.errno !== null) {
           // err.errno might be positive (like 5 for EIO) or negative, convert to positive
-          errno = err.errno < 0 ? -err.errno : (err.errno > 0 ? err.errno : 5);
+          errno = err.errno < 0 ? -err.errno : err.errno > 0 ? err.errno : 5;
         } else if (err.code === 'ENOENT') {
           errno = 2; // ENOENT
         } else if (err.code === 'ENODATA' || err.code === 'ENOATTR') {
@@ -33,7 +33,10 @@ export class FuseBridge {
           errno = 5; // EIO
         } else if (err.code === 'ENOSYS') {
           errno = 38; // ENOSYS (Function not implemented)
-        } else if (err.message && (err.message.includes('not supported') || err.message.includes('not implemented'))) {
+        } else if (
+          err.message &&
+          (err.message.includes('not supported') || err.message.includes('not implemented'))
+        ) {
           errno = 38; // ENOSYS for unsupported operations
         } else {
           errno = 5; // Default to EIO
@@ -41,7 +44,9 @@ export class FuseBridge {
         if (process.env.MOUNT0_DEBUG === '1') {
           const op = params?.op || 'unknown';
           const errMsg = err?.message || (typeof err === 'string' ? err : JSON.stringify(err));
-          console.error(`[FUSE:error] op=${op}, err=${errMsg}, errno=${err.errno}, code=${err.code}, final_errno=${errno}`);
+          console.error(
+            `[FUSE:error] op=${op}, err=${errMsg}, errno=${err.errno}, code=${err.code}, final_errno=${errno}`
+          );
         }
         mount0_fuse.reply_err(reqPtr, errno);
       }
@@ -64,7 +69,7 @@ export class FuseBridge {
       throw new Error('params is undefined');
     }
     const op = params.op;
-    
+
     // For init and destroy, there's no request to reply to
     if (op === 'init' || op === 'destroy') {
       if (op === 'init' && this.provider.init) {
