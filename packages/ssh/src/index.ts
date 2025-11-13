@@ -1,4 +1,4 @@
-import { DirEntry, FileHandle, FileStat, FilesystemProvider } from '@mount0/core';
+import { DirEntry, FileStat, FilesystemProvider, Flock, Statfs } from '@mount0/core';
 
 export interface SshConfig {
   host: string;
@@ -18,61 +18,202 @@ export class SshProvider implements FilesystemProvider {
     };
   }
 
-  async getattr(_path: string): Promise<FileStat | null> {
+  async lookup(_parent: number, _name: string): Promise<FileStat | null> {
     throw new Error('SshProvider not implemented');
   }
 
-  async readdir(_path: string): Promise<DirEntry[]> {
+  async getattr(_ino: number): Promise<FileStat | null> {
     throw new Error('SshProvider not implemented');
   }
 
-  async open(_path: string, _flags: number, _mode?: number): Promise<FileHandle> {
+  async setattr(_ino: number, _to_set: number, _attr: FileStat): Promise<void> {
+    throw new Error('SshProvider not implemented');
+  }
+
+  async readdir(_ino: number, _size: number, _off: number): Promise<DirEntry[]> {
+    throw new Error('SshProvider not implemented');
+  }
+
+  async opendir(_ino: number, _flags: number): Promise<number> {
+    throw new Error('SshProvider not implemented');
+  }
+
+  async releasedir(_ino: number, _fh: number): Promise<void> {
+    throw new Error('SshProvider not implemented');
+  }
+
+  async fsyncdir(_ino: number, _fh: number, _datasync: number): Promise<void> {
+    throw new Error('SshProvider not implemented');
+  }
+
+  async open(_ino: number, _flags: number, _mode?: number): Promise<number> {
     throw new Error('SshProvider not implemented');
   }
 
   async read(
-    _handle: FileHandle,
+    _ino: number,
+    _fh: number,
     _buffer: Buffer,
-    _offset: number,
+    _off: number,
     _length: number
   ): Promise<number> {
     throw new Error('SshProvider not implemented');
   }
 
   async write(
-    _handle: FileHandle,
+    _ino: number,
+    _fh: number,
     _buffer: Buffer,
-    _offset: number,
+    _off: number,
     _length: number
   ): Promise<number> {
     throw new Error('SshProvider not implemented');
   }
 
-  async create(_path: string, _mode: number): Promise<FileHandle> {
+  async flush(_ino: number, _fh: number): Promise<void> {
     throw new Error('SshProvider not implemented');
   }
 
-  async unlink(_path: string): Promise<void> {
+  async fsync(_ino: number, _fh: number, _datasync: number): Promise<void> {
     throw new Error('SshProvider not implemented');
   }
 
-  async mkdir(_path: string, _mode: number): Promise<void> {
+  async release(_ino: number, _fh: number): Promise<void> {
     throw new Error('SshProvider not implemented');
   }
 
-  async rmdir(_path: string): Promise<void> {
+  async create(_parent: number, _name: string, _mode: number, _flags: number): Promise<FileStat> {
     throw new Error('SshProvider not implemented');
   }
 
-  async rename(_oldpath: string, _newpath: string): Promise<void> {
+  async mknod(_parent: number, _name: string, _mode: number, _rdev: number): Promise<FileStat> {
     throw new Error('SshProvider not implemented');
   }
 
-  async truncate(_path: string, _length: number): Promise<void> {
+  async mkdir(_parent: number, _name: string, _mode: number): Promise<FileStat> {
     throw new Error('SshProvider not implemented');
   }
 
-  async close(_handle: FileHandle): Promise<void> {
+  async unlink(_parent: number, _name: string): Promise<void> {
+    throw new Error('SshProvider not implemented');
+  }
+
+  async rmdir(_parent: number, _name: string): Promise<void> {
+    throw new Error('SshProvider not implemented');
+  }
+
+  async link(_ino: number, _newparent: number, _newname: string): Promise<FileStat> {
+    throw new Error('SshProvider not implemented');
+  }
+
+  async symlink(_link: string, _parent: number, _name: string): Promise<FileStat> {
+    throw new Error('SshProvider not implemented');
+  }
+
+  async readlink(_ino: number): Promise<string> {
+    throw new Error('SshProvider not implemented');
+  }
+
+  async rename(
+    _parent: number,
+    _name: string,
+    _newparent: number,
+    _newname: string,
+    _flags: number
+  ): Promise<void> {
+    throw new Error('SshProvider not implemented');
+  }
+
+  async setxattr(
+    _ino: number,
+    _name: string,
+    _value: Buffer,
+    _size: number,
+    _flags: number
+  ): Promise<void> {
+    throw new Error('SshProvider not implemented');
+  }
+
+  async getxattr(_ino: number, _name: string, _size: number): Promise<Buffer | number> {
+    throw new Error('SshProvider not implemented');
+  }
+
+  async listxattr(_ino: number, _size: number): Promise<Buffer | number> {
+    throw new Error('SshProvider not implemented');
+  }
+
+  async removexattr(_ino: number, _name: string): Promise<void> {
+    throw new Error('SshProvider not implemented');
+  }
+
+  async access(_ino: number, _mask: number): Promise<void> {
+    throw new Error('SshProvider not implemented');
+  }
+
+  async statfs(_ino: number): Promise<Statfs> {
+    throw new Error('SshProvider not implemented');
+  }
+
+  async getlk(_ino: number, _fh: number): Promise<Flock> {
+    throw new Error('SshProvider not implemented');
+  }
+
+  async setlk(_ino: number, _fh: number, _sleep: number): Promise<void> {
+    throw new Error('SshProvider not implemented');
+  }
+
+  async flock(_ino: number, _fh: number, _op: number): Promise<void> {
+    throw new Error('SshProvider not implemented');
+  }
+
+  async bmap(_ino: number, _blocksize: number, _idx: number): Promise<number> {
+    throw new Error('SshProvider not implemented');
+  }
+
+  async ioctl(
+    _ino: number,
+    _cmd: number,
+    _in_buf: Buffer | null,
+    _in_bufsz: number,
+    _out_bufsz: number
+  ): Promise<{ result: number; out_buf?: Buffer }> {
+    throw new Error('SshProvider not implemented');
+  }
+
+  async poll(_ino: number, _fh: number): Promise<number> {
+    throw new Error('SshProvider not implemented');
+  }
+
+  async fallocate(
+    _ino: number,
+    _fh: number,
+    _off: number,
+    _to_set: number,
+    _mode: number
+  ): Promise<void> {
+    throw new Error('SshProvider not implemented');
+  }
+
+  async readdirplus(_ino: number, _size: number, _off: number): Promise<DirEntry[]> {
+    throw new Error('SshProvider not implemented');
+  }
+
+  async copy_file_range(
+    _ino_in: number,
+    _off_in: number,
+    _ino_out: number,
+    _off_out: number,
+    _len: number,
+    _flags: number
+  ): Promise<number> {
+    throw new Error('SshProvider not implemented');
+  }
+
+  async lseek(_ino: number, _fh: number, _off: number, _whence: number): Promise<number> {
+    throw new Error('SshProvider not implemented');
+  }
+
+  async tmpfile(_parent: number, _mode: number, _flags: number): Promise<FileStat> {
     throw new Error('SshProvider not implemented');
   }
 }

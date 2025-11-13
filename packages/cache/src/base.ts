@@ -1,4 +1,4 @@
-import { DirEntry, FileHandle, FileStat, FilesystemProvider } from '@mount0/core';
+import { DirEntry, FileStat, FilesystemProvider, Flock, Statfs } from '@mount0/core';
 
 export interface BaseCacheConfig {
   master: FilesystemProvider;
@@ -8,105 +8,469 @@ export interface BaseCacheConfig {
 export abstract class BaseCacheProvider implements FilesystemProvider {
   protected master: FilesystemProvider;
   protected slave: FilesystemProvider;
+  private inoToMasterIno: Map<number, number> = new Map();
+  private inoToSlaveIno: Map<number, number> = new Map();
+  private masterInoToIno: Map<number, number> = new Map();
+  private slaveInoToIno: Map<number, number> = new Map();
+  private nextIno: number = 2;
 
   constructor(config: BaseCacheConfig) {
     this.master = config.master;
     this.slave = config.slave;
   }
 
-  async getattr(path: string): Promise<FileStat | null> {
-    const stat = await this.slave.getattr(path);
-    return stat || this.master.getattr(path);
+  protected getMasterIno(ino: number): number {
+    return this.inoToMasterIno.get(ino) || ino;
   }
 
-  async readdir(path: string): Promise<DirEntry[]> {
-    const entries = await this.slave.readdir(path);
-    return entries.length > 0 ? entries : this.master.readdir(path);
+  protected getSlaveIno(ino: number): number {
+    return this.inoToSlaveIno.get(ino) || ino;
   }
 
-  async open(path: string, flags: number, mode?: number): Promise<FileHandle> {
-    // Open from slave (cache) if available, otherwise from master
-    try {
-      return await this.slave.open(path, flags, mode);
-    } catch {
-      return await this.master.open(path, flags, mode);
+  private setInoMapping(ino: number, masterIno: number, slaveIno?: number): void {
+    this.inoToMasterIno.set(ino, masterIno);
+    this.masterInoToIno.set(masterIno, ino);
+    if (slaveIno !== undefined) {
+      this.inoToSlaveIno.set(ino, slaveIno);
+      this.slaveInoToIno.set(slaveIno, ino);
     }
   }
 
-  async read(handle: FileHandle, buffer: Buffer, offset: number, length: number): Promise<number> {
-    // Read from slave (cache) if available, otherwise from master
-    try {
-      return await this.slave.read(handle, buffer, offset, length);
-    } catch {
-      return await this.master.read(handle, buffer, offset, length);
+  async lookup(parent: number, name: string): Promise<FileStat | null> {
+    const masterParent = this.getMasterIno(parent);
+    const slaveParent = this.getSlaveIno(parent);
+    const slaveStat = await this.slave.lookup(slaveParent, name);
+    if (slaveStat) {
+      const ino = this.nextIno++;
+      const masterStat = await this.master.lookup(masterParent, name);
+      this.setInoMapping(ino, masterStat?.ino || slaveStat.ino, slaveStat.ino);
+      return { ...slaveStat, ino };
     }
+    const masterStat = await this.master.lookup(masterParent, name);
+    if (masterStat) {
+      const ino = this.nextIno++;
+      this.setInoMapping(ino, masterStat.ino);
+      return { ...masterStat, ino };
+    }
+    return null;
   }
 
-  async create(path: string, mode: number): Promise<FileHandle> {
-    const handle = await this.master.create(path, mode);
-    // Also create in slave if possible
-    try {
-      await this.slave.create(path, mode);
-    } catch {
-      // Ignore slave errors
+  async getattr(ino: number): Promise<FileStat | null> {
+    if (ino === 1) {
+      const stat = await this.slave.getattr(1);
+      return stat || this.master.getattr(1);
     }
-    return handle;
+    const slaveIno = this.getSlaveIno(ino);
+    const stat = await this.slave.getattr(slaveIno);
+    if (stat) {
+      this.setInoMapping(ino, this.getMasterIno(ino), stat.ino);
+      return { ...stat, ino };
+    }
+    const masterIno = this.getMasterIno(ino);
+    const masterStat = await this.master.getattr(masterIno);
+    if (masterStat) {
+      this.setInoMapping(ino, masterStat.ino);
+      return { ...masterStat, ino };
+    }
+    return null;
   }
 
-  async unlink(path: string): Promise<void> {
-    await this.master.unlink(path);
+  async setattr(ino: number, to_set: number, attr: FileStat): Promise<void> {
+    const masterIno = this.getMasterIno(ino);
+    await this.master.setattr(masterIno, to_set, attr);
+    const slaveIno = this.getSlaveIno(ino);
     try {
-      await this.slave.unlink(path);
-    } catch {
-      // Ignore slave errors
-    }
-  }
-
-  async mkdir(path: string, mode: number): Promise<void> {
-    await this.master.mkdir(path, mode);
-    try {
-      await this.slave.mkdir(path, mode);
-    } catch {
-      // Ignore slave errors
-    }
-  }
-
-  async rmdir(path: string): Promise<void> {
-    await this.master.rmdir(path);
-    try {
-      await this.slave.rmdir(path);
-    } catch {
-      // Ignore slave errors
-    }
-  }
-
-  async rename(oldpath: string, newpath: string): Promise<void> {
-    await this.master.rename(oldpath, newpath);
-    try {
-      await this.slave.rename(oldpath, newpath);
+      await this.slave.setattr(slaveIno, to_set, attr);
     } catch {
       // Ignore slave errors
     }
   }
 
-  async truncate(path: string, length: number): Promise<void> {
-    await this.master.truncate(path, length);
+  async readdir(ino: number, size: number, offset: number): Promise<DirEntry[]> {
+    const slaveIno = this.getSlaveIno(ino);
+    const entries = await this.slave.readdir(slaveIno, size, offset);
+    if (entries.length > 0) {
+      return entries.map((entry) => {
+        const ino = this.nextIno++;
+        this.setInoMapping(ino, entry.ino, entry.ino);
+        return { ...entry, ino };
+      });
+    }
+    const masterIno = this.getMasterIno(ino);
+    const masterEntries = await this.master.readdir(masterIno, size, offset);
+    return masterEntries.map((entry) => {
+      const ino = this.nextIno++;
+      this.setInoMapping(ino, entry.ino);
+      return { ...entry, ino };
+    });
+  }
+
+  async opendir(ino: number, flags: number): Promise<number> {
+    const slaveIno = this.getSlaveIno(ino);
     try {
-      await this.slave.truncate(path, length);
+      return await this.slave.opendir(slaveIno, flags);
+    } catch {
+      const masterIno = this.getMasterIno(ino);
+      return await this.master.opendir(masterIno, flags);
+    }
+  }
+
+  async releasedir(ino: number, fh: number): Promise<void> {
+    const slaveIno = this.getSlaveIno(ino);
+    try {
+      await this.slave.releasedir(slaveIno, fh);
+    } catch {
+      // Ignore
+    }
+    const masterIno = this.getMasterIno(ino);
+    try {
+      await this.master.releasedir(masterIno, fh);
+    } catch {
+      // Ignore
+    }
+  }
+
+  async fsyncdir(ino: number, fh: number, datasync: number): Promise<void> {
+    const masterIno = this.getMasterIno(ino);
+    await this.master.fsyncdir(masterIno, fh, datasync);
+    const slaveIno = this.getSlaveIno(ino);
+    try {
+      await this.slave.fsyncdir(slaveIno, fh, datasync);
+    } catch {
+      // Ignore
+    }
+  }
+
+  async open(ino: number, flags: number, mode?: number): Promise<number> {
+    const slaveIno = this.getSlaveIno(ino);
+    try {
+      return await this.slave.open(slaveIno, flags, mode);
+    } catch {
+      const masterIno = this.getMasterIno(ino);
+      return await this.master.open(masterIno, flags, mode);
+    }
+  }
+
+  async read(
+    ino: number,
+    fh: number,
+    buffer: Buffer,
+    offset: number,
+    length: number
+  ): Promise<number> {
+    const slaveIno = this.getSlaveIno(ino);
+    try {
+      return await this.slave.read(slaveIno, fh, buffer, offset, length);
+    } catch {
+      const masterIno = this.getMasterIno(ino);
+      return await this.master.read(masterIno, fh, buffer, offset, length);
+    }
+  }
+
+  async create(parent: number, name: string, mode: number, flags: number): Promise<FileStat> {
+    const masterParent = this.getMasterIno(parent);
+    const stat = await this.master.create(masterParent, name, mode, flags);
+    const ino = this.nextIno++;
+    this.setInoMapping(ino, stat.ino);
+    try {
+      const slaveParent = this.getSlaveIno(parent);
+      const slaveStat = await this.slave.create(slaveParent, name, mode, flags);
+      this.setInoMapping(ino, stat.ino, slaveStat.ino);
+    } catch {
+      // Ignore slave errors
+    }
+    return { ...stat, ino };
+  }
+
+  async mknod(parent: number, name: string, mode: number, rdev: number): Promise<FileStat> {
+    const masterParent = this.getMasterIno(parent);
+    const stat = await this.master.mknod(masterParent, name, mode, rdev);
+    const ino = this.nextIno++;
+    this.setInoMapping(ino, stat.ino);
+    try {
+      const slaveParent = this.getSlaveIno(parent);
+      await this.slave.mknod(slaveParent, name, mode, rdev);
+    } catch {
+      // Ignore slave errors
+    }
+    return { ...stat, ino };
+  }
+
+  async mkdir(parent: number, name: string, mode: number): Promise<FileStat> {
+    const masterParent = this.getMasterIno(parent);
+    const stat = await this.master.mkdir(masterParent, name, mode);
+    const ino = this.nextIno++;
+    this.setInoMapping(ino, stat.ino);
+    try {
+      const slaveParent = this.getSlaveIno(parent);
+      await this.slave.mkdir(slaveParent, name, mode);
+    } catch {
+      // Ignore slave errors
+    }
+    return { ...stat, ino };
+  }
+
+  async unlink(parent: number, name: string): Promise<void> {
+    const masterParent = this.getMasterIno(parent);
+    await this.master.unlink(masterParent, name);
+    try {
+      const slaveParent = this.getSlaveIno(parent);
+      await this.slave.unlink(slaveParent, name);
     } catch {
       // Ignore slave errors
     }
   }
 
-  async close(handle: FileHandle): Promise<void> {
-    await Promise.all([
-      this.master.close(handle).catch(() => {}),
-      this.slave.close(handle).catch(() => {}),
-    ]);
+  async rmdir(parent: number, name: string): Promise<void> {
+    const masterParent = this.getMasterIno(parent);
+    await this.master.rmdir(masterParent, name);
+    try {
+      const slaveParent = this.getSlaveIno(parent);
+      await this.slave.rmdir(slaveParent, name);
+    } catch {
+      // Ignore slave errors
+    }
+  }
+
+  async rename(
+    parent: number,
+    name: string,
+    newparent: number,
+    newname: string,
+    flags: number
+  ): Promise<void> {
+    const masterParent = this.getMasterIno(parent);
+    const masterNewParent = this.getMasterIno(newparent);
+    await this.master.rename(masterParent, name, masterNewParent, newname, flags);
+    try {
+      const slaveParent = this.getSlaveIno(parent);
+      const slaveNewParent = this.getSlaveIno(newparent);
+      await this.slave.rename(slaveParent, name, slaveNewParent, newname, flags);
+    } catch {
+      // Ignore slave errors
+    }
+  }
+
+  async link(ino: number, newparent: number, newname: string): Promise<FileStat> {
+    const masterIno = this.getMasterIno(ino);
+    const masterNewParent = this.getMasterIno(newparent);
+    const stat = await this.master.link(masterIno, masterNewParent, newname);
+    const newIno = this.nextIno++;
+    this.setInoMapping(newIno, stat.ino);
+    return { ...stat, ino: newIno };
+  }
+
+  async symlink(link: string, parent: number, name: string): Promise<FileStat> {
+    const masterParent = this.getMasterIno(parent);
+    const stat = await this.master.symlink(link, masterParent, name);
+    const ino = this.nextIno++;
+    this.setInoMapping(ino, stat.ino);
+    try {
+      const slaveParent = this.getSlaveIno(parent);
+      await this.slave.symlink(link, slaveParent, name);
+    } catch {
+      // Ignore slave errors
+    }
+    return { ...stat, ino };
+  }
+
+  async readlink(ino: number): Promise<string> {
+    const slaveIno = this.getSlaveIno(ino);
+    try {
+      return await this.slave.readlink(slaveIno);
+    } catch {
+      const masterIno = this.getMasterIno(ino);
+      return await this.master.readlink(masterIno);
+    }
+  }
+
+  async setxattr(
+    ino: number,
+    name: string,
+    value: Buffer,
+    size: number,
+    flags: number
+  ): Promise<void> {
+    const masterIno = this.getMasterIno(ino);
+    await this.master.setxattr(masterIno, name, value, size, flags);
+    const slaveIno = this.getSlaveIno(ino);
+    try {
+      await this.slave.setxattr(slaveIno, name, value, size, flags);
+    } catch {
+      // Ignore
+    }
+  }
+
+  async getxattr(ino: number, name: string, size: number): Promise<Buffer | number> {
+    const slaveIno = this.getSlaveIno(ino);
+    try {
+      return await this.slave.getxattr(slaveIno, name, size);
+    } catch {
+      const masterIno = this.getMasterIno(ino);
+      return await this.master.getxattr(masterIno, name, size);
+    }
+  }
+
+  async listxattr(ino: number, size: number): Promise<Buffer | number> {
+    const slaveIno = this.getSlaveIno(ino);
+    try {
+      return await this.slave.listxattr(slaveIno, size);
+    } catch {
+      const masterIno = this.getMasterIno(ino);
+      return await this.master.listxattr(masterIno, size);
+    }
+  }
+
+  async removexattr(ino: number, name: string): Promise<void> {
+    const masterIno = this.getMasterIno(ino);
+    await this.master.removexattr(masterIno, name);
+    const slaveIno = this.getSlaveIno(ino);
+    try {
+      await this.slave.removexattr(slaveIno, name);
+    } catch {
+      // Ignore
+    }
+  }
+
+  async access(ino: number, mask: number): Promise<void> {
+    const slaveIno = this.getSlaveIno(ino);
+    try {
+      await this.slave.access(slaveIno, mask);
+      return;
+    } catch {
+      const masterIno = this.getMasterIno(ino);
+      await this.master.access(masterIno, mask);
+    }
+  }
+
+  async statfs(ino: number): Promise<Statfs> {
+    const masterIno = this.getMasterIno(ino);
+    return this.master.statfs(masterIno);
+  }
+
+  async getlk(ino: number, fh: number): Promise<Flock> {
+    const masterIno = this.getMasterIno(ino);
+    return this.master.getlk(masterIno, fh);
+  }
+
+  async setlk(ino: number, fh: number, sleep: number): Promise<void> {
+    const masterIno = this.getMasterIno(ino);
+    return this.master.setlk(masterIno, fh, sleep);
+  }
+
+  async flock(ino: number, fh: number, op: number): Promise<void> {
+    const masterIno = this.getMasterIno(ino);
+    return this.master.flock(masterIno, fh, op);
+  }
+
+  async bmap(ino: number, blocksize: number, idx: number): Promise<number> {
+    const masterIno = this.getMasterIno(ino);
+    return this.master.bmap(masterIno, blocksize, idx);
+  }
+
+  async ioctl(
+    ino: number,
+    cmd: number,
+    in_buf: Buffer | null,
+    in_bufsz: number,
+    out_bufsz: number
+  ): Promise<{ result: number; out_buf?: Buffer }> {
+    const masterIno = this.getMasterIno(ino);
+    return this.master.ioctl(masterIno, cmd, in_buf, in_bufsz, out_bufsz);
+  }
+
+  async poll(ino: number, fh: number): Promise<number> {
+    const masterIno = this.getMasterIno(ino);
+    return this.master.poll(masterIno, fh);
+  }
+
+  async fallocate(
+    ino: number,
+    fh: number,
+    offset: number,
+    length: number,
+    mode: number
+  ): Promise<void> {
+    const masterIno = this.getMasterIno(ino);
+    await this.master.fallocate(masterIno, fh, offset, length, mode);
+    const slaveIno = this.getSlaveIno(ino);
+    try {
+      await this.slave.fallocate(slaveIno, fh, offset, length, mode);
+    } catch {
+      // Ignore
+    }
+  }
+
+  async readdirplus(ino: number, size: number, offset: number): Promise<DirEntry[]> {
+    return this.readdir(ino, size, offset);
+  }
+
+  async copy_file_range(
+    ino_in: number,
+    off_in: number,
+    ino_out: number,
+    off_out: number,
+    len: number,
+    flags: number
+  ): Promise<number> {
+    const masterInoIn = this.getMasterIno(ino_in);
+    const masterInoOut = this.getMasterIno(ino_out);
+    return this.master.copy_file_range(masterInoIn, off_in, masterInoOut, off_out, len, flags);
+  }
+
+  async lseek(ino: number, fh: number, off: number, whence: number): Promise<number> {
+    const masterIno = this.getMasterIno(ino);
+    return this.master.lseek(masterIno, fh, off, whence);
+  }
+
+  async tmpfile(parent: number, mode: number, flags: number): Promise<FileStat> {
+    const masterParent = this.getMasterIno(parent);
+    const stat = await this.master.tmpfile(masterParent, mode, flags);
+    const ino = this.nextIno++;
+    this.setInoMapping(ino, stat.ino);
+    return { ...stat, ino };
+  }
+
+  async flush(ino: number, fh: number): Promise<void> {
+    const masterIno = this.getMasterIno(ino);
+    await this.master.flush(masterIno, fh);
+    const slaveIno = this.getSlaveIno(ino);
+    try {
+      await this.slave.flush(slaveIno, fh);
+    } catch {
+      // Ignore
+    }
+  }
+
+  async fsync(ino: number, fh: number, datasync: number): Promise<void> {
+    const masterIno = this.getMasterIno(ino);
+    await this.master.fsync(masterIno, fh, datasync);
+    const slaveIno = this.getSlaveIno(ino);
+    try {
+      await this.slave.fsync(slaveIno, fh, datasync);
+    } catch {
+      // Ignore
+    }
+  }
+
+  async release(ino: number, fh: number): Promise<void> {
+    const masterIno = this.getMasterIno(ino);
+    try {
+      await this.master.release(masterIno, fh);
+    } catch {
+      // Ignore
+    }
+    const slaveIno = this.getSlaveIno(ino);
+    try {
+      await this.slave.release(slaveIno, fh);
+    } catch {
+      // Ignore
+    }
   }
 
   abstract write(
-    handle: FileHandle,
+    ino: number,
+    fh: number,
     buffer: Buffer,
     offset: number,
     length: number

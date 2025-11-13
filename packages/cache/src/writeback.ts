@@ -1,4 +1,3 @@
-import { FileHandle } from '@mount0/core';
 import { BaseCacheConfig, BaseCacheProvider } from './base';
 
 export type WriteBackCacheConfig = BaseCacheConfig;
@@ -8,10 +7,17 @@ export class WriteBackCacheProvider extends BaseCacheProvider {
     super(config);
   }
 
-  async write(handle: FileHandle, buffer: Buffer, offset: number, length: number): Promise<number> {
-    // Write-back: write to slave first, then asynchronously to master
-    await this.slave.write(handle, buffer, offset, length);
-    this.master.write(handle, buffer, offset, length).catch(() => {});
+  async write(
+    ino: number,
+    fh: number,
+    buffer: Buffer,
+    offset: number,
+    length: number
+  ): Promise<number> {
+    const slaveIno = this.getSlaveIno(ino);
+    await this.slave.write(slaveIno, fh, buffer, offset, length);
+    const masterIno = this.getMasterIno(ino);
+    this.master.write(masterIno, fh, buffer, offset, length).catch(() => {});
     return length;
   }
 }
