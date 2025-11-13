@@ -56,3 +56,5 @@ Thumbs.db
 # package-lock.json
 # yarn.lock
 # pnpm-lock.yaml
+
+packages/core/fuse_lowlevel.h
