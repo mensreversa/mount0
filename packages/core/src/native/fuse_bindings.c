@@ -435,20 +435,22 @@ static void call_js(napi_env env, napi_value js_cb, void *context, void *data) {
     napi_set_named_property(env, params, "size", val);
   }
   
-  // For init and destroy, req_ptr is NULL, so we need to handle that
+  // Always pass both req_ptr and params to maintain consistent handler signature
+  // For init and destroy, req_ptr will be 0 (no request)
   if (d->req == NULL) {
-    napi_value argv[] = {params};
-    napi_call_function(env, js_cb, js_cb, 1, argv, NULL);
-  } else {
-    napi_value argv[] = {req_ptr, params};
-    napi_call_function(env, js_cb, js_cb, 2, argv, NULL);
+    napi_create_double(env, 0.0, &req_ptr);
   }
+  napi_value argv[] = {req_ptr, params};
+  napi_call_function(env, js_cb, js_cb, 2, argv, NULL);
   free(d);
 }
 
 static void send_to_js(fuse_req_t req, struct req_data *d) {
   if (napi_call_threadsafe_function(tsfn, d, napi_tsfn_nonblocking) != napi_ok) {
     free(d);
+    if (is_debug_enabled()) {
+      fprintf(stderr, "[FUSE:send_to_js] Error calling threadsafe function, replying with EIO\n");
+    }
     fuse_reply_err(req, EIO);
   }
 }
@@ -1295,7 +1297,19 @@ static napi_value fuse_napi_reply_err(napi_env env, napi_callback_info info) {
   
   double errno_double;
   napi_get_value_double(env, args[1], &errno_double);
-  fuse_reply_err(req, (int)errno_double);
+  int errno_val = (int)errno_double;
+  
+  // Based on FUSE reference implementations, fuse_reply_err expects positive errno values
+  // (like the C errno variable), not negative. The function internally handles the negation.
+  // If we receive a negative value, convert it to positive.
+  int final_errno = errno_val == 0 ? 0 : (errno_val < 0 ? -errno_val : errno_val);
+  
+  // Debug logging for all error replies
+  if (is_debug_enabled()) {
+    fprintf(stderr, "[FUSE:reply_err] Calling fuse_reply_err with errno=%d (original=%d)\n", final_errno, errno_val);
+  }
+  
+  fuse_reply_err(req, final_errno);
   return NULL;
 }
 
@@ -1681,7 +1695,12 @@ static napi_value fuse_napi_reply_int(napi_env env, napi_callback_info info) {
   
   int64_t val;
   napi_get_value_int64(env, args[1], &val);
-  fuse_reply_err(req, val == 0 ? 0 : (int)-val);
+  // Based on FUSE reference implementations, fuse_reply_err expects positive errno values
+  // If val is 0, return 0 (success)
+  // If val is negative, convert to positive (errno convention)
+  // If val is already positive, keep it as is
+  int final_errno = val == 0 ? 0 : (val < 0 ? (int)-val : (int)val);
+  fuse_reply_err(req, final_errno);
   return NULL;
 }
 
@@ -1752,7 +1771,7 @@ static napi_value Init(napi_env env, napi_value exports) {
     {"reply_tmpfile", NULL, fuse_napi_reply_create, NULL, NULL, NULL, napi_default, NULL},
     {"unmount", NULL, fuse_napi_unmount, NULL, NULL, NULL, napi_default, NULL}
   };
-  napi_define_properties(env, exports, 43, desc);
+  napi_define_properties(env, exports, 44, desc);
   return exports;
 }
 

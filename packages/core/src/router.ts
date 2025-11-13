@@ -28,18 +28,30 @@ export class RouterProvider implements FilesystemProvider {
     return provider;
   }
 
-  private matchProvider(path: string): FilesystemProvider {
+  private matchProvider(path: string): FilesystemProvider | null {
     const matched = this.providers
-      .filter((rp) => path === rp.path || path.startsWith(rp.path + '/'))
+      .filter((rp) => {
+        if (rp.path === '/') {
+          // Root provider matches everything
+          return true;
+        }
+        return path === rp.path || path.startsWith(rp.path + '/');
+      })
       .sort((a, b) => b.path.length - a.path.length)[0];
-    if (!matched) throw new Error(`No provider found for path ${path}`);
+    if (!matched) return null;
     return matched.provider;
   }
 
   async lookup(parent: number, name: string): Promise<FileStat | null> {
     if (parent === 1) {
-      const stat = await this.matchProvider(`/${name}`).getattr(1);
-      if (stat) this.inoToProvider.set(stat.ino, this.matchProvider(`/${name}`));
+      // For root lookups, find the provider for the root path
+      const provider = this.matchProvider('/');
+      if (!provider) return null; // No provider found, file doesn't exist
+      // Call lookup on the provider with parent=1 (root) and the name
+      const stat = await provider.lookup(1, name);
+      if (stat) {
+        this.inoToProvider.set(stat.ino, provider);
+      }
       return stat;
     }
     const stat = await this.getProvider(parent).lookup(parent, name);
@@ -192,6 +204,16 @@ export class RouterProvider implements FilesystemProvider {
   }
 
   async readlink(ino: number): Promise<string> {
+    // For root inode, use the first provider
+    if (ino === 1) {
+      if (this.providers.length > 0) {
+        const provider = this.providers[0].provider;
+        if (provider.readlink) {
+          return provider.readlink(1);
+        }
+      }
+      throw new Error('Readlink not supported for root');
+    }
     return this.getProvider(ino).readlink(ino);
   }
 
@@ -211,26 +233,94 @@ export class RouterProvider implements FilesystemProvider {
     size: number,
     flags: number
   ): Promise<void> {
+    // For root inode, use the first provider
+    if (ino === 1) {
+      if (this.providers.length > 0) {
+        const provider = this.providers[0].provider;
+        if (provider.setxattr) {
+          return provider.setxattr(1, name, value, size, flags);
+        }
+      }
+      throw new Error('Extended attributes not supported');
+    }
     return this.getProvider(ino).setxattr(ino, name, value, size, flags);
   }
 
   async getxattr(ino: number, name: string, size: number): Promise<Buffer | number> {
+    // For root inode, use the first provider
+    if (ino === 1) {
+      if (this.providers.length > 0) {
+        const provider = this.providers[0].provider;
+        if (provider.getxattr) {
+          return provider.getxattr(1, name, size);
+        }
+      }
+      throw new Error('Extended attributes not supported');
+    }
     return this.getProvider(ino).getxattr(ino, name, size);
   }
 
   async listxattr(ino: number, size: number): Promise<Buffer | number> {
+    // For root inode, use the first provider
+    if (ino === 1) {
+      if (this.providers.length > 0) {
+        const provider = this.providers[0].provider;
+        if (provider.listxattr) {
+          return provider.listxattr(1, size);
+        }
+      }
+      return size === 0 ? 0 : Buffer.alloc(0);
+    }
     return this.getProvider(ino).listxattr(ino, size);
   }
 
   async removexattr(ino: number, name: string): Promise<void> {
+    // For root inode, use the first provider
+    if (ino === 1) {
+      if (this.providers.length > 0) {
+        const provider = this.providers[0].provider;
+        if (provider.removexattr) {
+          return provider.removexattr(1, name);
+        }
+      }
+      throw new Error('Extended attributes not supported');
+    }
     return this.getProvider(ino).removexattr(ino, name);
   }
 
   async access(ino: number, mask: number): Promise<void> {
+    // For root inode, use the first provider or return success
+    if (ino === 1) {
+      if (this.providers.length > 0) {
+        const provider = this.providers[0].provider;
+        if (provider.access) {
+          return provider.access(1, mask);
+        }
+      }
+      return; // Success for root
+    }
     return this.getProvider(ino).access(ino, mask);
   }
 
   async statfs(ino: number): Promise<Statfs> {
+    // For root inode, use the first provider
+    if (ino === 1) {
+      if (this.providers.length > 0) {
+        const provider = this.providers[0].provider;
+        if (provider.statfs) {
+          return provider.statfs(1);
+        }
+      }
+      // Return default statfs for root if no provider
+      return {
+        bsize: 4096,
+        blocks: 0,
+        bfree: 0,
+        bavail: 0,
+        files: 0,
+        ffree: 0,
+      };
+    }
     return this.getProvider(ino).statfs(ino);
   }
 

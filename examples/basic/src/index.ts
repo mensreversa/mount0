@@ -10,7 +10,7 @@ async function main() {
   console.log(`Mounting at ${mountpoint}...`);
 
   const fs = mount0();
-  fs.handle('/', new LocalProvider('/tmp'));
+  fs.handle('/test', new LocalProvider('/tmp'));
 
   await fs.mount(mountpoint);
   console.log(`Mounted at ${mountpoint}`);

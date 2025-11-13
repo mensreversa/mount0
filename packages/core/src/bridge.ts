@@ -19,8 +19,31 @@ export class FuseBridge {
       try {
         await this.handleOperation(reqPtr, params);
       } catch (err: any) {
-        const errno = err.errno || (err.code === 'ENOENT' ? -2 : err.code === 'EIO' ? -5 : -5);
-        mount0_fuse.reply_err(reqPtr, errno < 0 ? errno : -errno);
+        // Based on FUSE reference implementations, fuse_reply_err expects positive errno values
+        // (like the C errno variable). We should pass positive values.
+        let errno: number;
+        if (err.errno !== undefined && err.errno !== null) {
+          // err.errno might be positive (like 5 for EIO) or negative, convert to positive
+          errno = err.errno < 0 ? -err.errno : (err.errno > 0 ? err.errno : 5);
+        } else if (err.code === 'ENOENT') {
+          errno = 2; // ENOENT
+        } else if (err.code === 'ENODATA' || err.code === 'ENOATTR') {
+          errno = 61; // ENODATA (No data available)
+        } else if (err.code === 'EIO') {
+          errno = 5; // EIO
+        } else if (err.code === 'ENOSYS') {
+          errno = 38; // ENOSYS (Function not implemented)
+        } else if (err.message && (err.message.includes('not supported') || err.message.includes('not implemented'))) {
+          errno = 38; // ENOSYS for unsupported operations
+        } else {
+          errno = 5; // Default to EIO
+        }
+        if (process.env.MOUNT0_DEBUG === '1') {
+          const op = params?.op || 'unknown';
+          const errMsg = err?.message || (typeof err === 'string' ? err : JSON.stringify(err));
+          console.error(`[FUSE:error] op=${op}, err=${errMsg}, errno=${err.errno}, code=${err.code}, final_errno=${errno}`);
+        }
+        mount0_fuse.reply_err(reqPtr, errno);
       }
     };
 
@@ -35,25 +58,25 @@ export class FuseBridge {
   }
 
   private async handleOperation(reqPtr: number, params: Record<string, any>): Promise<void> {
+    // reqPtr can be 0 for operations like init/destroy that don't have a request
+    // params should always be defined
+    if (!params) {
+      throw new Error('params is undefined');
+    }
     const op = params.op;
+    
+    // For init and destroy, there's no request to reply to
+    if (op === 'init' || op === 'destroy') {
+      if (op === 'init' && this.provider.init) {
+        await this.provider.init();
+      } else if (op === 'destroy' && this.provider.destroy) {
+        await this.provider.destroy();
+      }
+      return; // No reply needed for init/destroy
+    }
 
     switch (op) {
-      // Lifecycle operations
-      case 'init': {
-        if (this.provider.init) {
-          await this.provider.init();
-        }
-        // No reply needed for init
-        break;
-      }
-
-      case 'destroy': {
-        if (this.provider.destroy) {
-          await this.provider.destroy();
-        }
-        // No reply needed for destroy
-        break;
-      }
+      // Lifecycle operations (init and destroy are handled above)
 
       case 'forget': {
         if (this.provider.forget) {
@@ -392,10 +415,10 @@ export class FuseBridge {
           if (stat) {
             mount0_fuse.reply_getattr(reqPtr, stat);
           } else {
-            mount0_fuse.reply_err(reqPtr, -2); // ENOENT
+            mount0_fuse.reply_err(reqPtr, 2); // ENOENT
           }
         } else {
-          mount0_fuse.reply_err(reqPtr, -38); // ENOSYS
+          mount0_fuse.reply_err(reqPtr, 38); // ENOSYS
         }
         break;
       }

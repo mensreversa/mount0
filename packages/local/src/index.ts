@@ -414,9 +414,17 @@ export class LocalProvider implements FilesystemProvider {
     throw new Error('Extended attributes not supported');
   }
 
-  async getxattr(_ino: number, _name: string, _size: number): Promise<Buffer | number> {
+  async getxattr(_ino: number, _name: string, size: number): Promise<Buffer | number> {
     // Extended attributes not fully supported
-    throw new Error('Extended attributes not supported');
+    // Return size 0 when queried for size, or throw ENODATA when queried for value
+    if (size === 0) {
+      return 0; // No extended attributes
+    }
+    // Attribute doesn't exist - return ENODATA error
+    const err: any = new Error('No data available');
+    err.code = 'ENODATA';
+    err.errno = 61; // ENODATA
+    throw err;
   }
 
   async listxattr(_ino: number, size: number): Promise<Buffer | number> {
@@ -434,7 +442,11 @@ export class LocalProvider implements FilesystemProvider {
   async access(ino: number, mask: number): Promise<void> {
     const filePath = this.getPath(ino);
     const fullPath = this.resolvePath(filePath);
-    await fs.access(fullPath, mask);
+    // FUSE access mask: R_OK=4, W_OK=2, X_OK=1, F_OK=0
+    // Node.js fs.access expects values 0-7 (F_OK=0, R_OK=4, W_OK=2, X_OK=1, or combinations)
+    // Clamp mask to valid range (0-7)
+    const validMask = Math.max(0, Math.min(7, mask & 7));
+    await fs.access(fullPath, validMask);
   }
 
   async statfs(ino: number): Promise<Statfs> {
