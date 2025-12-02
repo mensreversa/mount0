@@ -22,7 +22,7 @@ jobs:
         language: ['javascript', 'cpp']
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Setup Node.js
         if: matrix.language == 'javascript' || matrix.language == 'cpp'
