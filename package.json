@@ -67,7 +67,7 @@
   "homepage": "https://github.com/mensreversa/mount0#readme",
   "devDependencies": {
     "@eslint/js": "^9.39.1",
-    "eslint": "^9.39.1",
+    "eslint": "^9.39.2",
     "globals": "^16.5.0",
     "typescript-eslint": "^8.46.4",
     "husky": "^9.1.7",
