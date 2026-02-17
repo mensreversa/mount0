@@ -1,28 +1,28 @@
 {
   "docusaurus-plugin-content-docs": {
     "default": {
-      "path": "/docs",
+      "path": "/",
       "versions": [
         {
           "name": "current",
           "label": "Next",
           "isLast": true,
-          "path": "/docs",
+          "path": "/",
           "mainDocId": "intro",
           "docs": [
             {
               "id": "architecture",
-              "path": "/docs/architecture",
+              "path": "/architecture",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "intro",
-              "path": "/docs/",
+              "path": "/",
               "sidebar": "tutorialSidebar"
             },
             {
               "id": "usage",
-              "path": "/docs/usage",
+              "path": "/usage",
               "sidebar": "tutorialSidebar"
             }
           ],
@@ -30,7 +30,7 @@
           "sidebars": {
             "tutorialSidebar": {
               "link": {
-                "path": "/docs/",
+                "path": "/",
                 "label": "intro"
               }
             }

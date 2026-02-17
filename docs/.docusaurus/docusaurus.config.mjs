@@ -5,13 +5,8 @@
  */
 export default {
   "title": "Mount0",
-  "tagline": "High-performance virtual filesystem",
-  "url": "https://mount0.com",
-  "baseUrl": "/",
-  "onBrokenLinks": "warn",
+  "tagline": "High-performance virtual filesystem infrastructure",
   "favicon": "img/favicon.ico",
-  "organizationName": "mensreversa",
-  "projectName": "mount0",
   "future": {
     "v4": {
       "removeLegacyPostBuildHeadAttribute": true,
@@ -41,16 +36,34 @@ export default {
           "../packages/core/src/index.ts"
         ],
         "tsconfig": "../tsconfig.json",
-        "out": "api"
+        "out": "api",
+        "sidebar": {
+          "categoryLabel": "API Reference",
+          "position": 99
+        }
       }
     ]
   ],
+  "url": "https://docs.mount0.com",
+  "baseUrl": "/",
+  "organizationName": "mensreversa",
+  "projectName": "mount0",
+  "onBrokenLinks": "warn",
+  "i18n": {
+    "defaultLocale": "en",
+    "locales": [
+      "en"
+    ],
+    "path": "i18n",
+    "localeConfigs": {}
+  },
   "presets": [
     [
       "classic",
       {
         "docs": {
           "sidebarPath": "./sidebars.ts",
+          "routeBasePath": "/",
           "editUrl": "https://github.com/mensreversa/mount0/tree/main/docs/"
         },
         "theme": {
@@ -70,7 +83,9 @@ export default {
       "title": "Mount0",
       "logo": {
         "alt": "Mount0 Logo",
-        "src": "img/logo.svg"
+        "src": "img/logo.svg",
+        "href": "https://mount0.com",
+        "target": "_self"
       },
       "items": [
         {
@@ -95,7 +110,7 @@ export default {
           "items": [
             {
               "label": "Introduction",
-              "to": "/docs/"
+              "to": "/"
             }
           ]
         },
@@ -107,9 +122,22 @@ export default {
               "href": "https://github.com/mensreversa/mount0"
             }
           ]
+        },
+        {
+          "title": "More",
+          "items": [
+            {
+              "label": "Mens Reversa",
+              "href": "https://mensreversa.com"
+            },
+            {
+              "label": "Mount0 Website",
+              "href": "https://mount0.com"
+            }
+          ]
         }
       ],
-      "copyright": "Copyright © 2026 Mens Reversa Srl. Built with Docusaurus."
+      "copyright": "Copyright © 2026 MENS REVERSA SRL. Built with Docusaurus."
     },
     "prism": {
       "theme": {
@@ -398,7 +426,11 @@ export default {
           }
         ]
       },
-      "additionalLanguages": [],
+      "additionalLanguages": [
+        "bash",
+        "json",
+        "typescript"
+      ],
       "magicComments": [
         {
           "className": "theme-code-block-highlighted-line",
@@ -429,14 +461,6 @@ export default {
     }
   },
   "baseUrlIssueBanner": true,
-  "i18n": {
-    "defaultLocale": "en",
-    "path": "i18n",
-    "locales": [
-      "en"
-    ],
-    "localeConfigs": {}
-  },
   "onBrokenAnchors": "warn",
   "onDuplicateRoutes": "warn",
   "staticDirectories": [

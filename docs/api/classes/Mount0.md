@@ -1,6 +1,6 @@
 # Class: Mount0
 
-Defined in: [mount0.ts:9](https://github.com/mensreversa/mount0/blob/19aeee93a09bc771469db85c335b7ff80194371c/packages/core/src/mount0.ts#L9)
+Defined in: [mount0.ts:9](https://github.com/mensreversa/mount0/blob/7152e50b9e64fc6a5b5fb5cc0d549e8ac96860bc/packages/core/src/mount0.ts#L9)
 
 ## Constructors
 
@@ -18,7 +18,7 @@ Defined in: [mount0.ts:9](https://github.com/mensreversa/mount0/blob/19aeee93a09
 
 > **handle**(`path`, `provider`): `this`
 
-Defined in: [mount0.ts:13](https://github.com/mensreversa/mount0/blob/19aeee93a09bc771469db85c335b7ff80194371c/packages/core/src/mount0.ts#L13)
+Defined in: [mount0.ts:13](https://github.com/mensreversa/mount0/blob/7152e50b9e64fc6a5b5fb5cc0d549e8ac96860bc/packages/core/src/mount0.ts#L13)
 
 #### Parameters
 
@@ -40,7 +40,7 @@ Defined in: [mount0.ts:13](https://github.com/mensreversa/mount0/blob/19aeee93a0
 
 > **mount**(`mountpoint`, `options?`): `Promise`\<`void`\>
 
-Defined in: [mount0.ts:28](https://github.com/mensreversa/mount0/blob/19aeee93a09bc771469db85c335b7ff80194371c/packages/core/src/mount0.ts#L28)
+Defined in: [mount0.ts:28](https://github.com/mensreversa/mount0/blob/7152e50b9e64fc6a5b5fb5cc0d549e8ac96860bc/packages/core/src/mount0.ts#L28)
 
 #### Parameters
 
@@ -62,7 +62,7 @@ Defined in: [mount0.ts:28](https://github.com/mensreversa/mount0/blob/19aeee93a0
 
 > **unhandle**(`path`): `this`
 
-Defined in: [mount0.ts:21](https://github.com/mensreversa/mount0/blob/19aeee93a09bc771469db85c335b7ff80194371c/packages/core/src/mount0.ts#L21)
+Defined in: [mount0.ts:21](https://github.com/mensreversa/mount0/blob/7152e50b9e64fc6a5b5fb5cc0d549e8ac96860bc/packages/core/src/mount0.ts#L21)
 
 #### Parameters
 
@@ -80,7 +80,7 @@ Defined in: [mount0.ts:21](https://github.com/mensreversa/mount0/blob/19aeee93a0
 
 > **unmount**(): `Promise`\<`void`\>
 
-Defined in: [mount0.ts:37](https://github.com/mensreversa/mount0/blob/19aeee93a09bc771469db85c335b7ff80194371c/packages/core/src/mount0.ts#L37)
+Defined in: [mount0.ts:37](https://github.com/mensreversa/mount0/blob/7152e50b9e64fc6a5b5fb5cc0d549e8ac96860bc/packages/core/src/mount0.ts#L37)
 
 #### Returns
 

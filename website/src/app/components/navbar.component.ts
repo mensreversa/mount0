@@ -12,6 +12,16 @@ import { Component } from '@angular/core';
           </a>
           <div class="hidden md:flex items-center space-x-6">
             <a
+              href="#features"
+              class="text-white/60 hover:text-white transition text-xs uppercase tracking-widest"
+              >[Features]</a
+            >
+            <a
+              href="#demo"
+              class="text-white/60 hover:text-white transition text-xs uppercase tracking-widest"
+              >[Demo]</a
+            >
+            <a
               href="https://docs.mount0.com"
               class="text-white/60 hover:text-white transition text-xs uppercase tracking-widest"
               >[Docs]</a

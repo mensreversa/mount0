@@ -4,14 +4,8 @@ import type * as Preset from "@docusaurus/preset-classic";
 
 const config: Config = {
     title: "Mount0",
-    tagline: "High-performance virtual filesystem",
-    url: "https://mount0.com",
-    baseUrl: "/",
-    onBrokenLinks: "warn",
-    onBrokenMarkdownLinks: "warn",
+    tagline: "High-performance virtual filesystem infrastructure",
     favicon: "img/favicon.ico",
-    organizationName: "mensreversa",
-    projectName: "mount0",
 
     future: {
         v4: true,
@@ -24,9 +18,26 @@ const config: Config = {
                 entryPoints: ["../packages/core/src/index.ts"],
                 tsconfig: "../tsconfig.json",
                 out: "api",
+                sidebar: {
+                    categoryLabel: "API Reference",
+                    position: 99,
+                },
             },
         ],
     ],
+
+    url: "https://docs.mount0.com",
+    baseUrl: "/",
+    organizationName: "mensreversa",
+    projectName: "mount0",
+
+    onBrokenLinks: "warn",
+    onBrokenMarkdownLinks: "warn",
+
+    i18n: {
+        defaultLocale: "en",
+        locales: ["en"],
+    },
 
     presets: [
         [
@@ -34,6 +45,7 @@ const config: Config = {
             {
                 docs: {
                     sidebarPath: "./sidebars.ts",
+                    routeBasePath: "/",
                     editUrl: "https://github.com/mensreversa/mount0/tree/main/docs/",
                 },
                 theme: {
@@ -55,6 +67,8 @@ const config: Config = {
             logo: {
                 alt: "Mount0 Logo",
                 src: "img/logo.svg",
+                href: "https://mount0.com",
+                target: "_self",
             },
             items: [
                 {
@@ -78,7 +92,7 @@ const config: Config = {
                     items: [
                         {
                             label: "Introduction",
-                            to: "/docs/",
+                            to: "/",
                         },
                     ],
                 },
@@ -91,12 +105,26 @@ const config: Config = {
                         },
                     ],
                 },
+                {
+                    title: "More",
+                    items: [
+                        {
+                            label: "Mens Reversa",
+                            href: "https://mensreversa.com",
+                        },
+                        {
+                            label: "Mount0 Website",
+                            href: "https://mount0.com",
+                        },
+                    ],
+                },
             ],
-            copyright: `Copyright © ${new Date().getFullYear()} Mens Reversa Srl. Built with Docusaurus.`,
+            copyright: `Copyright © ${new Date().getFullYear()} MENS REVERSA SRL. Built with Docusaurus.`,
         },
         prism: {
             theme: prismThemes.vsDark,
             darkTheme: prismThemes.vsDark,
+            additionalLanguages: ["bash", "json", "typescript"],
         },
     } satisfies Preset.ThemeConfig,
 };
