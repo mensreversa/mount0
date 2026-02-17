@@ -1,11 +1,11 @@
 {
   "id": "intro",
   "title": "Introduction",
-  "description": "Welcome to Mount0, the high-performance virtual filesystem for developers.",
+  "description": "Mount0 is a high-performance virtual filesystem designed for developers who need speed, flexibility, and zero-disk footprint.",
   "source": "@site/docs/intro.md",
   "sourceDirName": ".",
-  "slug": "/intro",
-  "permalink": "/docs/intro",
+  "slug": "/",
+  "permalink": "/docs/",
   "draft": false,
   "unlisted": false,
   "editUrl": "https://github.com/mensreversa/mount0/tree/main/docs/docs/intro.md",
@@ -13,7 +13,8 @@
   "version": "current",
   "sidebarPosition": 1,
   "frontMatter": {
-    "sidebar_position": 1
+    "sidebar_position": 1,
+    "slug": "/"
   },
   "sidebar": "tutorialSidebar",
   "next": {

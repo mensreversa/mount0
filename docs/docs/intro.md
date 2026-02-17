@@ -1,21 +1,40 @@
 ---
 sidebar_position: 1
+slug: /
 ---
 
 # Introduction
 
-Welcome to Mount0, the high-performance virtual filesystem for developers.
+**Mount0** is a high-performance virtual filesystem designed for developers who need speed, flexibility, and zero-disk footprint.
 
-## What is Mount0?
+## Why Mount0?
 
-Mount0 allows you to create virtual filesystems that are mounted directly to your OS, enabling you to inspect and modify data structures as if they were files on your disk.
+Traditional filesystems interact with physical disks, which can be slow and cumbersome for transient data tasks like:
+- **Testing**: creating thousands of temporary files for unit tests.
+- **Mocking**: Simulating complex directory structures without polluting your hard drive.
+- **Security**: Handling sensitive data in-memory without ever writing to disk.
 
-## Features
+Mount0 solves this by providing a FUSE-based interface to an in-memory filesystem structure.
 
-- **High Performance**: Optimized for speed and low latency.
-- **Virtual**: Files don't take up disk space until accessed.
-- **Secure**: Built with security in mind.
+## Key Features
+
+- **🚀 Blazing Fast**: All operations happen in memory.
+- **🛡️ Secure**: Data is wiped instantly when the process stops.
+- **🔗 FUSE Powered**: Works with standard tools (ls, grep, cat) just like a real disk.
+- **🛠️ Developer First**: TypeScript API for programmatic control.
 
 ## Getting Started
 
-To get started with Mount0, check out the [Usage Guide](usage).
+```bash
+npm install mount0
+```
+
+```typescript
+import { Mount0 } from 'mount0';
+
+const fs = new Mount0();
+await fs.mount('/tmp/my-virtual-drive');
+
+// Write to the virtual drive
+await fs.writeFile('/hello.txt', 'Hello World');
+```
