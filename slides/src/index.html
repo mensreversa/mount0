@@ -1,93 +1,37 @@
 <!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
+<html lang="en">
 
-    <title>Mount0 - Virtual Filesystem</title>
-
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/reset.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/reveal.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/theme/black.min.css"
-    />
-
-    <!-- Theme used for syntax highlighted code -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/plugin/highlight/monokai.min.css"
-    />
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mount0 Slides</title>
+    <link rel="icon" type="image/svg+xml" href="./assets/icon.svg" />
+    <link rel="alternate icon" href="./assets/favicon.ico" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
     <style>
-      .reveal h1,
-      .reveal h2,
-      .reveal h3 {
-        font-family: 'Courier New', Courier, monospace;
-        text-transform: uppercase;
-      }
-
-      .reveal p {
-        font-family: 'Courier New', Courier, monospace;
-      }
+        body {
+            font-family: 'JetBrains Mono', monospace;
+        }
     </style>
-  </head>
+</head>
 
-  <body>
-    <div class="reveal">
-      <div class="slides">
-        <section>
-          <h1>MOUNT<span style="color: #666">0</span></h1>
-          <h3>High-Performance Virtual Filesystem</h3>
-          <p>
-            <small>Built for Developers by Developers</small>
-          </p>
-        </section>
-        <section>
-          <h2>The Problem</h2>
-          <p>Traditional filesystems are slow and rigid.</p>
-          <p class="fragment">Simulating large datasets consumes massive disk space.</p>
-          <p class="fragment">Testing file interactions is complex and error-prone.</p>
-        </section>
-        <section>
-          <h2>The Solution: Mount0</h2>
-          <ul>
-            <li class="fragment">Virtual, in-memory filesystem</li>
-            <li class="fragment">Zero disk footprint</li>
-            <li class="fragment">Instant file creation and deletion</li>
-            <li class="fragment">Seamless OS integration</li>
-          </ul>
-        </section>
-        <section>
-          <h1>Start Mounting</h1>
-          <p>mount0.com</p>
-        </section>
-      </div>
+<body class="min-h-screen bg-black text-white grid place-items-center relative overflow-hidden">
+    <div
+        class="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:20px_20px]">
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/reveal.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/plugin/notes/notes.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/plugin/markdown/markdown.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/plugin/highlight/highlight.min.js"></script>
-    <script>
-      // More info about initialization & config:
-      // - https://revealjs.com/initialization/
-      // - https://revealjs.com/config/
-      Reveal.initialize({
-        hash: true,
-        history: true,
+    <main class="w-[min(860px,92vw)] border border-white/15 bg-black/90 relative z-10">
+        <header class="border-b border-white/15 px-4 py-3 text-white/60 text-xs tracking-[0.1em]">[ MOUNT0_SLIDES ]
+        </header>
+        <section class="p-5 grid gap-3">
+            <a class="block border border-white/15 p-4 hover:bg-white/5 transition" href="./intro/">
+                <div class="font-bold text-base">[ INTRO_OVERVIEW ]</div>
+                <div class="mt-1 text-xs text-white/70">Introduction to Mount0 Virtual Filesystem.</div>
+            </a>
+        </section>
+    </main>
+</body>
 
-        // Learn about plugins: https://revealjs.com/plugins/
-        plugins: [RevealMarkdown, RevealHighlight, RevealNotes],
-      });
-    </script>
-  </body>
 </html>
