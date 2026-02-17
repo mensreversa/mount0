@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <title>Mount0 - Virtual Filesystem</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/reset.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/reveal.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/theme/black.min.css" />
+
+    <!-- Theme used for syntax highlighted code -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/plugin/highlight/monokai.min.css" />
+    <style>
+        .reveal h1,
+        .reveal h2,
+        .reveal h3 {
+            font-family: 'Courier New', Courier, monospace;
+            text-transform: uppercase;
+        }
+
+        .reveal p {
+            font-family: 'Courier New', Courier, monospace;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="reveal">
+        <div class="slides">
+            <section>
+                <h1>MOUNT<span style="color: #666">0</span></h1>
+                <h3>High-Performance Virtual Filesystem</h3>
+                <p>
+                    <small>Built for Developers by Developers</small>
+                </p>
+            </section>
+            <section>
+                <h2>The Problem</h2>
+                <p>Traditional filesystems are slow and rigid.</p>
+                <p class="fragment">Simulating large datasets consumes massive disk space.</p>
+                <p class="fragment">Testing file interactions is complex and error-prone.</p>
+            </section>
+            <section>
+                <h2>The Solution: Mount0</h2>
+                <ul>
+                    <li class="fragment">Virtual, in-memory filesystem</li>
+                    <li class="fragment">Zero disk footprint</li>
+                    <li class="fragment">Instant file creation and deletion</li>
+                    <li class="fragment">Seamless OS integration</li>
+                </ul>
+            </section>
+            <section>
+                <h1>Start Mounting</h1>
+                <p>mount0.com</p>
+            </section>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/reveal.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/plugin/notes/notes.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/plugin/markdown/markdown.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/plugin/highlight/highlight.min.js"></script>
+    <script>
+        // More info about initialization & config:
+        // - https://revealjs.com/initialization/
+        // - https://revealjs.com/config/
+        Reveal.initialize({
+            hash: true,
+            history: true,
+
+            // Learn about plugins: https://revealjs.com/plugins/
+            plugins: [RevealMarkdown, RevealHighlight, RevealNotes],
+        });
+    </script>
+</body>
+
+</html>
