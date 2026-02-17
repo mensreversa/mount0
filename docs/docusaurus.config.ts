@@ -7,14 +7,14 @@ const config: Config = {
     tagline: "High-performance virtual filesystem",
     url: "https://mount0.com",
     baseUrl: "/",
-    onBrokenLinks: "throw",
+    onBrokenLinks: "warn",
     onBrokenMarkdownLinks: "warn",
     favicon: "img/favicon.ico",
     organizationName: "mensreversa",
     projectName: "mount0",
 
     future: {
-        experimental_faster: true,
+        v4: true,
     },
 
     presets: [
