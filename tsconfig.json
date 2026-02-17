@@ -1,0 +1,57 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "composite": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "exclude": ["node_modules", "dist", "website", "**/tests"],
+  "include": [],
+  "references": [
+    {
+      "path": "packages/core"
+    },
+    {
+      "path": "packages/cache"
+    },
+    {
+      "path": "packages/memory"
+    },
+    {
+      "path": "packages/local"
+    },
+    {
+      "path": "packages/multi"
+    },
+    {
+      "path": "packages/raid"
+    },
+    {
+      "path": "packages/encrypted"
+    },
+    {
+      "path": "packages/s3"
+    },
+    {
+      "path": "packages/samba"
+    },
+    {
+      "path": "packages/ftp"
+    },
+    {
+      "path": "packages/ssh"
+    },
+    {
+      "path": "packages/webdav"
+    }
+  ]
+}
