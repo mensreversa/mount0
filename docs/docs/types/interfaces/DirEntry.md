@@ -1,6 +1,6 @@
 # Interface: DirEntry
 
-Defined in: [types.ts:17](https://github.com/mensreversa/mount0/blob/00d47e84d88edd585a89985a69c0e82473acd0d7/packages/core/src/types.ts#L17)
+Defined in: [types.ts:17](https://github.com/mensreversa/mount0/blob/f767cdf1b86c550bbe2fa76c7356ec0bdeb105eb/packages/core/src/types.ts#L17)
 
 ## Properties
 
@@ -8,7 +8,7 @@ Defined in: [types.ts:17](https://github.com/mensreversa/mount0/blob/00d47e84d88
 
 > **ino**: `number`
 
-Defined in: [types.ts:20](https://github.com/mensreversa/mount0/blob/00d47e84d88edd585a89985a69c0e82473acd0d7/packages/core/src/types.ts#L20)
+Defined in: [types.ts:20](https://github.com/mensreversa/mount0/blob/f767cdf1b86c550bbe2fa76c7356ec0bdeb105eb/packages/core/src/types.ts#L20)
 
 ***
 
@@ -16,7 +16,7 @@ Defined in: [types.ts:20](https://github.com/mensreversa/mount0/blob/00d47e84d88
 
 > **mode**: `number`
 
-Defined in: [types.ts:19](https://github.com/mensreversa/mount0/blob/00d47e84d88edd585a89985a69c0e82473acd0d7/packages/core/src/types.ts#L19)
+Defined in: [types.ts:19](https://github.com/mensreversa/mount0/blob/f767cdf1b86c550bbe2fa76c7356ec0bdeb105eb/packages/core/src/types.ts#L19)
 
 ***
 
@@ -24,4 +24,4 @@ Defined in: [types.ts:19](https://github.com/mensreversa/mount0/blob/00d47e84d88
 
 > **name**: `string`
 
-Defined in: [types.ts:18](https://github.com/mensreversa/mount0/blob/00d47e84d88edd585a89985a69c0e82473acd0d7/packages/core/src/types.ts#L18)
+Defined in: [types.ts:18](https://github.com/mensreversa/mount0/blob/f767cdf1b86c550bbe2fa76c7356ec0bdeb105eb/packages/core/src/types.ts#L18)

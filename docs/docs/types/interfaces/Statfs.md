@@ -1,6 +1,6 @@
 # Interface: Statfs
 
-Defined in: [provider.ts:3](https://github.com/mensreversa/mount0/blob/00d47e84d88edd585a89985a69c0e82473acd0d7/packages/core/src/provider.ts#L3)
+Defined in: [provider.ts:3](https://github.com/mensreversa/mount0/blob/f767cdf1b86c550bbe2fa76c7356ec0bdeb105eb/packages/core/src/provider.ts#L3)
 
 ## Properties
 
@@ -8,7 +8,7 @@ Defined in: [provider.ts:3](https://github.com/mensreversa/mount0/blob/00d47e84d
 
 > **bavail**: `number`
 
-Defined in: [provider.ts:7](https://github.com/mensreversa/mount0/blob/00d47e84d88edd585a89985a69c0e82473acd0d7/packages/core/src/provider.ts#L7)
+Defined in: [provider.ts:7](https://github.com/mensreversa/mount0/blob/f767cdf1b86c550bbe2fa76c7356ec0bdeb105eb/packages/core/src/provider.ts#L7)
 
 ***
 
@@ -16,7 +16,7 @@ Defined in: [provider.ts:7](https://github.com/mensreversa/mount0/blob/00d47e84d
 
 > **bfree**: `number`
 
-Defined in: [provider.ts:6](https://github.com/mensreversa/mount0/blob/00d47e84d88edd585a89985a69c0e82473acd0d7/packages/core/src/provider.ts#L6)
+Defined in: [provider.ts:6](https://github.com/mensreversa/mount0/blob/f767cdf1b86c550bbe2fa76c7356ec0bdeb105eb/packages/core/src/provider.ts#L6)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [provider.ts:6](https://github.com/mensreversa/mount0/blob/00d47e84d
 
 > **blocks**: `number`
 
-Defined in: [provider.ts:5](https://github.com/mensreversa/mount0/blob/00d47e84d88edd585a89985a69c0e82473acd0d7/packages/core/src/provider.ts#L5)
+Defined in: [provider.ts:5](https://github.com/mensreversa/mount0/blob/f767cdf1b86c550bbe2fa76c7356ec0bdeb105eb/packages/core/src/provider.ts#L5)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: [provider.ts:5](https://github.com/mensreversa/mount0/blob/00d47e84d
 
 > **bsize**: `number`
 
-Defined in: [provider.ts:4](https://github.com/mensreversa/mount0/blob/00d47e84d88edd585a89985a69c0e82473acd0d7/packages/core/src/provider.ts#L4)
+Defined in: [provider.ts:4](https://github.com/mensreversa/mount0/blob/f767cdf1b86c550bbe2fa76c7356ec0bdeb105eb/packages/core/src/provider.ts#L4)
 
 ***
 
@@ -40,7 +40,7 @@ Defined in: [provider.ts:4](https://github.com/mensreversa/mount0/blob/00d47e84d
 
 > **ffree**: `number`
 
-Defined in: [provider.ts:9](https://github.com/mensreversa/mount0/blob/00d47e84d88edd585a89985a69c0e82473acd0d7/packages/core/src/provider.ts#L9)
+Defined in: [provider.ts:9](https://github.com/mensreversa/mount0/blob/f767cdf1b86c550bbe2fa76c7356ec0bdeb105eb/packages/core/src/provider.ts#L9)
 
 ***
 
@@ -48,4 +48,4 @@ Defined in: [provider.ts:9](https://github.com/mensreversa/mount0/blob/00d47e84d
 
 > **files**: `number`
 
-Defined in: [provider.ts:8](https://github.com/mensreversa/mount0/blob/00d47e84d88edd585a89985a69c0e82473acd0d7/packages/core/src/provider.ts#L8)
+Defined in: [provider.ts:8](https://github.com/mensreversa/mount0/blob/f767cdf1b86c550bbe2fa76c7356ec0bdeb105eb/packages/core/src/provider.ts#L8)
