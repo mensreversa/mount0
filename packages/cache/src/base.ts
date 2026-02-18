@@ -1,4 +1,4 @@
-import { DirEntry, FileStat, FilesystemProvider, Flock, Statfs } from '@mount0/core';
+import { DirEntry, FileStat, FilesystemProvider, Flock, Statfs } from "@mount0/core";
 
 export interface BaseCacheConfig {
   master: FilesystemProvider;
@@ -151,13 +151,7 @@ export abstract class BaseCacheProvider implements FilesystemProvider {
     }
   }
 
-  async read(
-    ino: number,
-    fh: number,
-    buffer: Buffer,
-    offset: number,
-    length: number
-  ): Promise<number> {
+  async read(ino: number, fh: number, buffer: Buffer, offset: number, length: number): Promise<number> {
     const slaveIno = this.getSlaveIno(ino);
     try {
       return await this.slave.read(slaveIno, fh, buffer, offset, length);
@@ -232,13 +226,7 @@ export abstract class BaseCacheProvider implements FilesystemProvider {
     }
   }
 
-  async rename(
-    parent: number,
-    name: string,
-    newparent: number,
-    newname: string,
-    flags: number
-  ): Promise<void> {
+  async rename(parent: number, name: string, newparent: number, newname: string, flags: number): Promise<void> {
     const masterParent = this.getMasterIno(parent);
     const masterNewParent = this.getMasterIno(newparent);
     await this.master.rename(masterParent, name, masterNewParent, newname, flags);
@@ -284,13 +272,7 @@ export abstract class BaseCacheProvider implements FilesystemProvider {
     }
   }
 
-  async setxattr(
-    ino: number,
-    name: string,
-    value: Buffer,
-    size: number,
-    flags: number
-  ): Promise<void> {
+  async setxattr(ino: number, name: string, value: Buffer, size: number, flags: number): Promise<void> {
     const masterIno = this.getMasterIno(ino);
     await this.master.setxattr(masterIno, name, value, size, flags);
     const slaveIno = this.getSlaveIno(ino);
@@ -368,13 +350,7 @@ export abstract class BaseCacheProvider implements FilesystemProvider {
     return this.master.bmap(masterIno, blocksize, idx);
   }
 
-  async ioctl(
-    ino: number,
-    cmd: number,
-    in_buf: Buffer | null,
-    in_bufsz: number,
-    out_bufsz: number
-  ): Promise<{ result: number; out_buf?: Buffer }> {
+  async ioctl(ino: number, cmd: number, in_buf: Buffer | null, in_bufsz: number, out_bufsz: number): Promise<{ result: number; out_buf?: Buffer }> {
     const masterIno = this.getMasterIno(ino);
     return this.master.ioctl(masterIno, cmd, in_buf, in_bufsz, out_bufsz);
   }
@@ -384,13 +360,7 @@ export abstract class BaseCacheProvider implements FilesystemProvider {
     return this.master.poll(masterIno, fh);
   }
 
-  async fallocate(
-    ino: number,
-    fh: number,
-    offset: number,
-    length: number,
-    mode: number
-  ): Promise<void> {
+  async fallocate(ino: number, fh: number, offset: number, length: number, mode: number): Promise<void> {
     const masterIno = this.getMasterIno(ino);
     await this.master.fallocate(masterIno, fh, offset, length, mode);
     const slaveIno = this.getSlaveIno(ino);
@@ -405,14 +375,7 @@ export abstract class BaseCacheProvider implements FilesystemProvider {
     return this.readdir(ino, size, offset);
   }
 
-  async copy_file_range(
-    ino_in: number,
-    off_in: number,
-    ino_out: number,
-    off_out: number,
-    len: number,
-    flags: number
-  ): Promise<number> {
+  async copy_file_range(ino_in: number, off_in: number, ino_out: number, off_out: number, len: number, flags: number): Promise<number> {
     const masterInoIn = this.getMasterIno(ino_in);
     const masterInoOut = this.getMasterIno(ino_out);
     return this.master.copy_file_range(masterInoIn, off_in, masterInoOut, off_out, len, flags);
@@ -468,11 +431,5 @@ export abstract class BaseCacheProvider implements FilesystemProvider {
     }
   }
 
-  abstract write(
-    ino: number,
-    fh: number,
-    buffer: Buffer,
-    offset: number,
-    length: number
-  ): Promise<number>;
+  abstract write(ino: number, fh: number, buffer: Buffer, offset: number, length: number): Promise<number>;
 }

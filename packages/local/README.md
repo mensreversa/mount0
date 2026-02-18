@@ -11,13 +11,13 @@ npm install @mount0/local
 ## Usage
 
 ```typescript
-import { mount0 } from '@mount0/core';
-import { LocalProvider } from '@mount0/local';
+import { mount0 } from "@mount0/core";
+import { LocalProvider } from "@mount0/local";
 
 const fs = mount0();
-fs.handle('/', new LocalProvider('/path/to/data'));
+fs.handle("/", new LocalProvider("/path/to/data"));
 
-await fs.mount('/mnt/myfs');
+await fs.mount("/mnt/myfs");
 ```
 
 ## License

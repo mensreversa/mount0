@@ -11,13 +11,13 @@ npm install @mount0/memory
 ## Usage
 
 ```typescript
-import { mount0 } from '@mount0/core';
-import { MemoryProvider } from '@mount0/memory';
+import { mount0 } from "@mount0/core";
+import { MemoryProvider } from "@mount0/memory";
 
 const fs = mount0();
-fs.handle('/cache', new MemoryProvider());
+fs.handle("/cache", new MemoryProvider());
 
-await fs.mount('/mnt/myfs');
+await fs.mount("/mnt/myfs");
 ```
 
 ## License

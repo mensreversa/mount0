@@ -1,5 +1,5 @@
-import { FilesystemProvider, Flock, Statfs } from './provider';
-import { DirEntry, FileStat } from './types';
+import { FilesystemProvider, Flock, Statfs } from "./provider";
+import { DirEntry, FileStat } from "./types";
 
 export class RouterProvider implements FilesystemProvider {
   public readonly providers: { path: string; provider: FilesystemProvider }[];
@@ -11,13 +11,13 @@ export class RouterProvider implements FilesystemProvider {
   }
 
   handle(path: string, provider: FilesystemProvider): void {
-    const normalized = path === '/' ? '/' : path.replace(/\/+$/, '') || '/';
+    const normalized = path === "/" ? "/" : path.replace(/\/+$/, "") || "/";
     this.providers.push({ path: normalized, provider });
     this.providers.sort((a, b) => b.path.length - a.path.length);
   }
 
   unhandle(path: string): void {
-    const normalized = path === '/' ? '/' : path.replace(/\/+$/, '') || '/';
+    const normalized = path === "/" ? "/" : path.replace(/\/+$/, "") || "/";
     const index = this.providers.findIndex((rp) => rp.path === normalized);
     if (index !== -1) this.providers.splice(index, 1);
   }
@@ -31,11 +31,11 @@ export class RouterProvider implements FilesystemProvider {
   private matchProvider(path: string): FilesystemProvider | null {
     const matched = this.providers
       .filter((rp) => {
-        if (rp.path === '/') {
+        if (rp.path === "/") {
           // Root provider matches everything
           return true;
         }
-        return path === rp.path || path.startsWith(rp.path + '/');
+        return path === rp.path || path.startsWith(rp.path + "/");
       })
       .sort((a, b) => b.path.length - a.path.length)[0];
     if (!matched) return null;
@@ -48,7 +48,7 @@ export class RouterProvider implements FilesystemProvider {
       const path = `/${name}`;
       const provider = this.matchProvider(path);
       if (!provider) {
-        throw new Error('No provider found');
+        throw new Error("No provider found");
       }
       // Call getattr(1) on the matched provider
       const stat = await provider.getattr(1);
@@ -92,8 +92,8 @@ export class RouterProvider implements FilesystemProvider {
       const entries = await Promise.all(
         this.providers
           .filter((rp) => {
-            if (rp.path === '/') return false;
-            const parts = rp.path.split('/').filter((p) => p);
+            if (rp.path === "/") return false;
+            const parts = rp.path.split("/").filter((p) => p);
             const top = `/${parts[0]}`;
             if (topLevel.has(top)) return false;
             topLevel.add(top);
@@ -132,23 +132,11 @@ export class RouterProvider implements FilesystemProvider {
     return this.getProvider(ino).open(ino, flags, mode);
   }
 
-  async read(
-    ino: number,
-    fh: number,
-    buffer: Buffer,
-    off: number,
-    length: number
-  ): Promise<number> {
+  async read(ino: number, fh: number, buffer: Buffer, off: number, length: number): Promise<number> {
     return this.getProvider(ino).read(ino, fh, buffer, off, length);
   }
 
-  async write(
-    ino: number,
-    fh: number,
-    buffer: Buffer,
-    off: number,
-    length: number
-  ): Promise<number> {
+  async write(ino: number, fh: number, buffer: Buffer, off: number, length: number): Promise<number> {
     return this.getProvider(ino).write(ino, fh, buffer, off, length);
   }
 
@@ -215,27 +203,15 @@ export class RouterProvider implements FilesystemProvider {
           return provider.readlink(1);
         }
       }
-      throw new Error('Readlink not supported for root');
+      throw new Error("Readlink not supported for root");
     }
     return this.getProvider(ino).readlink(ino);
   }
 
-  async rename(
-    parent: number,
-    name: string,
-    newparent: number,
-    newname: string,
-    flags: number
-  ): Promise<void> {
+  async rename(parent: number, name: string, newparent: number, newname: string, flags: number): Promise<void> {
     return this.getProvider(parent).rename(parent, name, newparent, newname, flags);
   }
-  async setxattr(
-    ino: number,
-    name: string,
-    value: Buffer,
-    size: number,
-    flags: number
-  ): Promise<void> {
+  async setxattr(ino: number, name: string, value: Buffer, size: number, flags: number): Promise<void> {
     // For root inode, use the first provider
     if (ino === 1) {
       if (this.providers.length > 0) {
@@ -244,7 +220,7 @@ export class RouterProvider implements FilesystemProvider {
           return provider.setxattr(1, name, value, size, flags);
         }
       }
-      throw new Error('Extended attributes not supported');
+      throw new Error("Extended attributes not supported");
     }
     return this.getProvider(ino).setxattr(ino, name, value, size, flags);
   }
@@ -258,7 +234,7 @@ export class RouterProvider implements FilesystemProvider {
           return provider.getxattr(1, name, size);
         }
       }
-      throw new Error('Extended attributes not supported');
+      throw new Error("Extended attributes not supported");
     }
     return this.getProvider(ino).getxattr(ino, name, size);
   }
@@ -286,7 +262,7 @@ export class RouterProvider implements FilesystemProvider {
           return provider.removexattr(1, name);
         }
       }
-      throw new Error('Extended attributes not supported');
+      throw new Error("Extended attributes not supported");
     }
     return this.getProvider(ino).removexattr(ino, name);
   }
@@ -342,13 +318,7 @@ export class RouterProvider implements FilesystemProvider {
     return this.getProvider(ino).bmap(ino, blocksize, idx);
   }
 
-  async ioctl(
-    ino: number,
-    cmd: number,
-    in_buf: Buffer | null,
-    in_bufsz: number,
-    out_bufsz: number
-  ): Promise<{ result: number; out_buf?: Buffer }> {
+  async ioctl(ino: number, cmd: number, in_buf: Buffer | null, in_bufsz: number, out_bufsz: number): Promise<{ result: number; out_buf?: Buffer }> {
     return this.getProvider(ino).ioctl(ino, cmd, in_buf, in_bufsz, out_bufsz);
   }
 
@@ -356,13 +326,7 @@ export class RouterProvider implements FilesystemProvider {
     return this.getProvider(ino).poll(ino, fh);
   }
 
-  async fallocate(
-    ino: number,
-    fh: number,
-    offset: number,
-    length: number,
-    mode: number
-  ): Promise<void> {
+  async fallocate(ino: number, fh: number, offset: number, length: number, mode: number): Promise<void> {
     return this.getProvider(ino).fallocate(ino, fh, offset, length, mode);
   }
 
@@ -374,14 +338,7 @@ export class RouterProvider implements FilesystemProvider {
     return entries;
   }
 
-  async copy_file_range(
-    ino_in: number,
-    off_in: number,
-    ino_out: number,
-    off_out: number,
-    len: number,
-    flags: number
-  ): Promise<number> {
+  async copy_file_range(ino_in: number, off_in: number, ino_out: number, off_out: number, len: number, flags: number): Promise<number> {
     return this.getProvider(ino_in).copy_file_range(ino_in, off_in, ino_out, off_out, len, flags);
   }
 

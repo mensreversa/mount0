@@ -11,21 +11,21 @@ npm install @mount0/encrypted
 ## Usage
 
 ```typescript
-import { mount0 } from '@mount0/core';
-import { LocalProvider } from '@mount0/local';
-import { EncryptedProvider } from '@mount0/encrypted';
+import { mount0 } from "@mount0/core";
+import { LocalProvider } from "@mount0/local";
+import { EncryptedProvider } from "@mount0/encrypted";
 
 const fs = mount0();
 fs.handle(
-  '/secure',
+  "/secure",
   new EncryptedProvider({
-    provider: new LocalProvider('/path/to/data'),
-    password: 'my-secret-password',
-    algorithm: 'aes-256-gcm',
+    provider: new LocalProvider("/path/to/data"),
+    password: "my-secret-password",
+    algorithm: "aes-256-gcm",
   })
 );
 
-await fs.mount('/mnt/myfs');
+await fs.mount("/mnt/myfs");
 ```
 
 ## Supported Algorithms

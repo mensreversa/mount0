@@ -1,4 +1,4 @@
-import './chunk-GOMI4DH3.js';
+import "./chunk-GOMI4DH3.js";
 import {
   BrowserDomAdapter,
   BrowserGetTestability,
@@ -35,11 +35,11 @@ import {
   withI18nSupport,
   withIncrementalHydration,
   withNoHttpTransferCache,
-} from './chunk-KI4GKF7B.js';
-import { getDOM } from './chunk-LKIPNMBV.js';
-import './chunk-O4IG6ODP.js';
-import './chunk-OIR7GKPT.js';
-import './chunk-VUNTEYGF.js';
+} from "./chunk-KI4GKF7B.js";
+import { getDOM } from "./chunk-LKIPNMBV.js";
+import "./chunk-O4IG6ODP.js";
+import "./chunk-OIR7GKPT.js";
+import "./chunk-VUNTEYGF.js";
 export {
   BrowserModule,
   By,

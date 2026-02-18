@@ -1,4 +1,4 @@
-import { DirEntry, FileStat } from './types';
+import { DirEntry, FileStat } from "./types";
 
 export interface Statfs {
   bsize: number;
@@ -59,13 +59,7 @@ export interface FilesystemProvider {
   readlink(ino: number): Promise<string>;
 
   // Rename
-  rename(
-    parent: number,
-    name: string,
-    newparent: number,
-    newname: string,
-    flags: number
-  ): Promise<void>;
+  rename(parent: number, name: string, newparent: number, newname: string, flags: number): Promise<void>;
 
   // Extended attributes
   setxattr(ino: number, name: string, value: Buffer, size: number, flags: number): Promise<void>;
@@ -84,26 +78,13 @@ export interface FilesystemProvider {
 
   // Advanced operations
   bmap(ino: number, blocksize: number, idx: number): Promise<number>;
-  ioctl(
-    ino: number,
-    cmd: number,
-    in_buf: Buffer | null,
-    in_bufsz: number,
-    out_bufsz: number
-  ): Promise<{ result: number; out_buf?: Buffer }>;
+  ioctl(ino: number, cmd: number, in_buf: Buffer | null, in_bufsz: number, out_bufsz: number): Promise<{ result: number; out_buf?: Buffer }>;
   poll(ino: number, fh: number): Promise<number>;
   fallocate(ino: number, fh: number, offset: number, length: number, mode: number): Promise<void>;
   readdirplus(ino: number, size: number, off: number): Promise<DirEntry[]>;
   retrieve_reply?(ino: number, cookie: number, offset: number, buffer: Buffer): Promise<void>;
   statx?(ino: number, flags: number, mask: number): Promise<FileStat | null>;
-  copy_file_range(
-    ino_in: number,
-    off_in: number,
-    ino_out: number,
-    off_out: number,
-    len: number,
-    flags: number
-  ): Promise<number>;
+  copy_file_range(ino_in: number, off_in: number, ino_out: number, off_out: number, len: number, flags: number): Promise<number>;
   lseek(ino: number, fh: number, off: number, whence: number): Promise<number>;
   tmpfile(parent: number, mode: number, flags: number): Promise<FileStat>;
 }

@@ -1,10 +1,10 @@
-import React from 'react';
-import { AbsoluteFill, Sequence } from 'remotion';
-import { TerminalBackground } from './components/TerminalBackground';
-import { Code } from './sequences/Code';
-import { CTA } from './sequences/CTA';
-import { Features } from './sequences/Features';
-import { Hero } from './sequences/Hero';
+import React from "react";
+import { AbsoluteFill, Sequence } from "remotion";
+import { TerminalBackground } from "./components/TerminalBackground";
+import { Code } from "./sequences/Code";
+import { CTA } from "./sequences/CTA";
+import { Features } from "./sequences/Features";
+import { Hero } from "./sequences/Hero";
 
 export const Intro: React.FC = () => {
   return (

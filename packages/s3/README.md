@@ -11,21 +11,21 @@ npm install @mount0/s3
 ## Usage
 
 ```typescript
-import { mount0 } from '@mount0/core';
-import { S3Provider } from '@mount0/s3';
+import { mount0 } from "@mount0/core";
+import { S3Provider } from "@mount0/s3";
 
 const fs = mount0();
 fs.handle(
-  '/s3',
+  "/s3",
   new S3Provider({
-    bucket: 'my-bucket',
-    region: 'us-east-1',
+    bucket: "my-bucket",
+    region: "us-east-1",
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   })
 );
 
-await fs.mount('/mnt/myfs');
+await fs.mount("/mnt/myfs");
 ```
 
 ## License

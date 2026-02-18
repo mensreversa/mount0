@@ -11,21 +11,21 @@ npm install @mount0/ssh
 ## Usage
 
 ```typescript
-import { mount0 } from '@mount0/core';
-import { SshProvider } from '@mount0/ssh';
+import { mount0 } from "@mount0/core";
+import { SshProvider } from "@mount0/ssh";
 
 const fs = mount0();
 fs.handle(
-  '/ssh',
+  "/ssh",
   new SshProvider({
-    host: 'example.com',
+    host: "example.com",
     port: 22,
-    username: 'user',
+    username: "user",
     privateKey: process.env.SSH_PRIVATE_KEY,
   })
 );
 
-await fs.mount('/mnt/myfs');
+await fs.mount("/mnt/myfs");
 ```
 
 ## License

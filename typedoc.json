@@ -1,9 +1,28 @@
 {
-  "entryPoints": ["packages/core/src/index.ts"],
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPointStrategy": "packages",
+  "entryPoints": [
+    "packages/core",
+    "packages/cache",
+    "packages/encrypted",
+    "packages/ftp",
+    "packages/local",
+    "packages/memory",
+    "packages/multi",
+    "packages/raid",
+    "packages/s3",
+    "packages/samba",
+    "packages/ssh",
+    "packages/webdav"
+  ],
   "out": "docs/docs/types",
-  "name": "Mount0 Documentation",
-  "readme": "none",
+  "name": "Mount0 API Documentation",
+  "readme": "README.md",
   "excludePrivate": true,
   "excludeProtected": true,
-  "excludeInternal": true
+  "excludeInternal": true,
+  "cleanOutputDir": true,
+  "githubPages": false,
+  "includeVersion": true,
+  "theme": "default"
 }

@@ -19,40 +19,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ['javascript', 'cpp']
+        language: ['javascript']
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        if: matrix.language == 'javascript' || matrix.language == 'cpp'
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22.x'
-          cache: 'npm'
-
-      - name: Install FUSE (for C++ build)
-        if: matrix.language == 'cpp'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libfuse3-dev build-essential python3 || true
-
-      - name: Install dependencies
-        if: matrix.language == 'javascript' || matrix.language == 'cpp'
-        run: npm ci
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
-          build-mode: ${{ matrix.language == 'cpp' && 'manual' || 'none' }}
-
-      - name: Build native module (for C++ analysis)
-        if: matrix.language == 'cpp'
-        run: |
-          cd packages/core
-          npm run build:native || npm run build:ts
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
-

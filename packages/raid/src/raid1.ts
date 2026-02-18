@@ -1,5 +1,5 @@
-import { FileStat, FilesystemProvider } from '@mount0/core';
-import { BaseRaidProvider } from './base';
+import { FileStat, FilesystemProvider } from "@mount0/core";
+import { BaseRaidProvider } from "./base";
 
 export interface Raid1Config {
   providers: FilesystemProvider[];
@@ -12,7 +12,7 @@ export class Raid1Provider extends BaseRaidProvider {
 
   async create(parent: number, name: string, mode: number, flags: number): Promise<FileStat> {
     const providerInos = this.getProviderInos(parent);
-    if (providerInos.length === 0) throw new Error('Parent not found');
+    if (providerInos.length === 0) throw new Error("Parent not found");
 
     const stats: FileStat[] = [];
     const providerFhs: number[] = [];
@@ -29,7 +29,7 @@ export class Raid1Provider extends BaseRaidProvider {
     }
 
     if (stats.length === 0) {
-      throw new Error('Failed to create file on any provider');
+      throw new Error("Failed to create file on any provider");
     }
 
     const raidIno = this.nextIno++;
@@ -45,38 +45,20 @@ export class Raid1Provider extends BaseRaidProvider {
     return { ...stats[0], ino: raidIno };
   }
 
-  async read(
-    ino: number,
-    fh: number,
-    buffer: Buffer,
-    offset: number,
-    length: number
-  ): Promise<number> {
+  async read(ino: number, fh: number, buffer: Buffer, offset: number, length: number): Promise<number> {
     const providerFhs = this.getProviderFhs(ino, fh);
     const providerInos = this.getProviderInos(ino);
     for (let i = 0; i < providerFhs.length && i < providerInos.length; i++) {
       try {
-        return await this.providers[i].read(
-          providerInos[i],
-          providerFhs[i],
-          buffer,
-          offset,
-          length
-        );
+        return await this.providers[i].read(providerInos[i], providerFhs[i], buffer, offset, length);
       } catch {
         continue;
       }
     }
-    throw new Error('All providers failed to read');
+    throw new Error("All providers failed to read");
   }
 
-  async write(
-    ino: number,
-    fh: number,
-    buffer: Buffer,
-    offset: number,
-    length: number
-  ): Promise<number> {
+  async write(ino: number, fh: number, buffer: Buffer, offset: number, length: number): Promise<number> {
     const providerFhs = this.getProviderFhs(ino, fh);
     const providerInos = this.getProviderInos(ino);
     await Promise.all(
@@ -91,7 +73,7 @@ export class Raid1Provider extends BaseRaidProvider {
 
   async unlink(parent: number, name: string): Promise<void> {
     const providerInos = this.getProviderInos(parent);
-    if (providerInos.length === 0) throw new Error('Parent not found');
+    if (providerInos.length === 0) throw new Error("Parent not found");
     const results = await Promise.allSettled(
       this.providers.map((p, i) => {
         if (providerInos[i]) {
@@ -99,7 +81,7 @@ export class Raid1Provider extends BaseRaidProvider {
         }
       })
     );
-    const failures = results.filter((r) => r.status === 'rejected');
+    const failures = results.filter((r) => r.status === "rejected");
     if (failures.length > 0) {
       throw new Error(`Failed to unlink on ${failures.length} providers`);
     }

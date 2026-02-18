@@ -11,22 +11,22 @@ npm install @mount0/samba
 ## Usage
 
 ```typescript
-import { mount0 } from '@mount0/core';
-import { SambaProvider } from '@mount0/samba';
+import { mount0 } from "@mount0/core";
+import { SambaProvider } from "@mount0/samba";
 
 const fs = mount0();
 fs.handle(
-  '/samba',
+  "/samba",
   new SambaProvider({
-    host: 'server.example.com',
-    share: 'shared',
-    username: 'user',
-    password: 'password',
-    domain: 'WORKGROUP',
+    host: "server.example.com",
+    share: "shared",
+    username: "user",
+    password: "password",
+    domain: "WORKGROUP",
   })
 );
 
-await fs.mount('/mnt/myfs');
+await fs.mount("/mnt/myfs");
 ```
 
 ## License

@@ -1,5 +1,5 @@
-import './chunk-GOMI4DH3.js';
-import './chunk-LKIPNMBV.js';
+import "./chunk-GOMI4DH3.js";
+import "./chunk-LKIPNMBV.js";
 import {
   FetchBackend,
   HTTP_INTERCEPTORS,
@@ -40,8 +40,8 @@ import {
   withNoXsrfProtection,
   withRequestsMadeViaParent,
   withXsrfConfiguration,
-} from './chunk-O4IG6ODP.js';
-import './chunk-VUNTEYGF.js';
+} from "./chunk-O4IG6ODP.js";
+import "./chunk-VUNTEYGF.js";
 export {
   FetchBackend,
   HTTP_INTERCEPTORS,

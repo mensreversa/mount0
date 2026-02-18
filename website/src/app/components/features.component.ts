@@ -1,17 +1,10 @@
-import { Component } from '@angular/core';
-import { NgIconComponent, provideIcons } from '@ng-icons/core';
-import {
-  lucideCode,
-  lucideCpu,
-  lucideLayers,
-  lucideShield,
-  lucideUnlock,
-  lucideZap,
-} from '@ng-icons/lucide';
-import { CodeComponent } from '../shared/components/code.component';
+import { Component } from "@angular/core";
+import { NgIconComponent, provideIcons } from "@ng-icons/core";
+import { lucideCode, lucideCpu, lucideLayers, lucideShield, lucideUnlock, lucideZap } from "@ng-icons/lucide";
+import { CodeComponent } from "../shared/components/code.component";
 
 @Component({
-  selector: 'app-features',
+  selector: "app-features",
   standalone: true,
   template: `
     <section id="features" class="relative z-10 py-20 px-6 bg-black">
@@ -31,9 +24,7 @@ import { CodeComponent } from '../shared/components/code.component';
               <div class="w-12 h-12 mb-4 border border-white/20 flex items-center justify-center">
                 <ng-icon name="lucideZap" size="24" class="text-white" />
               </div>
-              <p class="text-white/60 text-xs font-mono leading-relaxed">
-                Pure in-memory operations. No physical disk latency. Data lives only in RAM.
-              </p>
+              <p class="text-white/60 text-xs font-mono leading-relaxed">Pure in-memory operations. No physical disk latency. Data lives only in RAM.</p>
             </div>
           </div>
 
@@ -45,10 +36,7 @@ import { CodeComponent } from '../shared/components/code.component';
               <div class="w-12 h-12 mb-4 border border-white/20 flex items-center justify-center">
                 <ng-icon name="lucideCpu" size="24" class="text-white" />
               </div>
-              <p class="text-white/60 text-xs font-mono leading-relaxed">
-                Mount any data source into the native OS filesystem tree using High-performance FUSE
-                bindings.
-              </p>
+              <p class="text-white/60 text-xs font-mono leading-relaxed">Mount any data source into the native OS filesystem tree using High-performance FUSE bindings.</p>
             </div>
           </div>
 
@@ -60,10 +48,7 @@ import { CodeComponent } from '../shared/components/code.component';
               <div class="w-12 h-12 mb-4 border border-white/20 flex items-center justify-center">
                 <ng-icon name="lucideShield" size="24" class="text-white" />
               </div>
-              <p class="text-white/60 text-xs font-mono leading-relaxed">
-                Built-in AES-256-GCM encryption at the filesystem level. Your data is always secure
-                at rest.
-              </p>
+              <p class="text-white/60 text-xs font-mono leading-relaxed">Built-in AES-256-GCM encryption at the filesystem level. Your data is always secure at rest.</p>
             </div>
           </div>
         </div>
@@ -74,9 +59,7 @@ import { CodeComponent } from '../shared/components/code.component';
           <app-code title="[MOUNT_INTERFACES]" [code]="mountInterfacesCode" language="typescript" />
         </div>
 
-        <p class="text-white/50 text-xs font-mono text-center mb-10">
-          // more providers and RAID levels coming
-        </p>
+        <p class="text-white/50 text-xs font-mono text-center mb-10">// more providers and RAID levels coming</p>
 
         <div class="text-center">
           <div class="max-w-3xl mx-auto">
@@ -87,9 +70,7 @@ import { CodeComponent } from '../shared/components/code.component';
     </section>
   `,
   imports: [NgIconComponent, CodeComponent],
-  providers: [
-    provideIcons({ lucideZap, lucideCode, lucideUnlock, lucideShield, lucideCpu, lucideLayers }),
-  ],
+  providers: [provideIcons({ lucideZap, lucideCode, lucideUnlock, lucideShield, lucideCpu, lucideLayers })],
 })
 export class FeaturesComponent {
   protected readonly cliCode = `$ mount0 mount /mnt/s3 --provider s3 --bucket my-data

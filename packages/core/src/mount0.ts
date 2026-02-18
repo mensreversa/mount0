@@ -1,6 +1,6 @@
-import { FuseBridge } from './bridge';
-import { FilesystemProvider } from './provider';
-import { RouterProvider } from './router';
+import { FuseBridge } from "./bridge";
+import { FilesystemProvider } from "./provider";
+import { RouterProvider } from "./router";
 
 export interface MountOptions {
   options?: Record<string, string>;
@@ -27,7 +27,7 @@ export class Mount0 {
 
   async mount(mountpoint: string, options?: MountOptions): Promise<void> {
     if (!this.router || this.router.providers.length === 0) {
-      throw new Error('No provider set. Call handle() first.');
+      throw new Error("No provider set. Call handle() first.");
     }
 
     this.bridge = new FuseBridge(this.router);

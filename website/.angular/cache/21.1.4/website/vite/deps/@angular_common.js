@@ -1,14 +1,5 @@
-import './chunk-GOMI4DH3.js';
-import {
-  BrowserPlatformLocation,
-  DomAdapter,
-  LOCATION_INITIALIZED,
-  PlatformLocation,
-  XhrFactory,
-  getDOM,
-  parseCookieValue,
-  setRootDomAdapter,
-} from './chunk-LKIPNMBV.js';
+import "./chunk-GOMI4DH3.js";
+import { BrowserPlatformLocation, DomAdapter, LOCATION_INITIALIZED, PlatformLocation, XhrFactory, getDOM, parseCookieValue, setRootDomAdapter } from "./chunk-LKIPNMBV.js";
 import {
   APP_BASE_HREF,
   AsyncPipe,
@@ -98,8 +89,8 @@ import {
   provideImgixLoader,
   provideNetlifyLoader,
   registerLocaleData,
-} from './chunk-OIR7GKPT.js';
-import { DOCUMENT, IMAGE_CONFIG } from './chunk-VUNTEYGF.js';
+} from "./chunk-OIR7GKPT.js";
+import { DOCUMENT, IMAGE_CONFIG } from "./chunk-VUNTEYGF.js";
 export {
   APP_BASE_HREF,
   AsyncPipe,

@@ -1,5 +1,5 @@
-import React from 'react';
-import { AbsoluteFill, spring, useCurrentFrame, useVideoConfig } from 'remotion';
+import React from "react";
+import { AbsoluteFill, spring, useCurrentFrame, useVideoConfig } from "remotion";
 
 const FeatureItem: React.FC<{ text: string; delay: number }> = ({ text, delay }) => {
   const frame = useCurrentFrame();
@@ -13,9 +13,9 @@ const FeatureItem: React.FC<{ text: string; delay: number }> = ({ text, delay })
         opacity,
         transform: `translateY(${translateY}px)`,
         fontSize: 60,
-        margin: '20px 0',
-        color: '#fff',
-        fontFamily: 'monospace',
+        margin: "20px 0",
+        color: "#fff",
+        fontFamily: "monospace",
       }}
     >
       {text}
@@ -25,7 +25,7 @@ const FeatureItem: React.FC<{ text: string; delay: number }> = ({ text, delay })
 
 export const Features: React.FC = () => {
   return (
-    <AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center' }}>
+    <AbsoluteFill style={{ justifyContent: "center", alignItems: "center" }}>
       <FeatureItem text="> In-Memory Speed" delay={0} />
       <FeatureItem text="> FUSE Compatibility" delay={15} />
       <FeatureItem text="> Zero Disk Footprint" delay={30} />

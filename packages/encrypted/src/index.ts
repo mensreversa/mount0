@@ -1,6 +1,6 @@
-import { DirEntry, FileStat, FilesystemProvider, Flock, Statfs } from '@mount0/core';
-import { createCipheriv, createDecipheriv, randomBytes, scrypt } from 'crypto';
-import { promisify } from 'util';
+import { DirEntry, FileStat, FilesystemProvider, Flock, Statfs } from "@mount0/core";
+import { createCipheriv, createDecipheriv, randomBytes, scrypt } from "crypto";
+import { promisify } from "util";
 
 const scryptAsync = promisify(scrypt);
 
@@ -25,7 +25,7 @@ export class EncryptedProvider implements FilesystemProvider {
   constructor(config: EncryptedProviderConfig) {
     this.provider = config.provider;
     this.password = config.password;
-    this.algorithm = config.algorithm || 'aes-256-gcm';
+    this.algorithm = config.algorithm || "aes-256-gcm";
     this.keyLength = config.keyLength || 32;
   }
 
@@ -36,8 +36,7 @@ export class EncryptedProvider implements FilesystemProvider {
       this.salt = randomBytes(16);
     }
 
-    const passwordBuffer =
-      typeof this.password === 'string' ? Buffer.from(this.password, 'utf8') : this.password;
+    const passwordBuffer = typeof this.password === "string" ? Buffer.from(this.password, "utf8") : this.password;
 
     this.key = (await scryptAsync(passwordBuffer, this.salt!, this.keyLength)) as Buffer;
     return this.key;
@@ -50,6 +49,7 @@ export class EncryptedProvider implements FilesystemProvider {
 
     const encrypted = Buffer.concat([cipher.update(data), cipher.final()]);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const authTag = (cipher as any).getAuthTag?.();
 
     return Buffer.concat([iv, authTag || Buffer.alloc(0), encrypted]);
@@ -58,12 +58,13 @@ export class EncryptedProvider implements FilesystemProvider {
   private async decrypt(encrypted: Buffer): Promise<Buffer> {
     const key = await this.getKey();
     const iv = encrypted.subarray(0, 16);
-    const authTagLength = this.algorithm.includes('gcm') ? 16 : 0;
+    const authTagLength = this.algorithm.includes("gcm") ? 16 : 0;
     const authTag = authTagLength > 0 ? encrypted.subarray(16, 16 + authTagLength) : undefined;
     const data = encrypted.subarray(16 + authTagLength);
 
     const decipher = createDecipheriv(this.algorithm, key, iv);
     if (authTag) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (decipher as any).setAuthTag(authTag);
     }
 
@@ -138,23 +139,11 @@ export class EncryptedProvider implements FilesystemProvider {
     return this.provider.open(providerIno, flags, mode);
   }
 
-  async read(
-    ino: number,
-    fh: number,
-    buffer: Buffer,
-    offset: number,
-    length: number
-  ): Promise<number> {
+  async read(ino: number, fh: number, buffer: Buffer, offset: number, length: number): Promise<number> {
     const providerIno = this.getProviderIno(ino);
-    const overhead = this.algorithm.includes('gcm') ? 32 : 16;
+    const overhead = this.algorithm.includes("gcm") ? 32 : 16;
     const encryptedBuffer = Buffer.alloc(length + overhead);
-    const bytesRead = await this.provider.read(
-      providerIno,
-      fh,
-      encryptedBuffer,
-      offset,
-      length + overhead
-    );
+    const bytesRead = await this.provider.read(providerIno, fh, encryptedBuffer, offset, length + overhead);
     if (bytesRead < overhead) return 0;
 
     try {
@@ -163,17 +152,11 @@ export class EncryptedProvider implements FilesystemProvider {
       decrypted.copy(buffer, 0, 0, toCopy);
       return toCopy;
     } catch {
-      throw new Error('Decryption failed');
+      throw new Error("Decryption failed");
     }
   }
 
-  async write(
-    ino: number,
-    fh: number,
-    buffer: Buffer,
-    offset: number,
-    length: number
-  ): Promise<number> {
+  async write(ino: number, fh: number, buffer: Buffer, offset: number, length: number): Promise<number> {
     const providerIno = this.getProviderIno(ino);
     const encrypted = await this.encrypt(buffer.subarray(0, length));
     await this.provider.write(providerIno, fh, encrypted, offset, encrypted.length);
@@ -251,25 +234,13 @@ export class EncryptedProvider implements FilesystemProvider {
     return this.provider.readlink(providerIno);
   }
 
-  async rename(
-    parent: number,
-    name: string,
-    newparent: number,
-    newname: string,
-    flags: number
-  ): Promise<void> {
+  async rename(parent: number, name: string, newparent: number, newname: string, flags: number): Promise<void> {
     const providerParent = this.getProviderIno(parent);
     const providerNewParent = this.getProviderIno(newparent);
     return this.provider.rename(providerParent, name, providerNewParent, newname, flags);
   }
 
-  async setxattr(
-    ino: number,
-    name: string,
-    value: Buffer,
-    size: number,
-    flags: number
-  ): Promise<void> {
+  async setxattr(ino: number, name: string, value: Buffer, size: number, flags: number): Promise<void> {
     const providerIno = this.getProviderIno(ino);
     return this.provider.setxattr(providerIno, name, value, size, flags);
   }
@@ -319,13 +290,7 @@ export class EncryptedProvider implements FilesystemProvider {
     return this.provider.bmap(providerIno, blocksize, idx);
   }
 
-  async ioctl(
-    ino: number,
-    cmd: number,
-    in_buf: Buffer | null,
-    in_bufsz: number,
-    out_bufsz: number
-  ): Promise<{ result: number; out_buf?: Buffer }> {
+  async ioctl(ino: number, cmd: number, in_buf: Buffer | null, in_bufsz: number, out_bufsz: number): Promise<{ result: number; out_buf?: Buffer }> {
     const providerIno = this.getProviderIno(ino);
     return this.provider.ioctl(providerIno, cmd, in_buf, in_bufsz, out_bufsz);
   }
@@ -335,13 +300,7 @@ export class EncryptedProvider implements FilesystemProvider {
     return this.provider.poll(providerIno, fh);
   }
 
-  async fallocate(
-    ino: number,
-    fh: number,
-    offset: number,
-    length: number,
-    mode: number
-  ): Promise<void> {
+  async fallocate(ino: number, fh: number, offset: number, length: number, mode: number): Promise<void> {
     const providerIno = this.getProviderIno(ino);
     return this.provider.fallocate(providerIno, fh, offset, length, mode);
   }
@@ -356,24 +315,10 @@ export class EncryptedProvider implements FilesystemProvider {
     });
   }
 
-  async copy_file_range(
-    ino_in: number,
-    off_in: number,
-    ino_out: number,
-    off_out: number,
-    len: number,
-    flags: number
-  ): Promise<number> {
+  async copy_file_range(ino_in: number, off_in: number, ino_out: number, off_out: number, len: number, flags: number): Promise<number> {
     const providerInoIn = this.getProviderIno(ino_in);
     const providerInoOut = this.getProviderIno(ino_out);
-    return this.provider.copy_file_range(
-      providerInoIn,
-      off_in,
-      providerInoOut,
-      off_out,
-      len,
-      flags
-    );
+    return this.provider.copy_file_range(providerInoIn, off_in, providerInoOut, off_out, len, flags);
   }
 
   async lseek(ino: number, fh: number, off: number, whence: number): Promise<number> {

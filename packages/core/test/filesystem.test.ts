@@ -2,13 +2,13 @@
  * Filesystem Tests
  */
 
-import { FilesystemProvider } from '../src/provider';
-import { RouterProvider } from '../src/router';
-import { DirEntry, FileStat } from '../src/types';
+import { FilesystemProvider } from "../src/provider";
+import { RouterProvider } from "../src/router";
+import { DirEntry, FileStat } from "../src/types";
 
-describe('RouterProvider', () => {
-  describe('Provider Routing', () => {
-    test('should route to correct provider', async () => {
+describe("RouterProvider", () => {
+  describe("Provider Routing", () => {
+    test("should route to correct provider", async () => {
       const stat1: FileStat = {
         mode: 0o644,
         size: 0,
@@ -49,8 +49,8 @@ describe('RouterProvider', () => {
       } as any;
 
       const router = new RouterProvider([
-        { path: '/data', provider: provider1 },
-        { path: '/cache', provider: provider2 },
+        { path: "/data", provider: provider1 },
+        { path: "/cache", provider: provider2 },
       ]);
 
       // Lookup files in different paths
@@ -59,8 +59,8 @@ describe('RouterProvider', () => {
       provider1.getattr = jest.fn().mockResolvedValue(stat1);
       provider2.getattr = jest.fn().mockResolvedValue(stat2);
 
-      const result1 = await router.lookup(1, 'data');
-      const result2 = await router.lookup(1, 'cache');
+      const result1 = await router.lookup(1, "data");
+      const result2 = await router.lookup(1, "cache");
 
       expect(result1).toEqual(stat1);
       expect(result2).toEqual(stat2);
@@ -68,7 +68,7 @@ describe('RouterProvider', () => {
       expect(provider2.getattr).toHaveBeenCalledWith(1);
     });
 
-    test('should prefer longest matching path', async () => {
+    test("should prefer longest matching path", async () => {
       const dataStat: FileStat = {
         mode: 0o755,
         size: 0,
@@ -109,13 +109,13 @@ describe('RouterProvider', () => {
       } as any;
 
       const router = new RouterProvider([
-        { path: '/data', provider: provider1 },
-        { path: '/data/sub', provider: provider2 },
+        { path: "/data", provider: provider1 },
+        { path: "/data/sub", provider: provider2 },
       ]);
 
       // When looking up 'data' from root, it should match /data (not /data/sub)
       // because lookup(1, 'data') calls matchProvider('/data')
-      const dataResult = await router.lookup(1, 'data');
+      const dataResult = await router.lookup(1, "data");
       expect(dataResult).toEqual(dataStat);
       expect(provider1.getattr).toHaveBeenCalledWith(1);
 
@@ -124,13 +124,13 @@ describe('RouterProvider', () => {
       if (dataResult) {
         // The inode is registered to provider1, so lookup will use provider1
         provider1.lookup = jest.fn().mockResolvedValue(subStat);
-        const subResult = await router.lookup(dataResult.ino, 'sub');
+        const subResult = await router.lookup(dataResult.ino, "sub");
         expect(subResult).toEqual(subStat);
-        expect(provider1.lookup).toHaveBeenCalledWith(dataResult.ino, 'sub');
+        expect(provider1.lookup).toHaveBeenCalledWith(dataResult.ino, "sub");
       }
     });
 
-    test('should handle provider lookup by inode', async () => {
+    test("should handle provider lookup by inode", async () => {
       const stat: FileStat = {
         mode: 0o644,
         size: 0,
@@ -151,10 +151,10 @@ describe('RouterProvider', () => {
         getattr: jest.fn().mockResolvedValue(stat),
       } as any;
 
-      const router = new RouterProvider([{ path: '/data', provider }]);
+      const router = new RouterProvider([{ path: "/data", provider }]);
 
       // First lookup to register the inode
-      const lookupResult = await router.lookup(1, 'data');
+      const lookupResult = await router.lookup(1, "data");
       expect(lookupResult).toEqual(stat);
 
       // Then getattr should use the registered provider
@@ -164,8 +164,8 @@ describe('RouterProvider', () => {
     });
   });
 
-  describe('Filesystem Operations', () => {
-    test('should route create operations', async () => {
+  describe("Filesystem Operations", () => {
+    test("should route create operations", async () => {
       const createdStat: FileStat = {
         mode: 0o644,
         size: 0,
@@ -188,23 +188,23 @@ describe('RouterProvider', () => {
         readdir: jest.fn().mockResolvedValue([]),
       } as any;
 
-      const router = new RouterProvider([{ path: '/data', provider }]);
+      const router = new RouterProvider([{ path: "/data", provider }]);
 
       // First lookup the parent (root directory)
       const parentStat = await router.getattr(1);
       expect(parentStat).not.toBeNull();
       if (parentStat) {
         // For root, we need to lookup the 'data' entry first
-        const dataStat = await router.lookup(1, 'data');
+        const dataStat = await router.lookup(1, "data");
         if (dataStat) {
-          const result = await router.create(dataStat.ino, 'test.txt', 0o644, 0);
+          const result = await router.create(dataStat.ino, "test.txt", 0o644, 0);
           expect(result).toEqual(createdStat);
-          expect(provider.create).toHaveBeenCalledWith(dataStat.ino, 'test.txt', 0o644, 0);
+          expect(provider.create).toHaveBeenCalledWith(dataStat.ino, "test.txt", 0o644, 0);
         }
       }
     });
 
-    test('should route read and write operations', async () => {
+    test("should route read and write operations", async () => {
       const fileStat: FileStat = {
         mode: 0o644,
         size: 0,
@@ -230,10 +230,10 @@ describe('RouterProvider', () => {
         readdir: jest.fn().mockResolvedValue([]),
       } as any;
 
-      const router = new RouterProvider([{ path: '/data', provider }]);
+      const router = new RouterProvider([{ path: "/data", provider }]);
 
       // Lookup file
-      const stat = await router.lookup(1, 'data');
+      const stat = await router.lookup(1, "data");
       expect(stat).toEqual(fileStat);
       expect(stat).not.toBeNull();
 
@@ -244,16 +244,10 @@ describe('RouterProvider', () => {
         expect(provider.open).toHaveBeenCalledWith(stat.ino, 0, 0o644);
 
         // Write to file
-        const writeBuffer = Buffer.from('Hello, World!');
+        const writeBuffer = Buffer.from("Hello, World!");
         const bytesWritten = await router.write(stat.ino, fh, writeBuffer, 0, writeBuffer.length);
         expect(bytesWritten).toBe(13);
-        expect(provider.write).toHaveBeenCalledWith(
-          stat.ino,
-          fh,
-          writeBuffer,
-          0,
-          writeBuffer.length
-        );
+        expect(provider.write).toHaveBeenCalledWith(stat.ino, fh, writeBuffer, 0, writeBuffer.length);
 
         // Read from file
         const readBuffer = Buffer.alloc(13);
@@ -267,7 +261,7 @@ describe('RouterProvider', () => {
       }
     });
 
-    test('should route directory operations', async () => {
+    test("should route directory operations", async () => {
       const dirStat: FileStat = {
         mode: 0o755,
         size: 0,
@@ -283,7 +277,7 @@ describe('RouterProvider', () => {
         blksize: 0,
         blocks: 0,
       };
-      const entries: DirEntry[] = [{ name: 'subdir', mode: 0o755, ino: 3 }];
+      const entries: DirEntry[] = [{ name: "subdir", mode: 0o755, ino: 3 }];
       const provider: FilesystemProvider = {
         lookup: jest.fn().mockResolvedValue(dirStat),
         getattr: jest.fn().mockResolvedValue(dirStat),
@@ -292,18 +286,18 @@ describe('RouterProvider', () => {
         rmdir: jest.fn().mockResolvedValue(undefined),
       } as any;
 
-      const router = new RouterProvider([{ path: '/data', provider }]);
+      const router = new RouterProvider([{ path: "/data", provider }]);
 
       // Lookup directory
-      const stat = await router.lookup(1, 'data');
+      const stat = await router.lookup(1, "data");
       expect(stat).toEqual(dirStat);
       expect(stat).not.toBeNull();
 
       if (stat) {
         // Create subdirectory
-        const createdDir = await router.mkdir(stat.ino, 'subdir', 0o755);
+        const createdDir = await router.mkdir(stat.ino, "subdir", 0o755);
         expect(createdDir).toEqual(dirStat);
-        expect(provider.mkdir).toHaveBeenCalledWith(stat.ino, 'subdir', 0o755);
+        expect(provider.mkdir).toHaveBeenCalledWith(stat.ino, "subdir", 0o755);
 
         // Read directory
         const dirEntries = await router.readdir(stat.ino, 4096, 0);
@@ -311,12 +305,12 @@ describe('RouterProvider', () => {
         expect(provider.readdir).toHaveBeenCalledWith(stat.ino, 4096, 0);
 
         // Remove directory
-        await router.rmdir(stat.ino, 'subdir');
-        expect(provider.rmdir).toHaveBeenCalledWith(stat.ino, 'subdir');
+        await router.rmdir(stat.ino, "subdir");
+        expect(provider.rmdir).toHaveBeenCalledWith(stat.ino, "subdir");
       }
     });
 
-    test('should route file operations', async () => {
+    test("should route file operations", async () => {
       const fileStat: FileStat = {
         mode: 0o644,
         size: 12,
@@ -341,16 +335,16 @@ describe('RouterProvider', () => {
         readdir: jest.fn().mockResolvedValue([]),
       } as any;
 
-      const router = new RouterProvider([{ path: '/data', provider }]);
+      const router = new RouterProvider([{ path: "/data", provider }]);
 
       // Lookup parent directory
-      const parentStat = await router.lookup(1, 'data');
+      const parentStat = await router.lookup(1, "data");
       expect(parentStat).toEqual(fileStat);
       expect(parentStat).not.toBeNull();
 
       if (parentStat) {
         // Create file
-        const createdStat = await router.create(parentStat.ino, 'file.txt', 0o644, 0);
+        const createdStat = await router.create(parentStat.ino, "file.txt", 0o644, 0);
         expect(createdStat).toEqual(fileStat);
 
         // Get attributes
@@ -358,29 +352,23 @@ describe('RouterProvider', () => {
         expect(resultStat?.size).toBe(12);
 
         // Rename file
-        await router.rename(parentStat.ino, 'file.txt', parentStat.ino, 'new.txt', 0);
-        expect(provider.rename).toHaveBeenCalledWith(
-          parentStat.ino,
-          'file.txt',
-          parentStat.ino,
-          'new.txt',
-          0
-        );
+        await router.rename(parentStat.ino, "file.txt", parentStat.ino, "new.txt", 0);
+        expect(provider.rename).toHaveBeenCalledWith(parentStat.ino, "file.txt", parentStat.ino, "new.txt", 0);
 
         // Unlink file
-        await router.unlink(parentStat.ino, 'new.txt');
-        expect(provider.unlink).toHaveBeenCalledWith(parentStat.ino, 'new.txt');
+        await router.unlink(parentStat.ino, "new.txt");
+        expect(provider.unlink).toHaveBeenCalledWith(parentStat.ino, "new.txt");
       }
     });
   });
 
-  describe('Error Handling', () => {
-    test('should throw when no provider found for path', async () => {
+  describe("Error Handling", () => {
+    test("should throw when no provider found for path", async () => {
       const router = new RouterProvider([]);
-      await expect(router.lookup(1, 'other')).rejects.toThrow('No provider found');
+      await expect(router.lookup(1, "other")).rejects.toThrow("No provider found");
     });
 
-    test('should throw when provider operation fails', async () => {
+    test("should throw when provider operation fails", async () => {
       const fileStat: FileStat = {
         mode: 0o644,
         size: 0,
@@ -399,27 +387,27 @@ describe('RouterProvider', () => {
       const provider: FilesystemProvider = {
         lookup: jest.fn().mockResolvedValue(fileStat),
         getattr: jest.fn().mockResolvedValue(fileStat),
-        open: jest.fn().mockRejectedValue(new Error('File not found')),
+        open: jest.fn().mockRejectedValue(new Error("File not found")),
         readdir: jest.fn().mockResolvedValue([]),
       } as any;
 
-      const router = new RouterProvider([{ path: '/data', provider }]);
+      const router = new RouterProvider([{ path: "/data", provider }]);
 
-      const stat = await router.lookup(1, 'data');
+      const stat = await router.lookup(1, "data");
       expect(stat).not.toBeNull();
       if (stat) {
-        await expect(router.open(stat.ino, 0, 0o644)).rejects.toThrow('File not found');
+        await expect(router.open(stat.ino, 0, 0o644)).rejects.toThrow("File not found");
       }
     });
 
-    test('should throw when provider not found for inode', async () => {
+    test("should throw when provider not found for inode", async () => {
       const router = new RouterProvider([]);
-      await expect(router.getattr(999)).rejects.toThrow('Provider not found for inode 999');
+      await expect(router.getattr(999)).rejects.toThrow("Provider not found for inode 999");
     });
   });
 
-  describe('Provider Management', () => {
-    test('should handle adding providers', () => {
+  describe("Provider Management", () => {
+    test("should handle adding providers", () => {
       const provider: FilesystemProvider = {
         lookup: jest.fn(),
         getattr: jest.fn(),
@@ -427,28 +415,28 @@ describe('RouterProvider', () => {
       } as any;
 
       const router = new RouterProvider([]);
-      router.handle('/data', provider);
+      router.handle("/data", provider);
 
       expect(router.providers).toHaveLength(1);
-      expect(router.providers[0].path).toBe('/data');
+      expect(router.providers[0].path).toBe("/data");
       expect(router.providers[0].provider).toBe(provider);
     });
 
-    test('should handle removing providers', () => {
+    test("should handle removing providers", () => {
       const provider: FilesystemProvider = {
         lookup: jest.fn(),
         getattr: jest.fn(),
         readdir: jest.fn().mockResolvedValue([]),
       } as any;
 
-      const router = new RouterProvider([{ path: '/data', provider }]);
+      const router = new RouterProvider([{ path: "/data", provider }]);
       expect(router.providers).toHaveLength(1);
 
-      router.unhandle('/data');
+      router.unhandle("/data");
       expect(router.providers).toHaveLength(0);
     });
 
-    test('should sort providers by path length when adding', () => {
+    test("should sort providers by path length when adding", () => {
       const provider1: FilesystemProvider = {
         lookup: jest.fn(),
         getattr: jest.fn(),
@@ -463,12 +451,12 @@ describe('RouterProvider', () => {
       const router = new RouterProvider([]);
 
       // Add providers - handle() should sort them by length
-      router.handle('/data', provider1);
-      router.handle('/data/sub', provider2);
+      router.handle("/data", provider1);
+      router.handle("/data/sub", provider2);
 
       // Should be sorted by length (longest first)
-      expect(router.providers[0].path).toBe('/data/sub');
-      expect(router.providers[1].path).toBe('/data');
+      expect(router.providers[0].path).toBe("/data/sub");
+      expect(router.providers[1].path).toBe("/data");
     });
   });
 });

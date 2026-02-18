@@ -1,4 +1,4 @@
-import { DirEntry, FileStat, FilesystemProvider, Flock, Statfs } from '@mount0/core';
+import { DirEntry, FileStat, FilesystemProvider, Flock, Statfs } from "@mount0/core";
 
 export abstract class BaseRaidProvider implements FilesystemProvider {
   protected providers: FilesystemProvider[];
@@ -11,7 +11,7 @@ export abstract class BaseRaidProvider implements FilesystemProvider {
 
   constructor(providers: FilesystemProvider[], stripeSize: number = 64 * 1024) {
     if (providers.length < 2) {
-      throw new Error('RAID requires at least 2 providers');
+      throw new Error("RAID requires at least 2 providers");
     }
     this.providers = providers;
     this.stripeSize = stripeSize;
@@ -30,9 +30,9 @@ export abstract class BaseRaidProvider implements FilesystemProvider {
 
   protected getProviderFhs(ino: number, fh: number): number[] {
     const fileHandles = this.openFiles.get(ino);
-    if (!fileHandles) throw new Error('File not open');
+    if (!fileHandles) throw new Error("File not open");
     const providerFhs = fileHandles.get(fh);
-    if (!providerFhs) throw new Error('File handle not found');
+    if (!providerFhs) throw new Error("File handle not found");
     return providerFhs;
   }
 
@@ -114,9 +114,7 @@ export abstract class BaseRaidProvider implements FilesystemProvider {
 
   async setattr(ino: number, to_set: number, attr: FileStat): Promise<void> {
     const providerInos = this.getProviderInos(ino);
-    await Promise.all(
-      providerInos.map((providerIno, i) => this.providers[i].setattr(providerIno, to_set, attr))
-    );
+    await Promise.all(providerInos.map((providerIno, i) => this.providers[i].setattr(providerIno, to_set, attr)));
   }
 
   async readdir(ino: number, size: number, offset: number): Promise<DirEntry[]> {
@@ -184,7 +182,7 @@ export abstract class BaseRaidProvider implements FilesystemProvider {
 
   async open(ino: number, flags: number, mode?: number): Promise<number> {
     const providerInos = this.getProviderInos(ino);
-    if (providerInos.length === 0) throw new Error('File not found');
+    if (providerInos.length === 0) throw new Error("File not found");
 
     const providerFhs: number[] = [];
     const errors: Error[] = [];
@@ -199,7 +197,7 @@ export abstract class BaseRaidProvider implements FilesystemProvider {
     }
 
     if (providerFhs.length === 0) {
-      throw new Error(`Failed to open: ${errors.map((e) => e.message).join(', ')}`);
+      throw new Error(`Failed to open: ${errors.map((e) => e.message).join(", ")}`);
     }
 
     const fh = this.nextFh++;
@@ -210,26 +208,14 @@ export abstract class BaseRaidProvider implements FilesystemProvider {
     return fh;
   }
 
-  async read(
-    _ino: number,
-    _fh: number,
-    _buffer: Buffer,
-    _offset: number,
-    _length: number
-  ): Promise<number> {
+  async read(_ino: number, _fh: number, _buffer: Buffer, _offset: number, _length: number): Promise<number> {
     // Abstract - implemented by subclasses
-    throw new Error('read must be implemented by subclass');
+    throw new Error("read must be implemented by subclass");
   }
 
-  async write(
-    _ino: number,
-    _fh: number,
-    _buffer: Buffer,
-    _offset: number,
-    _length: number
-  ): Promise<number> {
+  async write(_ino: number, _fh: number, _buffer: Buffer, _offset: number, _length: number): Promise<number> {
     // Abstract - implemented by subclasses
-    throw new Error('write must be implemented by subclass');
+    throw new Error("write must be implemented by subclass");
   }
 
   async flush(ino: number, fh: number): Promise<void> {
@@ -278,7 +264,7 @@ export abstract class BaseRaidProvider implements FilesystemProvider {
 
   async create(parent: number, name: string, mode: number, flags: number): Promise<FileStat> {
     const providerInos = this.getProviderInos(parent);
-    if (providerInos.length === 0) throw new Error('Parent not found');
+    if (providerInos.length === 0) throw new Error("Parent not found");
 
     const stats: FileStat[] = [];
     const providerFhs: number[] = [];
@@ -295,7 +281,7 @@ export abstract class BaseRaidProvider implements FilesystemProvider {
     }
 
     if (stats.length === 0) {
-      throw new Error('Failed to create file on any provider');
+      throw new Error("Failed to create file on any provider");
     }
 
     const raidIno = this.nextIno++;
@@ -313,7 +299,7 @@ export abstract class BaseRaidProvider implements FilesystemProvider {
 
   async mknod(parent: number, name: string, mode: number, rdev: number): Promise<FileStat> {
     const providerInos = this.getProviderInos(parent);
-    if (providerInos.length === 0) throw new Error('Parent not found');
+    if (providerInos.length === 0) throw new Error("Parent not found");
 
     const stats: FileStat[] = [];
     for (let i = 0; i < this.providers.length && i < providerInos.length; i++) {
@@ -326,7 +312,7 @@ export abstract class BaseRaidProvider implements FilesystemProvider {
     }
 
     if (stats.length === 0) {
-      throw new Error('Failed to create node on any provider');
+      throw new Error("Failed to create node on any provider");
     }
 
     const raidIno = this.nextIno++;
@@ -337,7 +323,7 @@ export abstract class BaseRaidProvider implements FilesystemProvider {
 
   async mkdir(parent: number, name: string, mode: number): Promise<FileStat> {
     const providerInos = this.getProviderInos(parent);
-    if (providerInos.length === 0) throw new Error('Parent not found');
+    if (providerInos.length === 0) throw new Error("Parent not found");
 
     const stats: FileStat[] = [];
     for (let i = 0; i < this.providers.length && i < providerInos.length; i++) {
@@ -350,7 +336,7 @@ export abstract class BaseRaidProvider implements FilesystemProvider {
     }
 
     if (stats.length === 0) {
-      throw new Error('Failed to create directory on any provider');
+      throw new Error("Failed to create directory on any provider");
     }
 
     const raidIno = this.nextIno++;
@@ -361,31 +347,25 @@ export abstract class BaseRaidProvider implements FilesystemProvider {
 
   async unlink(_parent: number, _name: string): Promise<void> {
     // Abstract - implemented by subclasses
-    throw new Error('unlink must be implemented by subclass');
+    throw new Error("unlink must be implemented by subclass");
   }
 
   async rmdir(parent: number, name: string): Promise<void> {
     const providerInos = this.getProviderInos(parent);
-    if (providerInos.length === 0) throw new Error('Parent not found');
+    if (providerInos.length === 0) throw new Error("Parent not found");
 
-    await Promise.all(
-      providerInos.map((providerIno, i) => this.providers[i].rmdir(providerIno, name))
-    );
+    await Promise.all(providerInos.map((providerIno, i) => this.providers[i].rmdir(providerIno, name)));
   }
 
   async link(ino: number, newparent: number, newname: string): Promise<FileStat> {
     const providerInos = this.getProviderInos(ino);
     const newProviderInos = this.getProviderInos(newparent);
     if (providerInos.length === 0 || newProviderInos.length === 0) {
-      throw new Error('Source or destination not found');
+      throw new Error("Source or destination not found");
     }
 
     const stats: FileStat[] = [];
-    for (
-      let i = 0;
-      i < this.providers.length && i < providerInos.length && i < newProviderInos.length;
-      i++
-    ) {
+    for (let i = 0; i < this.providers.length && i < providerInos.length && i < newProviderInos.length; i++) {
       try {
         const stat = await this.providers[i].link(providerInos[i], newProviderInos[i], newname);
         stats.push(stat);
@@ -395,7 +375,7 @@ export abstract class BaseRaidProvider implements FilesystemProvider {
     }
 
     if (stats.length === 0) {
-      throw new Error('Failed to link on any provider');
+      throw new Error("Failed to link on any provider");
     }
 
     const raidIno = this.nextIno++;
@@ -406,7 +386,7 @@ export abstract class BaseRaidProvider implements FilesystemProvider {
 
   async symlink(_link: string, parent: number, name: string): Promise<FileStat> {
     const providerInos = this.getProviderInos(parent);
-    if (providerInos.length === 0) throw new Error('Parent not found');
+    if (providerInos.length === 0) throw new Error("Parent not found");
 
     const stats: FileStat[] = [];
     for (let i = 0; i < this.providers.length && i < providerInos.length; i++) {
@@ -419,7 +399,7 @@ export abstract class BaseRaidProvider implements FilesystemProvider {
     }
 
     if (stats.length === 0) {
-      throw new Error('Failed to create symlink on any provider');
+      throw new Error("Failed to create symlink on any provider");
     }
 
     const raidIno = this.nextIno++;
@@ -430,7 +410,7 @@ export abstract class BaseRaidProvider implements FilesystemProvider {
 
   async readlink(ino: number): Promise<string> {
     const providerInos = this.getProviderInos(ino);
-    if (providerInos.length === 0) throw new Error('Inode not found');
+    if (providerInos.length === 0) throw new Error("Inode not found");
 
     for (let i = 0; i < this.providers.length && i < providerInos.length; i++) {
       try {
@@ -439,20 +419,14 @@ export abstract class BaseRaidProvider implements FilesystemProvider {
         continue;
       }
     }
-    throw new Error('Failed to readlink on any provider');
+    throw new Error("Failed to readlink on any provider");
   }
 
-  async rename(
-    parent: number,
-    name: string,
-    newparent: number,
-    newname: string,
-    flags: number
-  ): Promise<void> {
+  async rename(parent: number, name: string, newparent: number, newname: string, flags: number): Promise<void> {
     const providerInos = this.getProviderInos(parent);
     const newProviderInos = this.getProviderInos(newparent);
     if (providerInos.length === 0 || newProviderInos.length === 0) {
-      throw new Error('Source or destination not found');
+      throw new Error("Source or destination not found");
     }
 
     await Promise.all(
@@ -464,19 +438,9 @@ export abstract class BaseRaidProvider implements FilesystemProvider {
     );
   }
 
-  async setxattr(
-    ino: number,
-    name: string,
-    value: Buffer,
-    size: number,
-    flags: number
-  ): Promise<void> {
+  async setxattr(ino: number, name: string, value: Buffer, size: number, flags: number): Promise<void> {
     const providerInos = this.getProviderInos(ino);
-    await Promise.all(
-      providerInos.map((providerIno, i) =>
-        this.providers[i].setxattr(providerIno, name, value, size, flags)
-      )
-    );
+    await Promise.all(providerInos.map((providerIno, i) => this.providers[i].setxattr(providerIno, name, value, size, flags)));
   }
 
   async getxattr(ino: number, name: string, size: number): Promise<Buffer | number> {
@@ -488,7 +452,7 @@ export abstract class BaseRaidProvider implements FilesystemProvider {
         continue;
       }
     }
-    throw new Error('Failed to getxattr on any provider');
+    throw new Error("Failed to getxattr on any provider");
   }
 
   async listxattr(ino: number, size: number): Promise<Buffer | number> {
@@ -505,9 +469,7 @@ export abstract class BaseRaidProvider implements FilesystemProvider {
 
   async removexattr(ino: number, name: string): Promise<void> {
     const providerInos = this.getProviderInos(ino);
-    await Promise.all(
-      providerInos.map((providerIno, i) => this.providers[i].removexattr(providerIno, name))
-    );
+    await Promise.all(providerInos.map((providerIno, i) => this.providers[i].removexattr(providerIno, name)));
   }
 
   async access(ino: number, mask: number): Promise<void> {
@@ -520,7 +482,7 @@ export abstract class BaseRaidProvider implements FilesystemProvider {
         continue;
       }
     }
-    throw new Error('Access denied on all providers');
+    throw new Error("Access denied on all providers");
   }
 
   async statfs(ino: number): Promise<Statfs> {
@@ -543,46 +505,34 @@ export abstract class BaseRaidProvider implements FilesystemProvider {
         continue;
       }
     }
-    throw new Error('Failed to statfs on any provider');
+    throw new Error("Failed to statfs on any provider");
   }
 
   async getlk(_ino: number, _fh: number): Promise<Flock> {
-    throw new Error('File locking not supported');
+    throw new Error("File locking not supported");
   }
 
   async setlk(_ino: number, _fh: number, _sleep: number): Promise<void> {
-    throw new Error('File locking not supported');
+    throw new Error("File locking not supported");
   }
 
   async flock(_ino: number, _fh: number, _op: number): Promise<void> {
-    throw new Error('File locking not supported');
+    throw new Error("File locking not supported");
   }
 
   async bmap(_ino: number, _blocksize: number, _idx: number): Promise<number> {
-    throw new Error('Block mapping not supported');
+    throw new Error("Block mapping not supported");
   }
 
-  async ioctl(
-    _ino: number,
-    _cmd: number,
-    _in_buf: Buffer | null,
-    _in_bufsz: number,
-    _out_bufsz: number
-  ): Promise<{ result: number; out_buf?: Buffer }> {
-    throw new Error('IOCTL not supported');
+  async ioctl(_ino: number, _cmd: number, _in_buf: Buffer | null, _in_bufsz: number, _out_bufsz: number): Promise<{ result: number; out_buf?: Buffer }> {
+    throw new Error("IOCTL not supported");
   }
 
   async poll(_ino: number, _fh: number): Promise<number> {
     return 0x05; // POLLIN | POLLOUT
   }
 
-  async fallocate(
-    ino: number,
-    fh: number,
-    offset: number,
-    length: number,
-    mode: number
-  ): Promise<void> {
+  async fallocate(ino: number, fh: number, offset: number, length: number, mode: number): Promise<void> {
     const providerFhs = this.getProviderFhs(ino, fh);
     const providerInos = this.getProviderInos(ino);
     await Promise.all(
@@ -598,19 +548,12 @@ export abstract class BaseRaidProvider implements FilesystemProvider {
     return this.readdir(ino, size, offset);
   }
 
-  async copy_file_range(
-    _ino_in: number,
-    _off_in: number,
-    _ino_out: number,
-    _off_out: number,
-    _len: number,
-    _flags: number
-  ): Promise<number> {
-    throw new Error('copy_file_range not supported');
+  async copy_file_range(_ino_in: number, _off_in: number, _ino_out: number, _off_out: number, _len: number, _flags: number): Promise<number> {
+    throw new Error("copy_file_range not supported");
   }
 
   async lseek(_ino: number, _fh: number, _off: number, _whence: number): Promise<number> {
-    throw new Error('lseek not supported');
+    throw new Error("lseek not supported");
   }
 
   async tmpfile(parent: number, _mode: number, _flags: number): Promise<FileStat> {

@@ -1,5 +1,5 @@
-import { FilesystemProvider } from '@mount0/core';
-import { BaseRaidProvider } from './base';
+import { FilesystemProvider } from "@mount0/core";
+import { BaseRaidProvider } from "./base";
 
 export interface Raid5Config {
   providers: FilesystemProvider[];
@@ -12,7 +12,7 @@ export class Raid5Provider extends BaseRaidProvider {
   constructor(config: Raid5Config) {
     super(config.providers, config.stripeSize);
     if (this.providers.length < 3) {
-      throw new Error('RAID 5 requires at least 3 providers');
+      throw new Error("RAID 5 requires at least 3 providers");
     }
     this.dataProviders = this.providers.length - 1;
   }
@@ -37,42 +37,20 @@ export class Raid5Provider extends BaseRaidProvider {
     return parity;
   }
 
-  async read(
-    ino: number,
-    fh: number,
-    buffer: Buffer,
-    offset: number,
-    length: number
-  ): Promise<number> {
+  async read(ino: number, fh: number, buffer: Buffer, offset: number, length: number): Promise<number> {
     const providerFhs = this.getProviderFhs(ino, fh);
     const providerInos = this.getProviderInos(ino);
-    for (
-      let i = 0;
-      i < this.dataProviders && i < providerFhs.length && i < providerInos.length;
-      i++
-    ) {
+    for (let i = 0; i < this.dataProviders && i < providerFhs.length && i < providerInos.length; i++) {
       try {
-        return await this.providers[i].read(
-          providerInos[i],
-          providerFhs[i],
-          buffer,
-          offset,
-          length
-        );
+        return await this.providers[i].read(providerInos[i], providerFhs[i], buffer, offset, length);
       } catch {
         continue;
       }
     }
-    throw new Error('RAID 5: Insufficient providers for read');
+    throw new Error("RAID 5: Insufficient providers for read");
   }
 
-  async write(
-    ino: number,
-    fh: number,
-    buffer: Buffer,
-    offset: number,
-    length: number
-  ): Promise<number> {
+  async write(ino: number, fh: number, buffer: Buffer, offset: number, length: number): Promise<number> {
     const providerFhs = this.getProviderFhs(ino, fh);
     const providerInos = this.getProviderInos(ino);
     const stripeIndex = Math.floor(offset / this.stripeSize);
@@ -81,16 +59,10 @@ export class Raid5Provider extends BaseRaidProvider {
 
     const dataIndex = this.getProviderIndex(stripeIndex);
     if (dataIndex >= providerFhs.length || dataIndex >= providerInos.length) {
-      throw new Error('Invalid provider index');
+      throw new Error("Invalid provider index");
     }
 
-    await this.providers[dataIndex].write(
-      providerInos[dataIndex],
-      providerFhs[dataIndex],
-      stripeData,
-      stripeOffset,
-      stripeData.length
-    );
+    await this.providers[dataIndex].write(providerInos[dataIndex], providerFhs[dataIndex], stripeData, stripeOffset, stripeData.length);
 
     const stripeGroup = Math.floor(stripeIndex / this.dataProviders);
     const stripeStart = stripeGroup * this.dataProviders;
@@ -105,13 +77,7 @@ export class Raid5Provider extends BaseRaidProvider {
         try {
           const blockProviderIndex = this.getProviderIndex(blockStripeIndex);
           if (blockProviderIndex < providerInos.length && blockProviderIndex < providerFhs.length) {
-            await this.providers[blockProviderIndex].read(
-              providerInos[blockProviderIndex],
-              providerFhs[blockProviderIndex],
-              existingData,
-              stripeOffset,
-              this.stripeSize
-            );
+            await this.providers[blockProviderIndex].read(providerInos[blockProviderIndex], providerFhs[blockProviderIndex], existingData, stripeOffset, this.stripeSize);
             dataBlocks.push(existingData);
           } else {
             dataBlocks.push(Buffer.alloc(this.stripeSize));
@@ -125,13 +91,7 @@ export class Raid5Provider extends BaseRaidProvider {
     const parity = this.calculateParity(dataBlocks);
     const parityIndex = this.getParityIndex(stripeIndex);
     if (parityIndex < providerInos.length && parityIndex < providerFhs.length) {
-      await this.providers[parityIndex].write(
-        providerInos[parityIndex],
-        providerFhs[parityIndex],
-        parity,
-        stripeOffset,
-        parity.length
-      );
+      await this.providers[parityIndex].write(providerInos[parityIndex], providerFhs[parityIndex], parity, stripeOffset, parity.length);
     }
 
     return stripeData.length;
@@ -139,7 +99,7 @@ export class Raid5Provider extends BaseRaidProvider {
 
   async unlink(parent: number, name: string): Promise<void> {
     const providerInos = this.getProviderInos(parent);
-    if (providerInos.length === 0) throw new Error('Parent not found');
+    if (providerInos.length === 0) throw new Error("Parent not found");
     const results = await Promise.allSettled(
       this.providers.map((p, i) => {
         if (providerInos[i]) {
@@ -147,7 +107,7 @@ export class Raid5Provider extends BaseRaidProvider {
         }
       })
     );
-    const failures = results.filter((r) => r.status === 'rejected');
+    const failures = results.filter((r) => r.status === "rejected");
     if (failures.length > 0) {
       throw new Error(`Failed to unlink on ${failures.length} providers`);
     }

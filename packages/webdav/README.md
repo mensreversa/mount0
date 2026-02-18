@@ -11,20 +11,20 @@ npm install @mount0/webdav
 ## Usage
 
 ```typescript
-import { mount0 } from '@mount0/core';
-import { WebDavProvider } from '@mount0/webdav';
+import { mount0 } from "@mount0/core";
+import { WebDavProvider } from "@mount0/webdav";
 
 const fs = mount0();
 fs.handle(
-  '/webdav',
+  "/webdav",
   new WebDavProvider({
-    url: 'https://example.com/webdav',
-    username: 'user',
-    password: 'password',
+    url: "https://example.com/webdav",
+    username: "user",
+    password: "password",
   })
 );
 
-await fs.mount('/mnt/myfs');
+await fs.mount("/mnt/myfs");
 ```
 
 ## License

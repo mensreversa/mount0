@@ -1,4 +1,4 @@
-import { DirEntry, FileStat, FilesystemProvider, Flock, Statfs } from '@mount0/core';
+import { DirEntry, FileStat, FilesystemProvider, Flock, Statfs } from "@mount0/core";
 
 export interface FirstProviderConfig {
   providers: FilesystemProvider[];
@@ -11,9 +11,7 @@ export class FirstProvider implements FilesystemProvider {
     this.providers = config.providers;
   }
 
-  private async executeFirst<T>(
-    operation: (provider: FilesystemProvider) => Promise<T>
-  ): Promise<T> {
+  private async executeFirst<T>(operation: (provider: FilesystemProvider) => Promise<T>): Promise<T> {
     for (const provider of this.providers) {
       try {
         return await operation(provider);
@@ -21,7 +19,7 @@ export class FirstProvider implements FilesystemProvider {
         continue;
       }
     }
-    throw new Error('All providers failed');
+    throw new Error("All providers failed");
   }
 
   // Core operations
@@ -67,23 +65,11 @@ export class FirstProvider implements FilesystemProvider {
     return this.executeFirst((p) => p.open(ino, flags, mode));
   }
 
-  async read(
-    ino: number,
-    fh: number,
-    buffer: Buffer,
-    off: number,
-    length: number
-  ): Promise<number> {
+  async read(ino: number, fh: number, buffer: Buffer, off: number, length: number): Promise<number> {
     return this.executeFirst((p) => p.read(ino, fh, buffer, off, length));
   }
 
-  async write(
-    ino: number,
-    fh: number,
-    buffer: Buffer,
-    off: number,
-    length: number
-  ): Promise<number> {
+  async write(ino: number, fh: number, buffer: Buffer, off: number, length: number): Promise<number> {
     return this.executeFirst((p) => p.write(ino, fh, buffer, off, length));
   }
 
@@ -135,24 +121,12 @@ export class FirstProvider implements FilesystemProvider {
   }
 
   // Rename
-  async rename(
-    parent: number,
-    name: string,
-    newparent: number,
-    newname: string,
-    flags: number
-  ): Promise<void> {
+  async rename(parent: number, name: string, newparent: number, newname: string, flags: number): Promise<void> {
     return this.executeFirst((p) => p.rename(parent, name, newparent, newname, flags));
   }
 
   // Extended attributes
-  async setxattr(
-    ino: number,
-    name: string,
-    value: Buffer,
-    size: number,
-    flags: number
-  ): Promise<void> {
+  async setxattr(ino: number, name: string, value: Buffer, size: number, flags: number): Promise<void> {
     return this.executeFirst((p) => p.setxattr(ino, name, value, size, flags));
   }
 
@@ -195,13 +169,7 @@ export class FirstProvider implements FilesystemProvider {
     return this.executeFirst((p) => p.bmap(ino, blocksize, idx));
   }
 
-  async ioctl(
-    ino: number,
-    cmd: number,
-    in_buf: Buffer | null,
-    in_bufsz: number,
-    out_bufsz: number
-  ): Promise<{ result: number; out_buf?: Buffer }> {
+  async ioctl(ino: number, cmd: number, in_buf: Buffer | null, in_bufsz: number, out_bufsz: number): Promise<{ result: number; out_buf?: Buffer }> {
     return this.executeFirst((p) => p.ioctl(ino, cmd, in_buf, in_bufsz, out_bufsz));
   }
 
@@ -209,13 +177,7 @@ export class FirstProvider implements FilesystemProvider {
     return this.executeFirst((p) => p.poll(ino, fh));
   }
 
-  async fallocate(
-    ino: number,
-    fh: number,
-    offset: number,
-    length: number,
-    mode: number
-  ): Promise<void> {
+  async fallocate(ino: number, fh: number, offset: number, length: number, mode: number): Promise<void> {
     return this.executeFirst((p) => p.fallocate(ino, fh, offset, length, mode));
   }
 
@@ -223,17 +185,8 @@ export class FirstProvider implements FilesystemProvider {
     return this.executeFirst((p) => p.readdirplus(ino, size, off));
   }
 
-  async copy_file_range(
-    ino_in: number,
-    off_in: number,
-    ino_out: number,
-    off_out: number,
-    len: number,
-    flags: number
-  ): Promise<number> {
-    return this.executeFirst((p) =>
-      p.copy_file_range(ino_in, off_in, ino_out, off_out, len, flags)
-    );
+  async copy_file_range(ino_in: number, off_in: number, ino_out: number, off_out: number, len: number, flags: number): Promise<number> {
+    return this.executeFirst((p) => p.copy_file_range(ino_in, off_in, ino_out, off_out, len, flags));
   }
 
   async lseek(ino: number, fh: number, off: number, whence: number): Promise<number> {

@@ -1,6 +1,6 @@
-import { Composition } from 'remotion';
-import './index.css';
-import { Intro } from './intro/Intro';
+import { Composition } from "remotion";
+import "./index.css";
+import { Intro } from "./intro/Intro";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -13,8 +13,8 @@ export const RemotionRoot: React.FC = () => {
         width={1920}
         height={1080}
         defaultProps={{
-          title: 'MOUNT0',
-          subtitle: 'Virtual Filesystem',
+          title: "MOUNT0",
+          subtitle: "Virtual Filesystem",
         }}
       />
     </>

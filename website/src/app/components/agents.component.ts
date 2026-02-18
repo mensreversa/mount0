@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component } from "@angular/core";
 
 @Component({
-  selector: 'app-agents',
+  selector: "app-agents",
   standalone: true,
   template: `
     <section id="agents" class="relative z-10 py-20 px-6 bg-black">
@@ -14,8 +14,7 @@ import { Component } from '@angular/core';
         <div class="grid md:grid-cols-2 gap-12 items-center">
           <div class="sq-panel p-8">
             <p class="text-white/60 font-mono text-sm leading-relaxed">
-              // Mount0 provides a native interface for AI agents to interact with distributed data
-              sources.<br />
+              // Mount0 provides a native interface for AI agents to interact with distributed data sources.<br />
               // No need for complex API integrations. Just mount and read.
             </p>
           </div>

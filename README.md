@@ -60,18 +60,18 @@ npm install @mount0/samba    # Samba/CIFS support
 ## Quick Start
 
 ```typescript
-import { mount0 } from '@mount0/core';
-import { LocalProvider } from '@mount0/local';
+import { mount0 } from "@mount0/core";
+import { LocalProvider } from "@mount0/local";
 
 async function main() {
   const fs = mount0();
-  fs.handle('/', new LocalProvider('/tmp'));
+  fs.handle("/", new LocalProvider("/tmp"));
 
-  await fs.mount('/tmp/mount0');
-  console.log('Filesystem mounted at /tmp/mount0');
+  await fs.mount("/tmp/mount0");
+  console.log("Filesystem mounted at /tmp/mount0");
 
   // Handle graceful shutdown
-  process.on('SIGINT', async () => {
+  process.on("SIGINT", async () => {
     await fs.unmount();
     process.exit(0);
   });
@@ -85,59 +85,59 @@ main().catch(console.error);
 ### Basic Mounting
 
 ```typescript
-import { mount0 } from '@mount0/core';
-import { LocalProvider } from '@mount0/local';
+import { mount0 } from "@mount0/core";
+import { LocalProvider } from "@mount0/local";
 
 const fs = mount0();
-fs.handle('/', new LocalProvider('/path/to/data'));
+fs.handle("/", new LocalProvider("/path/to/data"));
 
-await fs.mount('/mnt/myfs');
+await fs.mount("/mnt/myfs");
 // Filesystem is now accessible at /mnt/myfs
 ```
 
 ### Multiple Backends
 
 ```typescript
-import { mount0 } from '@mount0/core';
-import { LocalProvider } from '@mount0/local';
-import { MemoryProvider } from '@mount0/memory';
+import { mount0 } from "@mount0/core";
+import { LocalProvider } from "@mount0/local";
+import { MemoryProvider } from "@mount0/memory";
 
 const fs = mount0();
-fs.handle('/data', new LocalProvider('/var/data'));
-fs.handle('/cache', new MemoryProvider());
+fs.handle("/data", new LocalProvider("/var/data"));
+fs.handle("/cache", new MemoryProvider());
 
-await fs.mount('/mnt/multi');
+await fs.mount("/mnt/multi");
 ```
 
 ### With Caching
 
 ```typescript
-import { mount0 } from '@mount0/core';
-import { LocalProvider } from '@mount0/local';
-import { MemoryProvider } from '@mount0/memory';
-import { WriteThroughCacheProvider } from '@mount0/cache';
+import { mount0 } from "@mount0/core";
+import { LocalProvider } from "@mount0/local";
+import { MemoryProvider } from "@mount0/memory";
+import { WriteThroughCacheProvider } from "@mount0/cache";
 
 const cachedProvider = new WriteThroughCacheProvider({
-  master: new LocalProvider('/path/to/data'),
+  master: new LocalProvider("/path/to/data"),
   slave: new MemoryProvider(),
 });
 
 const fs = mount0();
-fs.handle('/', cachedProvider);
+fs.handle("/", cachedProvider);
 
-await fs.mount('/mnt/cached');
+await fs.mount("/mnt/cached");
 ```
 
 Or use write-back caching:
 
 ```typescript
-import { mount0 } from '@mount0/core';
-import { LocalProvider } from '@mount0/local';
-import { MemoryProvider } from '@mount0/memory';
-import { WriteBackCacheProvider } from '@mount0/cache';
+import { mount0 } from "@mount0/core";
+import { LocalProvider } from "@mount0/local";
+import { MemoryProvider } from "@mount0/memory";
+import { WriteBackCacheProvider } from "@mount0/cache";
 
 const cachedProvider = new WriteBackCacheProvider({
-  master: new LocalProvider('/path/to/data'),
+  master: new LocalProvider("/path/to/data"),
   slave: new MemoryProvider(),
 });
 ```
@@ -145,51 +145,42 @@ const cachedProvider = new WriteBackCacheProvider({
 ### RAID Storage
 
 ```typescript
-import { mount0 } from '@mount0/core';
-import { LocalProvider } from '@mount0/local';
-import { Raid0Provider, Raid1Provider, Raid5Provider, Raid6Provider } from '@mount0/raid';
+import { mount0 } from "@mount0/core";
+import { LocalProvider } from "@mount0/local";
+import { Raid0Provider, Raid1Provider, Raid5Provider, Raid6Provider } from "@mount0/raid";
 
 const fs = mount0();
 
 // RAID 0 (Striping) - Performance
 fs.handle(
-  '/fast',
+  "/fast",
   new Raid0Provider({
-    providers: [new LocalProvider('/disk1'), new LocalProvider('/disk2')],
+    providers: [new LocalProvider("/disk1"), new LocalProvider("/disk2")],
     stripeSize: 128 * 1024,
   })
 );
 
 // RAID 1 (Mirroring) - Redundancy
 fs.handle(
-  '/backup',
+  "/backup",
   new Raid1Provider({
-    providers: [new LocalProvider('/disk1'), new LocalProvider('/disk2')],
+    providers: [new LocalProvider("/disk1"), new LocalProvider("/disk2")],
   })
 );
 
 // RAID 5 (Parity) - Balance of performance and redundancy
 fs.handle(
-  '/data',
+  "/data",
   new Raid5Provider({
-    providers: [
-      new LocalProvider('/disk1'),
-      new LocalProvider('/disk2'),
-      new LocalProvider('/disk3'),
-    ],
+    providers: [new LocalProvider("/disk1"), new LocalProvider("/disk2"), new LocalProvider("/disk3")],
   })
 );
 
 // RAID 6 (Double Parity) - High redundancy
 fs.handle(
-  '/critical',
+  "/critical",
   new Raid6Provider({
-    providers: [
-      new LocalProvider('/disk1'),
-      new LocalProvider('/disk2'),
-      new LocalProvider('/disk3'),
-      new LocalProvider('/disk4'),
-    ],
+    providers: [new LocalProvider("/disk1"), new LocalProvider("/disk2"), new LocalProvider("/disk3"), new LocalProvider("/disk4")],
   })
 );
 ```
@@ -197,24 +188,24 @@ fs.handle(
 ### Multi-Provider Strategies
 
 ```typescript
-import { mount0 } from '@mount0/core';
-import { LocalProvider } from '@mount0/local';
-import { MemoryProvider } from '@mount0/memory';
-import { FirstProvider, MajorityProvider } from '@mount0/multi';
+import { mount0 } from "@mount0/core";
+import { LocalProvider } from "@mount0/local";
+import { MemoryProvider } from "@mount0/memory";
+import { FirstProvider, MajorityProvider } from "@mount0/multi";
 
 const fs = mount0();
 
 // Failover - Try providers sequentially
 fs.handle(
-  '/failover',
+  "/failover",
   new FirstProvider({
-    providers: [new LocalProvider('/primary'), new LocalProvider('/secondary')],
+    providers: [new LocalProvider("/primary"), new LocalProvider("/secondary")],
   })
 );
 
 // Quorum - Require majority consensus
 fs.handle(
-  '/quorum',
+  "/quorum",
   new MajorityProvider({
     providers: [new MemoryProvider(), new MemoryProvider(), new MemoryProvider()],
   })
@@ -224,65 +215,65 @@ fs.handle(
 ### Combining Providers
 
 ```typescript
-import { mount0 } from '@mount0/core';
-import { LocalProvider } from '@mount0/local';
-import { Raid1Provider } from '@mount0/raid';
-import { EncryptedProvider } from '@mount0/encrypted';
-import { FirstProvider } from '@mount0/multi';
+import { mount0 } from "@mount0/core";
+import { LocalProvider } from "@mount0/local";
+import { Raid1Provider } from "@mount0/raid";
+import { EncryptedProvider } from "@mount0/encrypted";
+import { FirstProvider } from "@mount0/multi";
 
 const fs = mount0();
 
 // RAID 1 for redundancy
 fs.handle(
-  '/backup',
+  "/backup",
   new Raid1Provider({
-    providers: [new LocalProvider('/disk1'), new LocalProvider('/disk2')],
+    providers: [new LocalProvider("/disk1"), new LocalProvider("/disk2")],
   })
 );
 
 // Encrypted storage
 fs.handle(
-  '/secure',
+  "/secure",
   new EncryptedProvider({
-    provider: new LocalProvider('/secure-data'),
-    password: 'my-secret-password',
+    provider: new LocalProvider("/secure-data"),
+    password: "my-secret-password",
   })
 );
 
 // Failover with encryption
 fs.handle(
-  '/encrypted-failover',
+  "/encrypted-failover",
   new FirstProvider({
     providers: [
       new EncryptedProvider({
-        provider: new LocalProvider('/primary'),
-        password: 'pass1',
+        provider: new LocalProvider("/primary"),
+        password: "pass1",
       }),
       new EncryptedProvider({
-        provider: new LocalProvider('/secondary'),
-        password: 'pass2',
+        provider: new LocalProvider("/secondary"),
+        password: "pass2",
       }),
     ],
   })
 );
 
-await fs.mount('/mnt/combined');
+await fs.mount("/mnt/combined");
 ```
 
 ### Graceful Shutdown
 
 ```typescript
-import { mount0 } from '@mount0/core';
-import { LocalProvider } from '@mount0/local';
+import { mount0 } from "@mount0/core";
+import { LocalProvider } from "@mount0/local";
 
 const fs = mount0();
-fs.handle('/', new LocalProvider('/data'));
+fs.handle("/", new LocalProvider("/data"));
 
-await fs.mount('/mnt/myfs');
+await fs.mount("/mnt/myfs");
 
 // Handle shutdown signals
-process.on('SIGINT', async () => {
-  console.log('Unmounting...');
+process.on("SIGINT", async () => {
+  console.log("Unmounting...");
   await fs.unmount();
   process.exit(0);
 });
@@ -350,13 +341,7 @@ interface FilesystemProvider {
   readlink(ino: number): Promise<string>;
 
   // Rename
-  rename(
-    parent: number,
-    name: string,
-    newparent: number,
-    newname: string,
-    flags: number
-  ): Promise<void>;
+  rename(parent: number, name: string, newparent: number, newname: string, flags: number): Promise<void>;
 
   // Extended attributes
   setxattr(ino: number, name: string, value: Buffer, size: number, flags: number): Promise<void>;
@@ -375,26 +360,13 @@ interface FilesystemProvider {
 
   // Advanced operations
   bmap(ino: number, blocksize: number, idx: number): Promise<number>;
-  ioctl(
-    ino: number,
-    cmd: number,
-    in_buf: Buffer | null,
-    in_bufsz: number,
-    out_bufsz: number
-  ): Promise<{ result: number; out_buf?: Buffer }>;
+  ioctl(ino: number, cmd: number, in_buf: Buffer | null, in_bufsz: number, out_bufsz: number): Promise<{ result: number; out_buf?: Buffer }>;
   poll(ino: number, fh: number): Promise<number>;
   fallocate(ino: number, fh: number, offset: number, length: number, mode: number): Promise<void>;
   readdirplus(ino: number, size: number, off: number): Promise<DirEntry[]>;
   retrieve_reply?(ino: number, cookie: number, offset: number, buffer: Buffer): Promise<void>;
   statx?(ino: number, flags: number, mask: number): Promise<FileStat | null>;
-  copy_file_range(
-    ino_in: number,
-    off_in: number,
-    ino_out: number,
-    off_out: number,
-    len: number,
-    flags: number
-  ): Promise<number>;
+  copy_file_range(ino_in: number, off_in: number, ino_out: number, off_out: number, len: number, flags: number): Promise<number>;
   lseek(ino: number, fh: number, off: number, whence: number): Promise<number>;
   tmpfile(parent: number, mode: number, flags: number): Promise<FileStat>;
 }
@@ -403,7 +375,7 @@ interface FilesystemProvider {
 ### Creating Custom Providers
 
 ```typescript
-import { FilesystemProvider, FileStat, DirEntry } from '@mount0/core';
+import { FilesystemProvider, FileStat, DirEntry } from "@mount0/core";
 
 class MyCustomProvider implements FilesystemProvider {
   async lookup(parent: number, name: string): Promise<FileStat | null> {

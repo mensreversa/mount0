@@ -1,7 +1,7 @@
-import { DirEntry, FileStat, FilesystemProvider, Flock, Statfs } from '@mount0/core';
-import { Dirent } from 'fs';
-import * as fs from 'fs/promises';
-import * as path from 'path';
+import { DirEntry, FileStat, FilesystemProvider, Flock, Statfs } from "@mount0/core";
+import { Dirent } from "fs";
+import * as fs from "fs/promises";
+import * as path from "path";
 
 export class LocalProvider implements FilesystemProvider {
   private root: string;
@@ -12,20 +12,20 @@ export class LocalProvider implements FilesystemProvider {
 
   constructor(root: string) {
     this.root = path.resolve(root);
-    this.inoToPath.set(1, '/');
-    this.pathToIno.set('/', 1);
+    this.inoToPath.set(1, "/");
+    this.pathToIno.set("/", 1);
   }
 
   private resolvePath(filePath: string): string {
-    const resolved = path.resolve(this.root, filePath.replace(/^\//, ''));
+    const resolved = path.resolve(this.root, filePath.replace(/^\//, ""));
     if (!resolved.startsWith(this.root)) {
-      throw new Error('Path traversal detected');
+      throw new Error("Path traversal detected");
     }
     return resolved;
   }
 
   private getPath(ino: number): string {
-    return this.inoToPath.get(ino) || '/';
+    return this.inoToPath.get(ino) || "/";
   }
 
   private setPath(ino: number, filePath: string): void {
@@ -35,7 +35,7 @@ export class LocalProvider implements FilesystemProvider {
 
   private pathFromParent(parent: number, name: string): string {
     const parentPath = this.getPath(parent);
-    return parentPath === '/' ? `/${name}` : `${parentPath}/${name}`;
+    return parentPath === "/" ? `/${name}` : `${parentPath}/${name}`;
   }
 
   async lookup(parent: number, name: string): Promise<FileStat | null> {
@@ -59,8 +59,9 @@ export class LocalProvider implements FilesystemProvider {
         blksize: stats.blksize,
         blocks: stats.blocks,
       };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      if (err.code === 'ENOENT') {
+      if (err.code === "ENOENT") {
         return null;
       }
       throw err;
@@ -88,8 +89,9 @@ export class LocalProvider implements FilesystemProvider {
         blksize: stats.blksize,
         blocks: stats.blocks,
       };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      if (err.code === 'ENOENT') {
+      if (err.code === "ENOENT") {
         return null;
       }
       throw err;
@@ -103,7 +105,7 @@ export class LocalProvider implements FilesystemProvider {
 
     const result = await Promise.all(
       entries.map(async (entry: Dirent) => {
-        const entryPath = filePath === '/' ? `/${entry.name}` : `${filePath}/${entry.name}`;
+        const entryPath = filePath === "/" ? `/${entry.name}` : `${filePath}/${entry.name}`;
         const entryFullPath = this.resolvePath(entryPath);
         const stats = await fs.stat(entryFullPath);
         this.setPath(stats.ino, entryPath);
@@ -129,32 +131,20 @@ export class LocalProvider implements FilesystemProvider {
     return fh;
   }
 
-  async read(
-    ino: number,
-    fh: number,
-    buffer: Buffer,
-    offset: number,
-    length: number
-  ): Promise<number> {
+  async read(ino: number, fh: number, buffer: Buffer, offset: number, length: number): Promise<number> {
     const handles = this.openFiles.get(ino);
-    if (!handles) throw new Error('File not open');
+    if (!handles) throw new Error("File not open");
     const fileHandle = handles.get(fh);
-    if (!fileHandle) throw new Error('File handle not found');
+    if (!fileHandle) throw new Error("File handle not found");
     const result = await fileHandle.read(buffer, 0, length, offset);
     return result.bytesRead;
   }
 
-  async write(
-    ino: number,
-    fh: number,
-    buffer: Buffer,
-    offset: number,
-    length: number
-  ): Promise<number> {
+  async write(ino: number, fh: number, buffer: Buffer, offset: number, length: number): Promise<number> {
     const handles = this.openFiles.get(ino);
-    if (!handles) throw new Error('File not open');
+    if (!handles) throw new Error("File not open");
     const fileHandle = handles.get(fh);
-    if (!fileHandle) throw new Error('File handle not found');
+    if (!fileHandle) throw new Error("File handle not found");
     const result = await fileHandle.write(buffer, 0, length, offset);
     return result.bytesWritten;
   }
@@ -165,12 +155,13 @@ export class LocalProvider implements FilesystemProvider {
     const parentDir = path.dirname(fullPath);
     try {
       await fs.mkdir(parentDir, { recursive: true });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      if (err.code !== 'EEXIST') {
+      if (err.code !== "EEXIST") {
         throw err;
       }
     }
-    const fileHandle = await fs.open(fullPath, 'w', mode);
+    const fileHandle = await fs.open(fullPath, "w", mode);
     const fh = this.nextFh++;
     const stats = await fs.stat(fullPath);
     this.setPath(stats.ino, filePath);
@@ -240,13 +231,7 @@ export class LocalProvider implements FilesystemProvider {
     }
   }
 
-  async rename(
-    parent: number,
-    name: string,
-    newparent: number,
-    newname: string,
-    _flags: number
-  ): Promise<void> {
+  async rename(parent: number, name: string, newparent: number, newname: string, _flags: number): Promise<void> {
     const oldPath = this.pathFromParent(parent, name);
     const newPath = this.pathFromParent(newparent, newname);
     const oldFull = this.resolvePath(oldPath);
@@ -263,7 +248,7 @@ export class LocalProvider implements FilesystemProvider {
   async setattr(ino: number, length: number): Promise<void> {
     const filePath = this.getPath(ino);
     const fullPath = this.resolvePath(filePath);
-    const fileHandle = await fs.open(fullPath, 'r+');
+    const fileHandle = await fs.open(fullPath, "r+");
     try {
       await fileHandle.truncate(length);
     } finally {
@@ -323,10 +308,10 @@ export class LocalProvider implements FilesystemProvider {
     const fullPath = this.resolvePath(filePath);
     // For regular files, use create; for devices, this would need special handling
     if (S_ISREG(mode)) {
-      await fs.writeFile(fullPath, '', { mode });
+      await fs.writeFile(fullPath, "", { mode });
     } else {
       // Device files - not fully supported on all platforms
-      throw new Error('Device file creation not fully supported');
+      throw new Error("Device file creation not fully supported");
     }
     const stats = await fs.stat(fullPath);
     this.setPath(stats.ino, filePath);
@@ -403,15 +388,9 @@ export class LocalProvider implements FilesystemProvider {
   }
 
   // Extended attributes
-  async setxattr(
-    _ino: number,
-    _name: string,
-    _value: Buffer,
-    _size: number,
-    _flags: number
-  ): Promise<void> {
+  async setxattr(_ino: number, _name: string, _value: Buffer, _size: number, _flags: number): Promise<void> {
     // Extended attributes not fully supported - would need platform-specific code
-    throw new Error('Extended attributes not supported');
+    throw new Error("Extended attributes not supported");
   }
 
   async getxattr(_ino: number, _name: string, size: number): Promise<Buffer | number> {
@@ -421,8 +400,9 @@ export class LocalProvider implements FilesystemProvider {
       return 0; // No extended attributes
     }
     // Attribute doesn't exist - return ENODATA error
-    const err: any = new Error('No data available');
-    err.code = 'ENODATA';
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const err: any = new Error("No data available");
+    err.code = "ENODATA";
     err.errno = 61; // ENODATA
     throw err;
   }
@@ -435,7 +415,7 @@ export class LocalProvider implements FilesystemProvider {
 
   async removexattr(_ino: number, _name: string): Promise<void> {
     // Extended attributes not fully supported
-    throw new Error('Extended attributes not supported');
+    throw new Error("Extended attributes not supported");
   }
 
   // Other operations
@@ -466,34 +446,28 @@ export class LocalProvider implements FilesystemProvider {
   // Locking
   async getlk(_ino: number, _fh: number): Promise<Flock> {
     // File locking not implemented
-    throw new Error('File locking not supported');
+    throw new Error("File locking not supported");
   }
 
   async setlk(_ino: number, _fh: number, _sleep: number): Promise<void> {
     // File locking not implemented
-    throw new Error('File locking not supported');
+    throw new Error("File locking not supported");
   }
 
   async flock(_ino: number, _fh: number, _op: number): Promise<void> {
     // File locking not implemented
-    throw new Error('File locking not supported');
+    throw new Error("File locking not supported");
   }
 
   // Advanced operations
   async bmap(_ino: number, _blocksize: number, _idx: number): Promise<number> {
     // Block mapping not implemented
-    throw new Error('Block mapping not supported');
+    throw new Error("Block mapping not supported");
   }
 
-  async ioctl(
-    _ino: number,
-    _cmd: number,
-    _in_buf: Buffer | null,
-    _in_bufsz: number,
-    _out_bufsz: number
-  ): Promise<{ result: number; out_buf?: Buffer }> {
+  async ioctl(_ino: number, _cmd: number, _in_buf: Buffer | null, _in_bufsz: number, _out_bufsz: number): Promise<{ result: number; out_buf?: Buffer }> {
     // IOCTL not implemented
-    throw new Error('IOCTL not supported');
+    throw new Error("IOCTL not supported");
   }
 
   async poll(_ino: number, _fh: number): Promise<number> {
@@ -501,17 +475,11 @@ export class LocalProvider implements FilesystemProvider {
     return 0x05; // POLLIN | POLLOUT
   }
 
-  async fallocate(
-    ino: number,
-    fh: number,
-    offset: number,
-    length: number,
-    _mode: number
-  ): Promise<void> {
+  async fallocate(ino: number, fh: number, offset: number, length: number, _mode: number): Promise<void> {
     const handles = this.openFiles.get(ino);
-    if (!handles) throw new Error('File not open');
+    if (!handles) throw new Error("File not open");
     const fileHandle = handles.get(fh);
-    if (!fileHandle) throw new Error('File handle not found');
+    if (!fileHandle) throw new Error("File handle not found");
     // Fallocate - ensure space is allocated
     const stats = await fileHandle.stat();
     const newSize = Math.max(stats.size, offset + length);
@@ -523,21 +491,14 @@ export class LocalProvider implements FilesystemProvider {
     return this.readdir(ino, size, off);
   }
 
-  async copy_file_range(
-    ino_in: number,
-    off_in: number,
-    ino_out: number,
-    off_out: number,
-    len: number,
-    _flags: number
-  ): Promise<number> {
+  async copy_file_range(ino_in: number, off_in: number, ino_out: number, off_out: number, len: number, _flags: number): Promise<number> {
     const inPath = this.getPath(ino_in);
     const outPath = this.getPath(ino_out);
     const inFull = this.resolvePath(inPath);
     const outFull = this.resolvePath(outPath);
 
-    const inHandle = await fs.open(inFull, 'r');
-    const outHandle = await fs.open(outFull, 'r+');
+    const inHandle = await fs.open(inFull, "r");
+    const outHandle = await fs.open(outFull, "r+");
     try {
       const buf = Buffer.alloc(len);
       const { bytesRead } = await inHandle.read(buf, 0, len, off_in);
@@ -553,9 +514,9 @@ export class LocalProvider implements FilesystemProvider {
 
   async lseek(ino: number, fh: number, _off: number, _whence: number): Promise<number> {
     const handles = this.openFiles.get(ino);
-    if (!handles) throw new Error('File not open');
+    if (!handles) throw new Error("File not open");
     const fileHandle = handles.get(fh);
-    if (!fileHandle) throw new Error('File handle not found');
+    if (!fileHandle) throw new Error("File handle not found");
     // lseek - return current position (simplified)
     const stats = await fileHandle.stat();
     return stats.size;
