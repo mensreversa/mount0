@@ -1,3 +1,4 @@
+import './chunk-GOMI4DH3.js';
 import {
   BrowserDomAdapter,
   BrowserGetTestability,
@@ -33,15 +34,12 @@ import {
   withHttpTransferCacheOptions,
   withI18nSupport,
   withIncrementalHydration,
-  withNoHttpTransferCache
-} from "./chunk-KI4GKF7B.js";
-import "./chunk-O4IG6ODP.js";
-import "./chunk-OIR7GKPT.js";
-import {
-  getDOM
-} from "./chunk-LKIPNMBV.js";
-import "./chunk-VUNTEYGF.js";
-import "./chunk-GOMI4DH3.js";
+  withNoHttpTransferCache,
+} from './chunk-KI4GKF7B.js';
+import { getDOM } from './chunk-LKIPNMBV.js';
+import './chunk-O4IG6ODP.js';
+import './chunk-OIR7GKPT.js';
+import './chunk-VUNTEYGF.js';
 export {
   BrowserModule,
   By,
@@ -78,5 +76,5 @@ export {
   HammerGesturesPlugin as ɵHammerGesturesPlugin,
   KeyEventsPlugin as ɵKeyEventsPlugin,
   SharedStylesHost as ɵSharedStylesHost,
-  getDOM as ɵgetDOM
+  getDOM as ɵgetDOM,
 };

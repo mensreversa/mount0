@@ -1,3 +1,5 @@
+import './chunk-GOMI4DH3.js';
+import './chunk-LKIPNMBV.js';
 import {
   FetchBackend,
   HTTP_INTERCEPTORS,
@@ -37,11 +39,9 @@ import {
   withJsonpSupport,
   withNoXsrfProtection,
   withRequestsMadeViaParent,
-  withXsrfConfiguration
-} from "./chunk-O4IG6ODP.js";
-import "./chunk-LKIPNMBV.js";
-import "./chunk-VUNTEYGF.js";
-import "./chunk-GOMI4DH3.js";
+  withXsrfConfiguration,
+} from './chunk-O4IG6ODP.js';
+import './chunk-VUNTEYGF.js';
 export {
   FetchBackend,
   HTTP_INTERCEPTORS,
@@ -81,5 +81,5 @@ export {
   HTTP_ROOT_INTERCEPTOR_FNS as ɵHTTP_ROOT_INTERCEPTOR_FNS,
   HttpInterceptorHandler as ɵHttpInterceptingHandler,
   REQUESTS_CONTRIBUTE_TO_STABILITY as ɵREQUESTS_CONTRIBUTE_TO_STABILITY,
-  withHttpTransferCache as ɵwithHttpTransferCache
+  withHttpTransferCache as ɵwithHttpTransferCache,
 };

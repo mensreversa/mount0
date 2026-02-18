@@ -1,3 +1,4 @@
+import './chunk-GOMI4DH3.js';
 import {
   ANIMATIONS_DISABLED,
   ANIMATION_MODULE_TYPE,
@@ -500,9 +501,8 @@ import {
   ɵɵtwoWayProperty,
   ɵɵvalidateAttribute,
   ɵɵviewQuery,
-  ɵɵviewQuerySignal
-} from "./chunk-VUNTEYGF.js";
-import "./chunk-GOMI4DH3.js";
+  ɵɵviewQuerySignal,
+} from './chunk-VUNTEYGF.js';
 export {
   ANIMATION_MODULE_TYPE,
   APP_BOOTSTRAP_LISTENER,
@@ -1007,5 +1007,5 @@ export {
   ɵɵtwoWayProperty,
   ɵɵvalidateAttribute,
   ɵɵviewQuery,
-  ɵɵviewQuerySignal
+  ɵɵviewQuerySignal,
 };

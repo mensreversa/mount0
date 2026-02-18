@@ -1,4 +1,5 @@
-import { createRequire } from 'module';const require = createRequire(import.meta.url);
+import { createRequire } from 'module';
+import './chunk-6DU2HRTW.js';
 import {
   ANIMATIONS_DISABLED,
   ANIMATION_MODULE_TYPE,
@@ -501,9 +502,9 @@ import {
   ɵɵtwoWayProperty,
   ɵɵvalidateAttribute,
   ɵɵviewQuery,
-  ɵɵviewQuerySignal
-} from "./chunk-EV7XQRJH.js";
-import "./chunk-6DU2HRTW.js";
+  ɵɵviewQuerySignal,
+} from './chunk-EV7XQRJH.js';
+const require = createRequire(import.meta.url);
 export {
   ANIMATION_MODULE_TYPE,
   APP_BOOTSTRAP_LISTENER,
@@ -1008,5 +1009,5 @@ export {
   ɵɵtwoWayProperty,
   ɵɵvalidateAttribute,
   ɵɵviewQuery,
-  ɵɵviewQuerySignal
+  ɵɵviewQuerySignal,
 };
