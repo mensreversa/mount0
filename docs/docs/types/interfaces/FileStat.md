@@ -1,6 +1,6 @@
 # Interface: FileStat
 
-Defined in: [types.ts:1](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/types.ts#L1)
+Defined in: [types.ts:1](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/types.ts#L1)
 
 ## Properties
 
@@ -8,7 +8,7 @@ Defined in: [types.ts:1](https://github.com/mensreversa/mount0/blob/a38f02a29443
 
 > **atime**: `number`
 
-Defined in: [types.ts:6](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/types.ts#L6)
+Defined in: [types.ts:6](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/types.ts#L6)
 
 ***
 
@@ -16,7 +16,7 @@ Defined in: [types.ts:6](https://github.com/mensreversa/mount0/blob/a38f02a29443
 
 > **blksize**: `number`
 
-Defined in: [types.ts:13](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/types.ts#L13)
+Defined in: [types.ts:13](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/types.ts#L13)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [types.ts:13](https://github.com/mensreversa/mount0/blob/a38f02a2944
 
 > **blocks**: `number`
 
-Defined in: [types.ts:14](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/types.ts#L14)
+Defined in: [types.ts:14](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/types.ts#L14)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: [types.ts:14](https://github.com/mensreversa/mount0/blob/a38f02a2944
 
 > **ctime**: `number`
 
-Defined in: [types.ts:5](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/types.ts#L5)
+Defined in: [types.ts:5](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/types.ts#L5)
 
 ***
 
@@ -40,7 +40,7 @@ Defined in: [types.ts:5](https://github.com/mensreversa/mount0/blob/a38f02a29443
 
 > **dev**: `number`
 
-Defined in: [types.ts:9](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/types.ts#L9)
+Defined in: [types.ts:9](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/types.ts#L9)
 
 ***
 
@@ -48,7 +48,7 @@ Defined in: [types.ts:9](https://github.com/mensreversa/mount0/blob/a38f02a29443
 
 > **gid**: `number`
 
-Defined in: [types.ts:8](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/types.ts#L8)
+Defined in: [types.ts:8](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/types.ts#L8)
 
 ***
 
@@ -56,7 +56,7 @@ Defined in: [types.ts:8](https://github.com/mensreversa/mount0/blob/a38f02a29443
 
 > **ino**: `number`
 
-Defined in: [types.ts:10](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/types.ts#L10)
+Defined in: [types.ts:10](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/types.ts#L10)
 
 ***
 
@@ -64,7 +64,7 @@ Defined in: [types.ts:10](https://github.com/mensreversa/mount0/blob/a38f02a2944
 
 > **mode**: `number`
 
-Defined in: [types.ts:2](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/types.ts#L2)
+Defined in: [types.ts:2](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/types.ts#L2)
 
 ***
 
@@ -72,7 +72,7 @@ Defined in: [types.ts:2](https://github.com/mensreversa/mount0/blob/a38f02a29443
 
 > **mtime**: `number`
 
-Defined in: [types.ts:4](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/types.ts#L4)
+Defined in: [types.ts:4](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/types.ts#L4)
 
 ***
 
@@ -80,7 +80,7 @@ Defined in: [types.ts:4](https://github.com/mensreversa/mount0/blob/a38f02a29443
 
 > **nlink**: `number`
 
-Defined in: [types.ts:11](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/types.ts#L11)
+Defined in: [types.ts:11](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/types.ts#L11)
 
 ***
 
@@ -88,7 +88,7 @@ Defined in: [types.ts:11](https://github.com/mensreversa/mount0/blob/a38f02a2944
 
 > **rdev**: `number`
 
-Defined in: [types.ts:12](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/types.ts#L12)
+Defined in: [types.ts:12](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/types.ts#L12)
 
 ***
 
@@ -96,7 +96,7 @@ Defined in: [types.ts:12](https://github.com/mensreversa/mount0/blob/a38f02a2944
 
 > **size**: `number`
 
-Defined in: [types.ts:3](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/types.ts#L3)
+Defined in: [types.ts:3](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/types.ts#L3)
 
 ***
 
@@ -104,4 +104,4 @@ Defined in: [types.ts:3](https://github.com/mensreversa/mount0/blob/a38f02a29443
 
 > **uid**: `number`
 
-Defined in: [types.ts:7](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/types.ts#L7)
+Defined in: [types.ts:7](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/types.ts#L7)

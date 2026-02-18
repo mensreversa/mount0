@@ -1,6 +1,6 @@
 # Interface: FilesystemProvider
 
-Defined in: [provider.ts:20](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L20)
+Defined in: [provider.ts:20](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L20)
 
 ## Methods
 
@@ -8,7 +8,7 @@ Defined in: [provider.ts:20](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **access**(`ino`, `mask`): `Promise`\<`void`\>
 
-Defined in: [provider.ts:77](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L77)
+Defined in: [provider.ts:71](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L71)
 
 #### Parameters
 
@@ -30,7 +30,7 @@ Defined in: [provider.ts:77](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **bmap**(`ino`, `blocksize`, `idx`): `Promise`\<`number`\>
 
-Defined in: [provider.ts:86](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L86)
+Defined in: [provider.ts:80](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L80)
 
 #### Parameters
 
@@ -56,7 +56,7 @@ Defined in: [provider.ts:86](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **copy\_file\_range**(`ino_in`, `off_in`, `ino_out`, `off_out`, `len`, `flags`): `Promise`\<`number`\>
 
-Defined in: [provider.ts:99](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L99)
+Defined in: [provider.ts:87](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L87)
 
 #### Parameters
 
@@ -94,7 +94,7 @@ Defined in: [provider.ts:99](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **create**(`parent`, `name`, `mode`, `flags`): `Promise`\<[`FileStat`](FileStat.md)\>
 
-Defined in: [provider.ts:48](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L48)
+Defined in: [provider.ts:48](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L48)
 
 #### Parameters
 
@@ -124,7 +124,7 @@ Defined in: [provider.ts:48](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > `optional` **destroy**(): `Promise`\<`void`\>
 
-Defined in: [provider.ts:23](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L23)
+Defined in: [provider.ts:23](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L23)
 
 #### Returns
 
@@ -136,7 +136,7 @@ Defined in: [provider.ts:23](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **fallocate**(`ino`, `fh`, `offset`, `length`, `mode`): `Promise`\<`void`\>
 
-Defined in: [provider.ts:95](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L95)
+Defined in: [provider.ts:83](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L83)
 
 #### Parameters
 
@@ -170,7 +170,7 @@ Defined in: [provider.ts:95](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **flock**(`ino`, `fh`, `op`): `Promise`\<`void`\>
 
-Defined in: [provider.ts:83](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L83)
+Defined in: [provider.ts:77](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L77)
 
 #### Parameters
 
@@ -196,7 +196,7 @@ Defined in: [provider.ts:83](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **flush**(`ino`, `fh`): `Promise`\<`void`\>
 
-Defined in: [provider.ts:43](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L43)
+Defined in: [provider.ts:43](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L43)
 
 #### Parameters
 
@@ -218,7 +218,7 @@ Defined in: [provider.ts:43](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > `optional` **forget**(`ino`, `nlookup`): `Promise`\<`void`\>
 
-Defined in: [provider.ts:24](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L24)
+Defined in: [provider.ts:24](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L24)
 
 #### Parameters
 
@@ -240,7 +240,7 @@ Defined in: [provider.ts:24](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > `optional` **forget\_multi**(`forgets`): `Promise`\<`void`\>
 
-Defined in: [provider.ts:25](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L25)
+Defined in: [provider.ts:25](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L25)
 
 #### Parameters
 
@@ -258,7 +258,7 @@ Defined in: [provider.ts:25](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **fsync**(`ino`, `fh`, `datasync`): `Promise`\<`void`\>
 
-Defined in: [provider.ts:44](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L44)
+Defined in: [provider.ts:44](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L44)
 
 #### Parameters
 
@@ -284,7 +284,7 @@ Defined in: [provider.ts:44](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **fsyncdir**(`ino`, `fh`, `datasync`): `Promise`\<`void`\>
 
-Defined in: [provider.ts:36](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L36)
+Defined in: [provider.ts:36](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L36)
 
 #### Parameters
 
@@ -310,7 +310,7 @@ Defined in: [provider.ts:36](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **getattr**(`ino`): `Promise`\<[`FileStat`](FileStat.md) \| `null`\>
 
-Defined in: [provider.ts:29](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L29)
+Defined in: [provider.ts:29](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L29)
 
 #### Parameters
 
@@ -328,7 +328,7 @@ Defined in: [provider.ts:29](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **getlk**(`ino`, `fh`): `Promise`\<[`Flock`](Flock.md)\>
 
-Defined in: [provider.ts:81](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L81)
+Defined in: [provider.ts:75](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L75)
 
 #### Parameters
 
@@ -350,7 +350,7 @@ Defined in: [provider.ts:81](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **getxattr**(`ino`, `name`, `size`): `Promise`\<`number` \| `Buffer`\<`ArrayBufferLike`\>\>
 
-Defined in: [provider.ts:72](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L72)
+Defined in: [provider.ts:66](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L66)
 
 #### Parameters
 
@@ -376,7 +376,7 @@ Defined in: [provider.ts:72](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > `optional` **init**(): `Promise`\<`void`\>
 
-Defined in: [provider.ts:22](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L22)
+Defined in: [provider.ts:22](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L22)
 
 #### Returns
 
@@ -388,7 +388,7 @@ Defined in: [provider.ts:22](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **ioctl**(`ino`, `cmd`, `in_buf`, `in_bufsz`, `out_bufsz`): `Promise`\<\{ `out_buf?`: `Buffer`\<`ArrayBufferLike`\>; `result`: `number`; \}\>
 
-Defined in: [provider.ts:87](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L87)
+Defined in: [provider.ts:81](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L81)
 
 #### Parameters
 
@@ -422,7 +422,7 @@ Defined in: [provider.ts:87](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **link**(`ino`, `newparent`, `newname`): `Promise`\<[`FileStat`](FileStat.md)\>
 
-Defined in: [provider.ts:57](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L57)
+Defined in: [provider.ts:57](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L57)
 
 #### Parameters
 
@@ -448,7 +448,7 @@ Defined in: [provider.ts:57](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **listxattr**(`ino`, `size`): `Promise`\<`number` \| `Buffer`\<`ArrayBufferLike`\>\>
 
-Defined in: [provider.ts:73](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L73)
+Defined in: [provider.ts:67](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L67)
 
 #### Parameters
 
@@ -470,7 +470,7 @@ Defined in: [provider.ts:73](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **lookup**(`parent`, `name`): `Promise`\<[`FileStat`](FileStat.md) \| `null`\>
 
-Defined in: [provider.ts:28](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L28)
+Defined in: [provider.ts:28](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L28)
 
 #### Parameters
 
@@ -492,7 +492,7 @@ Defined in: [provider.ts:28](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **lseek**(`ino`, `fh`, `off`, `whence`): `Promise`\<`number`\>
 
-Defined in: [provider.ts:107](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L107)
+Defined in: [provider.ts:88](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L88)
 
 #### Parameters
 
@@ -522,7 +522,7 @@ Defined in: [provider.ts:107](https://github.com/mensreversa/mount0/blob/a38f02a
 
 > **mkdir**(`parent`, `name`, `mode`): `Promise`\<[`FileStat`](FileStat.md)\>
 
-Defined in: [provider.ts:50](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L50)
+Defined in: [provider.ts:50](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L50)
 
 #### Parameters
 
@@ -548,7 +548,7 @@ Defined in: [provider.ts:50](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **mknod**(`parent`, `name`, `mode`, `rdev`): `Promise`\<[`FileStat`](FileStat.md)\>
 
-Defined in: [provider.ts:49](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L49)
+Defined in: [provider.ts:49](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L49)
 
 #### Parameters
 
@@ -578,7 +578,7 @@ Defined in: [provider.ts:49](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **open**(`ino`, `flags`, `mode?`): `Promise`\<`number`\>
 
-Defined in: [provider.ts:39](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L39)
+Defined in: [provider.ts:39](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L39)
 
 #### Parameters
 
@@ -604,7 +604,7 @@ Defined in: [provider.ts:39](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **opendir**(`ino`, `flags`): `Promise`\<`number`\>
 
-Defined in: [provider.ts:34](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L34)
+Defined in: [provider.ts:34](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L34)
 
 #### Parameters
 
@@ -626,7 +626,7 @@ Defined in: [provider.ts:34](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **poll**(`ino`, `fh`): `Promise`\<`number`\>
 
-Defined in: [provider.ts:94](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L94)
+Defined in: [provider.ts:82](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L82)
 
 #### Parameters
 
@@ -648,7 +648,7 @@ Defined in: [provider.ts:94](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **read**(`ino`, `fh`, `buffer`, `off`, `length`): `Promise`\<`number`\>
 
-Defined in: [provider.ts:40](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L40)
+Defined in: [provider.ts:40](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L40)
 
 #### Parameters
 
@@ -682,7 +682,7 @@ Defined in: [provider.ts:40](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **readdir**(`ino`, `size`, `off`): `Promise`\<[`DirEntry`](DirEntry.md)[]\>
 
-Defined in: [provider.ts:33](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L33)
+Defined in: [provider.ts:33](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L33)
 
 #### Parameters
 
@@ -708,7 +708,7 @@ Defined in: [provider.ts:33](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **readdirplus**(`ino`, `size`, `off`): `Promise`\<[`DirEntry`](DirEntry.md)[]\>
 
-Defined in: [provider.ts:96](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L96)
+Defined in: [provider.ts:84](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L84)
 
 #### Parameters
 
@@ -734,7 +734,7 @@ Defined in: [provider.ts:96](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **readlink**(`ino`): `Promise`\<`string`\>
 
-Defined in: [provider.ts:59](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L59)
+Defined in: [provider.ts:59](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L59)
 
 #### Parameters
 
@@ -752,7 +752,7 @@ Defined in: [provider.ts:59](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **release**(`ino`, `fh`): `Promise`\<`void`\>
 
-Defined in: [provider.ts:45](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L45)
+Defined in: [provider.ts:45](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L45)
 
 #### Parameters
 
@@ -774,7 +774,7 @@ Defined in: [provider.ts:45](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **releasedir**(`ino`, `fh`): `Promise`\<`void`\>
 
-Defined in: [provider.ts:35](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L35)
+Defined in: [provider.ts:35](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L35)
 
 #### Parameters
 
@@ -796,7 +796,7 @@ Defined in: [provider.ts:35](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **removexattr**(`ino`, `name`): `Promise`\<`void`\>
 
-Defined in: [provider.ts:74](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L74)
+Defined in: [provider.ts:68](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L68)
 
 #### Parameters
 
@@ -818,7 +818,7 @@ Defined in: [provider.ts:74](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **rename**(`parent`, `name`, `newparent`, `newname`, `flags`): `Promise`\<`void`\>
 
-Defined in: [provider.ts:62](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L62)
+Defined in: [provider.ts:62](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L62)
 
 #### Parameters
 
@@ -852,7 +852,7 @@ Defined in: [provider.ts:62](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > `optional` **retrieve\_reply**(`ino`, `cookie`, `offset`, `buffer`): `Promise`\<`void`\>
 
-Defined in: [provider.ts:97](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L97)
+Defined in: [provider.ts:85](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L85)
 
 #### Parameters
 
@@ -882,7 +882,7 @@ Defined in: [provider.ts:97](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **rmdir**(`parent`, `name`): `Promise`\<`void`\>
 
-Defined in: [provider.ts:54](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L54)
+Defined in: [provider.ts:54](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L54)
 
 #### Parameters
 
@@ -904,7 +904,7 @@ Defined in: [provider.ts:54](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **setattr**(`ino`, `to_set`, `attr`): `Promise`\<`void`\>
 
-Defined in: [provider.ts:30](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L30)
+Defined in: [provider.ts:30](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L30)
 
 #### Parameters
 
@@ -930,7 +930,7 @@ Defined in: [provider.ts:30](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **setlk**(`ino`, `fh`, `sleep`): `Promise`\<`void`\>
 
-Defined in: [provider.ts:82](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L82)
+Defined in: [provider.ts:76](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L76)
 
 #### Parameters
 
@@ -956,7 +956,7 @@ Defined in: [provider.ts:82](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **setxattr**(`ino`, `name`, `value`, `size`, `flags`): `Promise`\<`void`\>
 
-Defined in: [provider.ts:71](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L71)
+Defined in: [provider.ts:65](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L65)
 
 #### Parameters
 
@@ -990,7 +990,7 @@ Defined in: [provider.ts:71](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **statfs**(`ino`): `Promise`\<[`Statfs`](Statfs.md)\>
 
-Defined in: [provider.ts:78](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L78)
+Defined in: [provider.ts:72](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L72)
 
 #### Parameters
 
@@ -1008,7 +1008,7 @@ Defined in: [provider.ts:78](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > `optional` **statx**(`ino`, `flags`, `mask`): `Promise`\<[`FileStat`](FileStat.md) \| `null`\>
 
-Defined in: [provider.ts:98](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L98)
+Defined in: [provider.ts:86](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L86)
 
 #### Parameters
 
@@ -1034,7 +1034,7 @@ Defined in: [provider.ts:98](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **symlink**(`link`, `parent`, `name`): `Promise`\<[`FileStat`](FileStat.md)\>
 
-Defined in: [provider.ts:58](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L58)
+Defined in: [provider.ts:58](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L58)
 
 #### Parameters
 
@@ -1060,7 +1060,7 @@ Defined in: [provider.ts:58](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **tmpfile**(`parent`, `mode`, `flags`): `Promise`\<[`FileStat`](FileStat.md)\>
 
-Defined in: [provider.ts:108](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L108)
+Defined in: [provider.ts:89](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L89)
 
 #### Parameters
 
@@ -1086,7 +1086,7 @@ Defined in: [provider.ts:108](https://github.com/mensreversa/mount0/blob/a38f02a
 
 > **unlink**(`parent`, `name`): `Promise`\<`void`\>
 
-Defined in: [provider.ts:53](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L53)
+Defined in: [provider.ts:53](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L53)
 
 #### Parameters
 
@@ -1108,7 +1108,7 @@ Defined in: [provider.ts:53](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > **write**(`ino`, `fh`, `buffer`, `off`, `length`): `Promise`\<`number`\>
 
-Defined in: [provider.ts:41](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L41)
+Defined in: [provider.ts:41](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L41)
 
 #### Parameters
 
@@ -1142,7 +1142,7 @@ Defined in: [provider.ts:41](https://github.com/mensreversa/mount0/blob/a38f02a2
 
 > `optional` **write\_buf**(`ino`, `fh`, `buffer`, `off`, `size`): `Promise`\<`number`\>
 
-Defined in: [provider.ts:42](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L42)
+Defined in: [provider.ts:42](https://github.com/mensreversa/mount0/blob/fe80ba83cb642d2dacf6a87b6fdeef5a48acf24f/packages/core/src/provider.ts#L42)
 
 #### Parameters
 

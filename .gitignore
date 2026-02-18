@@ -58,3 +58,7 @@ Thumbs.db
 # pnpm-lock.yaml
 
 packages/core/fuse_lowlevel.h
+
+# Generated directories
+.docusaurus/
+.angular/
