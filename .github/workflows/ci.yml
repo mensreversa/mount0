@@ -51,11 +51,11 @@ jobs:
       - name: Build Website
         run: npm run build --workspace=website
 
+      - name: Generate API Docs
+        run: npm run docs:api
+
       - name: Build Docs
         run: npm run build --workspace=docs
 
       - name: Build Slides
         run: npm run start --workspace=slides & sleep 5 && curl http://localhost:3000 || true # Just a smoke test
-
-      - name: Generate API Docs
-        run: npm run docs:api

@@ -1,0 +1,24 @@
+{
+  "id": "types/globals",
+  "title": "@mount0/core",
+  "description": "Classes",
+  "source": "@site/docs/types/globals.md",
+  "sourceDirName": "types",
+  "slug": "/types/globals",
+  "permalink": "/types/globals",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mensreversa/mount0/tree/main/docs/docs/types/globals.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "apiSidebar",
+  "previous": {
+    "title": "Function: mount0()",
+    "permalink": "/types/functions/mount0"
+  },
+  "next": {
+    "title": "@mount0/core",
+    "permalink": "/types/"
+  }
+}

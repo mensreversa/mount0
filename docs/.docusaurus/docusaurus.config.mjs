@@ -36,11 +36,8 @@ export default {
           "../packages/core/src/index.ts"
         ],
         "tsconfig": "../tsconfig.json",
-        "out": "api",
-        "sidebar": {
-          "categoryLabel": "API Reference",
-          "position": 99
-        }
+        "out": "./docs/types",
+        "readme": "none"
       }
     ]
   ],
@@ -49,6 +46,23 @@ export default {
   "organizationName": "mensreversa",
   "projectName": "mount0",
   "onBrokenLinks": "warn",
+  "markdown": {
+    "format": "mdx",
+    "mermaid": false,
+    "emoji": true,
+    "mdx1Compat": {
+      "comments": true,
+      "admonitions": true,
+      "headingIds": true
+    },
+    "anchors": {
+      "maintainCase": false
+    },
+    "hooks": {
+      "onBrokenMarkdownLinks": "warn",
+      "onBrokenMarkdownImages": "throw"
+    }
+  },
   "i18n": {
     "defaultLocale": "en",
     "locales": [
@@ -64,6 +78,10 @@ export default {
         "docs": {
           "sidebarPath": "./sidebars.ts",
           "routeBasePath": "/",
+          "editUrl": "https://github.com/mensreversa/mount0/tree/main/docs/"
+        },
+        "blog": {
+          "showReadingTime": true,
           "editUrl": "https://github.com/mensreversa/mount0/tree/main/docs/"
         },
         "theme": {
@@ -95,6 +113,17 @@ export default {
           "label": "Documentation"
         },
         {
+          "type": "docSidebar",
+          "sidebarId": "apiSidebar",
+          "position": "left",
+          "label": "API"
+        },
+        {
+          "to": "/blog",
+          "label": "Blog",
+          "position": "left"
+        },
+        {
           "href": "https://github.com/mensreversa/mount0",
           "label": "GitHub",
           "position": "right"
@@ -111,6 +140,10 @@ export default {
             {
               "label": "Introduction",
               "to": "/"
+            },
+            {
+              "label": "API Reference",
+              "to": "/types"
             }
           ]
         },
@@ -118,8 +151,16 @@ export default {
           "title": "Community",
           "items": [
             {
-              "label": "GitHub",
-              "href": "https://github.com/mensreversa/mount0"
+              "label": "Stack Overflow",
+              "href": "https://stackoverflow.com/questions/tagged/mount0"
+            },
+            {
+              "label": "Discord",
+              "href": "https://discordapp.com/invite/mensreversa"
+            },
+            {
+              "label": "X",
+              "href": "https://x.com/mensreversa"
             }
           ]
         },
@@ -127,12 +168,12 @@ export default {
           "title": "More",
           "items": [
             {
-              "label": "Mens Reversa",
-              "href": "https://mensreversa.com"
+              "label": "GitHub",
+              "href": "https://github.com/mensreversa/mount0"
             },
             {
-              "label": "Mount0 Website",
-              "href": "https://mount0.com"
+              "label": "Mens Reversa",
+              "href": "https://mensreversa.com"
             }
           ]
         }
@@ -473,22 +514,5 @@ export default {
   "stylesheets": [],
   "clientModules": [],
   "titleDelimiter": "|",
-  "noIndex": false,
-  "markdown": {
-    "format": "mdx",
-    "mermaid": false,
-    "emoji": true,
-    "mdx1Compat": {
-      "comments": true,
-      "admonitions": true,
-      "headingIds": true
-    },
-    "anchors": {
-      "maintainCase": false
-    },
-    "hooks": {
-      "onBrokenMarkdownLinks": "warn",
-      "onBrokenMarkdownImages": "throw"
-    }
-  }
+  "noIndex": false
 };

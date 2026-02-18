@@ -36,7 +36,7 @@ jobs:
           # Build website
           npm run build --workspace=website
           
-          # Generate API Documentation (stored in docs/static/api)
+          # Generate API Documentation (stored in docs/static/api-reference)
           npm run docs:api
           
           # Build docusaurus (includes generated API docs)

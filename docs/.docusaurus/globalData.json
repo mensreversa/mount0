@@ -21,6 +21,56 @@
               "sidebar": "tutorialSidebar"
             },
             {
+              "id": "types/classes/Mount0",
+              "path": "/types/classes/Mount0",
+              "sidebar": "apiSidebar"
+            },
+            {
+              "id": "types/functions/mount0",
+              "path": "/types/functions/mount0",
+              "sidebar": "apiSidebar"
+            },
+            {
+              "id": "types/index",
+              "path": "/types/",
+              "sidebar": "apiSidebar"
+            },
+            {
+              "id": "types/interfaces/DirEntry",
+              "path": "/types/interfaces/DirEntry",
+              "sidebar": "apiSidebar"
+            },
+            {
+              "id": "types/interfaces/FileHandle",
+              "path": "/types/interfaces/FileHandle",
+              "sidebar": "apiSidebar"
+            },
+            {
+              "id": "types/interfaces/FileStat",
+              "path": "/types/interfaces/FileStat",
+              "sidebar": "apiSidebar"
+            },
+            {
+              "id": "types/interfaces/FilesystemProvider",
+              "path": "/types/interfaces/FilesystemProvider",
+              "sidebar": "apiSidebar"
+            },
+            {
+              "id": "types/interfaces/Flock",
+              "path": "/types/interfaces/Flock",
+              "sidebar": "apiSidebar"
+            },
+            {
+              "id": "types/interfaces/MountOptions",
+              "path": "/types/interfaces/MountOptions",
+              "sidebar": "apiSidebar"
+            },
+            {
+              "id": "types/interfaces/Statfs",
+              "path": "/types/interfaces/Statfs",
+              "sidebar": "apiSidebar"
+            },
+            {
               "id": "usage",
               "path": "/usage",
               "sidebar": "tutorialSidebar"
@@ -32,6 +82,12 @@
               "link": {
                 "path": "/",
                 "label": "intro"
+              }
+            },
+            "apiSidebar": {
+              "link": {
+                "path": "/types/classes/Mount0",
+                "label": "types/classes/Mount0"
               }
             }
           }

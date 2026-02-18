@@ -1,9 +1,4 @@
-import { createRequire } from 'module';
-import './chunk-5PYVB5X4.js';
-import './chunk-6DU2HRTW.js';
-import './chunk-B64X4CJI.js';
-import './chunk-EV7XQRJH.js';
-import './chunk-GSDMDRSQ.js';
+import { createRequire } from 'module';const require = createRequire(import.meta.url);
 import {
   AngularAppEngine,
   InlineCriticalCssProcessor,
@@ -18,11 +13,15 @@ import {
   setAngularAppEngineManifest,
   setAngularAppManifest,
   withAppShell,
-  withRoutes,
-} from './chunk-I26XCGGX.js';
-import './chunk-XX4NHVME.js';
-import './chunk-YPEIYHPD.js';
-const require = createRequire(import.meta.url);
+  withRoutes
+} from "./chunk-I26XCGGX.js";
+import "./chunk-B64X4CJI.js";
+import "./chunk-GSDMDRSQ.js";
+import "./chunk-YPEIYHPD.js";
+import "./chunk-5PYVB5X4.js";
+import "./chunk-XX4NHVME.js";
+import "./chunk-EV7XQRJH.js";
+import "./chunk-6DU2HRTW.js";
 export {
   AngularAppEngine,
   PrerenderFallback,
@@ -37,5 +36,5 @@ export {
   getOrCreateAngularServerApp as ɵgetOrCreateAngularServerApp,
   getRoutesFromAngularRouterConfig as ɵgetRoutesFromAngularRouterConfig,
   setAngularAppEngineManifest as ɵsetAngularAppEngineManifest,
-  setAngularAppManifest as ɵsetAngularAppManifest,
+  setAngularAppManifest as ɵsetAngularAppManifest
 };
