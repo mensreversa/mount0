@@ -1,0 +1,24 @@
+{
+  "id": "types/interfaces/FileStat",
+  "title": "Interface: FileStat",
+  "description": "Defined in1",
+  "source": "@site/docs/types/interfaces/FileStat.md",
+  "sourceDirName": "types/interfaces",
+  "slug": "/types/interfaces/FileStat",
+  "permalink": "/types/interfaces/FileStat",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mensreversa/mount0/tree/main/docs/docs/types/interfaces/FileStat.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "apiSidebar",
+  "previous": {
+    "title": "Interface: FileHandle",
+    "permalink": "/types/interfaces/FileHandle"
+  },
+  "next": {
+    "title": "Interface: FilesystemProvider",
+    "permalink": "/types/interfaces/FilesystemProvider"
+  }
+}

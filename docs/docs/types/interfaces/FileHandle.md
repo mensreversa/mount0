@@ -1,6 +1,6 @@
 # Interface: FileHandle
 
-Defined in: [types.ts:23](https://github.com/mensreversa/mount0/blob/f767cdf1b86c550bbe2fa76c7356ec0bdeb105eb/packages/core/src/types.ts#L23)
+Defined in: [types.ts:23](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/types.ts#L23)
 
 ## Properties
 
@@ -8,7 +8,7 @@ Defined in: [types.ts:23](https://github.com/mensreversa/mount0/blob/f767cdf1b86
 
 > **fd**: `number`
 
-Defined in: [types.ts:24](https://github.com/mensreversa/mount0/blob/f767cdf1b86c550bbe2fa76c7356ec0bdeb105eb/packages/core/src/types.ts#L24)
+Defined in: [types.ts:24](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/types.ts#L24)
 
 ***
 
@@ -16,7 +16,7 @@ Defined in: [types.ts:24](https://github.com/mensreversa/mount0/blob/f767cdf1b86
 
 > **flags**: `number`
 
-Defined in: [types.ts:26](https://github.com/mensreversa/mount0/blob/f767cdf1b86c550bbe2fa76c7356ec0bdeb105eb/packages/core/src/types.ts#L26)
+Defined in: [types.ts:26](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/types.ts#L26)
 
 ***
 
@@ -24,4 +24,4 @@ Defined in: [types.ts:26](https://github.com/mensreversa/mount0/blob/f767cdf1b86
 
 > **path**: `string`
 
-Defined in: [types.ts:25](https://github.com/mensreversa/mount0/blob/f767cdf1b86c550bbe2fa76c7356ec0bdeb105eb/packages/core/src/types.ts#L25)
+Defined in: [types.ts:25](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/types.ts#L25)

@@ -1,0 +1,24 @@
+{
+  "id": "types/functions/mount0",
+  "title": "Function: mount0()",
+  "description": "mount0(): Mount0",
+  "source": "@site/docs/types/functions/mount0.md",
+  "sourceDirName": "types/functions",
+  "slug": "/types/functions/mount0",
+  "permalink": "/types/functions/mount0",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mensreversa/mount0/tree/main/docs/docs/types/functions/mount0.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "apiSidebar",
+  "previous": {
+    "title": "Class: Mount0",
+    "permalink": "/types/classes/Mount0"
+  },
+  "next": {
+    "title": "@mount0/core",
+    "permalink": "/types/"
+  }
+}

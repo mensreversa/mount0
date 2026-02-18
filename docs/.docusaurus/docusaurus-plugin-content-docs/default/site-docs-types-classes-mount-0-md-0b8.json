@@ -1,0 +1,20 @@
+{
+  "id": "types/classes/Mount0",
+  "title": "Class: Mount0",
+  "description": "Defined in9",
+  "source": "@site/docs/types/classes/Mount0.md",
+  "sourceDirName": "types/classes",
+  "slug": "/types/classes/Mount0",
+  "permalink": "/types/classes/Mount0",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mensreversa/mount0/tree/main/docs/docs/types/classes/Mount0.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "apiSidebar",
+  "next": {
+    "title": "Function: mount0()",
+    "permalink": "/types/functions/mount0"
+  }
+}

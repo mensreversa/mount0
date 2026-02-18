@@ -1,0 +1,27 @@
+{
+  "id": "architecture",
+  "title": "Architecture",
+  "description": "Mount0 uses FUSE (Filesystem in Userspace) bindings to intercept filesystem calls and handle them in user space.",
+  "source": "@site/docs/architecture.md",
+  "sourceDirName": ".",
+  "slug": "/architecture",
+  "permalink": "/architecture",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mensreversa/mount0/tree/main/docs/docs/architecture.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 3,
+  "frontMatter": {
+    "sidebar_position": 3
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Usage Guide",
+    "permalink": "/usage"
+  },
+  "next": {
+    "title": "@mount0/core",
+    "permalink": "/types/"
+  }
+}

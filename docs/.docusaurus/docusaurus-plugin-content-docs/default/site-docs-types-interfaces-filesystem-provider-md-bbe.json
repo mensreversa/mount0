@@ -1,0 +1,24 @@
+{
+  "id": "types/interfaces/FilesystemProvider",
+  "title": "Interface: FilesystemProvider",
+  "description": "Defined in20",
+  "source": "@site/docs/types/interfaces/FilesystemProvider.md",
+  "sourceDirName": "types/interfaces",
+  "slug": "/types/interfaces/FilesystemProvider",
+  "permalink": "/types/interfaces/FilesystemProvider",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mensreversa/mount0/tree/main/docs/docs/types/interfaces/FilesystemProvider.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "apiSidebar",
+  "previous": {
+    "title": "Interface: FileStat",
+    "permalink": "/types/interfaces/FileStat"
+  },
+  "next": {
+    "title": "Interface: Flock",
+    "permalink": "/types/interfaces/Flock"
+  }
+}

@@ -1,6 +1,6 @@
 # Interface: Flock
 
-Defined in: [provider.ts:12](https://github.com/mensreversa/mount0/blob/f767cdf1b86c550bbe2fa76c7356ec0bdeb105eb/packages/core/src/provider.ts#L12)
+Defined in: [provider.ts:12](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L12)
 
 ## Properties
 
@@ -8,7 +8,7 @@ Defined in: [provider.ts:12](https://github.com/mensreversa/mount0/blob/f767cdf1
 
 > **len**: `number`
 
-Defined in: [provider.ts:16](https://github.com/mensreversa/mount0/blob/f767cdf1b86c550bbe2fa76c7356ec0bdeb105eb/packages/core/src/provider.ts#L16)
+Defined in: [provider.ts:16](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L16)
 
 ***
 
@@ -16,7 +16,7 @@ Defined in: [provider.ts:16](https://github.com/mensreversa/mount0/blob/f767cdf1
 
 > **pid**: `number`
 
-Defined in: [provider.ts:17](https://github.com/mensreversa/mount0/blob/f767cdf1b86c550bbe2fa76c7356ec0bdeb105eb/packages/core/src/provider.ts#L17)
+Defined in: [provider.ts:17](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L17)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [provider.ts:17](https://github.com/mensreversa/mount0/blob/f767cdf1
 
 > **start**: `number`
 
-Defined in: [provider.ts:15](https://github.com/mensreversa/mount0/blob/f767cdf1b86c550bbe2fa76c7356ec0bdeb105eb/packages/core/src/provider.ts#L15)
+Defined in: [provider.ts:15](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L15)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: [provider.ts:15](https://github.com/mensreversa/mount0/blob/f767cdf1
 
 > **type**: `number`
 
-Defined in: [provider.ts:13](https://github.com/mensreversa/mount0/blob/f767cdf1b86c550bbe2fa76c7356ec0bdeb105eb/packages/core/src/provider.ts#L13)
+Defined in: [provider.ts:13](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L13)
 
 ***
 
@@ -40,4 +40,4 @@ Defined in: [provider.ts:13](https://github.com/mensreversa/mount0/blob/f767cdf1
 
 > **whence**: `number`
 
-Defined in: [provider.ts:14](https://github.com/mensreversa/mount0/blob/f767cdf1b86c550bbe2fa76c7356ec0bdeb105eb/packages/core/src/provider.ts#L14)
+Defined in: [provider.ts:14](https://github.com/mensreversa/mount0/blob/a38f02a29443dc3b994d813116e3c76553fef6ae/packages/core/src/provider.ts#L14)

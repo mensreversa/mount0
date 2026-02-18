@@ -1,0 +1,24 @@
+{
+  "id": "types/index",
+  "title": "@mount0/core",
+  "description": "Classes",
+  "source": "@site/docs/types/index.md",
+  "sourceDirName": "types",
+  "slug": "/types/",
+  "permalink": "/types/",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mensreversa/mount0/tree/main/docs/docs/types/index.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "apiSidebar",
+  "previous": {
+    "title": "Function: mount0()",
+    "permalink": "/types/functions/mount0"
+  },
+  "next": {
+    "title": "Interface: DirEntry",
+    "permalink": "/types/interfaces/DirEntry"
+  }
+}
