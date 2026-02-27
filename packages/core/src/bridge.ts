@@ -21,24 +21,21 @@ export class FuseBridge {
         await this.handleOperation(reqPtr, params);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
-        // Based on FUSE reference implementations, fuse_reply_err expects positive errno values
-        // (like the C errno variable). We should pass positive values.
         let errno: number;
         if (err.errno !== undefined && err.errno !== null) {
-          // err.errno might be positive (like 5 for EIO) or negative, convert to positive
           errno = err.errno < 0 ? -err.errno : err.errno > 0 ? err.errno : 5;
         } else if (err.code === "ENOENT") {
-          errno = 2; // ENOENT
+          errno = 2;
         } else if (err.code === "ENODATA" || err.code === "ENOATTR") {
-          errno = 61; // ENODATA (No data available)
+          errno = 61;
         } else if (err.code === "EIO") {
-          errno = 5; // EIO
+          errno = 5;
         } else if (err.code === "ENOSYS") {
-          errno = 38; // ENOSYS (Function not implemented)
+          errno = 38;
         } else if (err.message && (err.message.includes("not supported") || err.message.includes("not implemented"))) {
-          errno = 38; // ENOSYS for unsupported operations
+          errno = 38;
         } else {
-          errno = 5; // Default to EIO
+          errno = 5;
         }
         if (process.env.MOUNT0_DEBUG === "1") {
           const op = params?.op || "unknown";
@@ -61,26 +58,16 @@ export class FuseBridge {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async handleOperation(reqPtr: number, params: Record<string, any>): Promise<void> {
-    // reqPtr can be 0 for operations like init/destroy that don't have a request
-    // params should always be defined
-    if (!params) {
-      throw new Error("params is undefined");
-    }
+    if (!params) throw new Error("params is undefined");
     const op = params.op;
 
-    // For init and destroy, there's no request to reply to
     if (op === "init" || op === "destroy") {
-      if (op === "init" && this.provider.init) {
-        await this.provider.init();
-      } else if (op === "destroy" && this.provider.destroy) {
-        await this.provider.destroy();
-      }
-      return; // No reply needed for init/destroy
+      if (op === "init" && this.provider.init) await this.provider.init();
+      else if (op === "destroy" && this.provider.destroy) await this.provider.destroy();
+      return;
     }
 
     switch (op) {
-      // Lifecycle operations (init and destroy are handled above)
-
       case "forget": {
         if (this.provider.forget) {
           await this.provider.forget(params.ino, params.nlookup);
@@ -105,7 +92,7 @@ export class FuseBridge {
 
       case "retrieve_reply": {
         if (this.provider.retrieve_reply) {
-          const buf = Buffer.from(params.data || "", "binary");
+          const buf = params.data || Buffer.alloc(0);
           await this.provider.retrieve_reply(params.ino, params.cookie, params.offset, buf);
         }
         mount0_fuse.reply_none(reqPtr);
@@ -121,22 +108,22 @@ export class FuseBridge {
       }
 
       case "getattr": {
-        const stat = await this.provider.getattr(params.ino);
+        const stat = await this.provider.getattr(params.ino, params.fh);
         if (!stat) throw { code: "ENOENT", errno: -2 };
         mount0_fuse.reply_getattr(reqPtr, stat);
         break;
       }
 
       case "setattr": {
-        await this.provider.setattr(params.ino, params.to_set, params.attr);
-        mount0_fuse.reply_getattr(reqPtr, await this.provider.getattr(params.ino));
+        await this.provider.setattr(params.ino, params.fh, params.to_set, params.attr);
+        mount0_fuse.reply_getattr(reqPtr, await this.provider.getattr(params.ino, params.fh));
         break;
       }
 
       // Directory operations
       case "readdir": {
-        const entries = await this.provider.readdir(params.ino, params.size, params.off);
-        mount0_fuse.reply_readdir(reqPtr, entries ? entries.map((e) => e.name) : []);
+        const entries = await this.provider.readdir(params.ino, params.fh, params.size, params.off);
+        mount0_fuse.reply_readdir(reqPtr, entries || []);
         break;
       }
 
@@ -168,19 +155,19 @@ export class FuseBridge {
       case "read": {
         const buf = Buffer.alloc(params.size);
         const bytesRead = await this.provider.read(params.ino, params.fh, buf, params.off, params.size);
-        mount0_fuse.reply_read(reqPtr, buf.subarray(0, bytesRead).toString("binary"));
+        mount0_fuse.reply_read(reqPtr, buf.subarray(0, bytesRead));
         break;
       }
 
       case "write": {
-        const buf = Buffer.from(params.data, "binary");
+        const buf = params.data || Buffer.alloc(0);
         const bytesWritten = await this.provider.write(params.ino, params.fh, buf, params.off, params.size);
         mount0_fuse.reply_write(reqPtr, bytesWritten);
         break;
       }
 
       case "write_buf": {
-        const buf = Buffer.from(params.data || "", "binary");
+        const buf = params.data || Buffer.alloc(0);
         const bytesWritten = await this.provider.write(params.ino, params.fh, buf, params.off, params.size);
         mount0_fuse.reply_write(reqPtr, bytesWritten);
         break;
@@ -206,8 +193,8 @@ export class FuseBridge {
 
       // Create operations
       case "create": {
-        const stat = await this.provider.create(params.parent, params.name, params.mode, params.flags);
-        mount0_fuse.reply_create(reqPtr, stat);
+        const result = await this.provider.create(params.parent, params.name, params.mode, params.flags);
+        mount0_fuse.reply_create(reqPtr, result.stat, result.fh);
         break;
       }
 
@@ -218,8 +205,8 @@ export class FuseBridge {
       }
 
       case "mkdir": {
-        await this.provider.mkdir(params.parent, params.name, params.mode);
-        mount0_fuse.reply_mkdir(reqPtr, 0);
+        const stat = await this.provider.mkdir(params.parent, params.name, params.mode);
+        mount0_fuse.reply_lookup(reqPtr, stat);
         break;
       }
 
@@ -264,7 +251,7 @@ export class FuseBridge {
 
       // Extended attributes
       case "setxattr": {
-        const value = Buffer.from(params.value, "binary");
+        const value = params.value || Buffer.alloc(0);
         await this.provider.setxattr(params.ino, params.name, value, params.size, params.flags);
         mount0_fuse.reply_setxattr(reqPtr, 0);
         break;
@@ -275,7 +262,7 @@ export class FuseBridge {
         if (typeof result === "number") {
           mount0_fuse.reply_xattr(reqPtr, result);
         } else {
-          mount0_fuse.reply_getxattr(reqPtr, result.toString("binary"));
+          mount0_fuse.reply_getxattr(reqPtr, result);
         }
         break;
       }
@@ -285,7 +272,7 @@ export class FuseBridge {
         if (typeof result === "number") {
           mount0_fuse.reply_xattr(reqPtr, result);
         } else {
-          mount0_fuse.reply_listxattr(reqPtr, result.toString("binary"));
+          mount0_fuse.reply_listxattr(reqPtr, result);
         }
         break;
       }
@@ -304,20 +291,20 @@ export class FuseBridge {
       }
 
       case "statfs": {
-        const statfs = await this.provider.statfs(params.ino);
+        const statfs = await this.provider.statfs(params.ino, params.fh);
         mount0_fuse.reply_statfs(reqPtr, statfs);
         break;
       }
 
       // Locking
       case "getlk": {
-        const lock = await this.provider.getlk(params.ino, params.fh);
+        const lock = await this.provider.getlk(params.ino, params.fh, params.lock);
         mount0_fuse.reply_getlk(reqPtr, lock);
         break;
       }
 
       case "setlk": {
-        await this.provider.setlk(params.ino, params.fh, params.sleep);
+        await this.provider.setlk(params.ino, params.fh, params.lock, params.sleep);
         mount0_fuse.reply_setlk(reqPtr, 0);
         break;
       }
@@ -336,9 +323,9 @@ export class FuseBridge {
       }
 
       case "ioctl": {
-        const inBuf = params.in_buf ? Buffer.from(params.in_buf, "binary") : null;
-        const result = await this.provider.ioctl(params.ino, params.cmd, inBuf, params.in_bufsz, params.out_bufsz);
-        mount0_fuse.reply_ioctl(reqPtr, result.result, result.out_buf ? result.out_buf.toString("binary") : undefined);
+        const inBuf = params.in_buf || null;
+        const result = await this.provider.ioctl(params.ino, params.fh, params.cmd, inBuf, params.in_bufsz, params.out_bufsz, params.flags);
+        mount0_fuse.reply_ioctl(reqPtr, result.result, result.out_buf);
         break;
       }
 
@@ -355,29 +342,25 @@ export class FuseBridge {
       }
 
       case "readdirplus": {
-        const entries = await this.provider.readdirplus(params.ino, params.size, params.off);
-        mount0_fuse.reply_readdirplus(reqPtr, entries ? entries.map((e) => e.name) : []);
+        const entries = await this.provider.readdirplus(params.ino, params.fh, params.size, params.off);
+        mount0_fuse.reply_readdirplus(reqPtr, entries || []);
         break;
       }
 
       case "statx": {
         if (this.provider.statx) {
           await this.provider.statx(params.ino, params.flags, params.mask);
-          // Note: statx reply needs special handling - for now use getattr
-          const stat = await this.provider.getattr(params.ino);
-          if (stat) {
-            mount0_fuse.reply_getattr(reqPtr, stat);
-          } else {
-            mount0_fuse.reply_err(reqPtr, 2); // ENOENT
-          }
+          const stat = await this.provider.getattr(params.ino, 0);
+          if (stat) mount0_fuse.reply_getattr(reqPtr, stat);
+          else mount0_fuse.reply_err(reqPtr, 2);
         } else {
-          mount0_fuse.reply_err(reqPtr, 38); // ENOSYS
+          mount0_fuse.reply_err(reqPtr, 38);
         }
         break;
       }
 
       case "copy_file_range": {
-        const bytesWritten = await this.provider.copy_file_range(params.ino_in, params.off_in, params.ino_out, params.off_out, params.len, params.flags);
+        const bytesWritten = await this.provider.copy_file_range(params.ino_in, params.fh_in, params.off_in, params.ino_out, params.fh_out, params.off_out, params.len, params.flags);
         mount0_fuse.reply_copy_file_range(reqPtr, bytesWritten);
         break;
       }
@@ -389,8 +372,8 @@ export class FuseBridge {
       }
 
       case "tmpfile": {
-        const stat = await this.provider.tmpfile(params.parent, params.mode, params.flags);
-        mount0_fuse.reply_tmpfile(reqPtr, stat);
+        const result = await this.provider.tmpfile(params.parent, params.mode, params.flags);
+        mount0_fuse.reply_tmpfile(reqPtr, result.stat, result.fh);
         break;
       }
 

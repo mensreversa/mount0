@@ -68,7 +68,7 @@ export class LocalProvider implements FilesystemProvider {
     }
   }
 
-  async getattr(ino: number): Promise<FileStat | null> {
+  async getattr(ino: number, _fh: number): Promise<FileStat | null> {
     const filePath = this.getPath(ino);
     const fullPath = this.resolvePath(filePath);
     try {
@@ -98,7 +98,7 @@ export class LocalProvider implements FilesystemProvider {
     }
   }
 
-  async readdir(ino: number, size: number, offset: number): Promise<DirEntry[]> {
+  async readdir(ino: number, _fh: number, size: number, offset: number): Promise<DirEntry[]> {
     const filePath = this.getPath(ino);
     const fullPath = this.resolvePath(filePath);
     const entries = await fs.readdir(fullPath, { withFileTypes: true });
@@ -149,7 +149,7 @@ export class LocalProvider implements FilesystemProvider {
     return result.bytesWritten;
   }
 
-  async create(parent: number, name: string, mode: number, _flags: number): Promise<FileStat> {
+  async create(parent: number, name: string, mode: number, _flags: number): Promise<{ stat: FileStat; fh: number }> {
     const filePath = this.pathFromParent(parent, name);
     const fullPath = this.resolvePath(filePath);
     const parentDir = path.dirname(fullPath);
@@ -170,19 +170,22 @@ export class LocalProvider implements FilesystemProvider {
     }
     this.openFiles.get(stats.ino)!.set(fh, fileHandle);
     return {
-      mode: stats.mode,
-      size: stats.size,
-      mtime: Math.floor(stats.mtimeMs / 1000),
-      ctime: Math.floor(stats.ctimeMs / 1000),
-      atime: Math.floor(stats.atimeMs / 1000),
-      uid: stats.uid,
-      gid: stats.gid,
-      dev: stats.dev,
-      ino: stats.ino,
-      nlink: stats.nlink,
-      rdev: stats.rdev,
-      blksize: stats.blksize,
-      blocks: stats.blocks,
+      stat: {
+        mode: stats.mode,
+        size: stats.size,
+        mtime: Math.floor(stats.mtimeMs / 1000),
+        ctime: Math.floor(stats.ctimeMs / 1000),
+        atime: Math.floor(stats.atimeMs / 1000),
+        uid: stats.uid,
+        gid: stats.gid,
+        dev: stats.dev,
+        ino: stats.ino,
+        nlink: stats.nlink,
+        rdev: stats.rdev,
+        blksize: stats.blksize,
+        blocks: stats.blocks,
+      },
+      fh,
     };
   }
 
@@ -245,7 +248,7 @@ export class LocalProvider implements FilesystemProvider {
     }
   }
 
-  async setattr(ino: number, length: number): Promise<void> {
+  async setattr(ino: number, _fh: number, length: number): Promise<void> {
     const filePath = this.getPath(ino);
     const fullPath = this.resolvePath(filePath);
     const fileHandle = await fs.open(fullPath, "r+");
@@ -429,7 +432,7 @@ export class LocalProvider implements FilesystemProvider {
     await fs.access(fullPath, validMask);
   }
 
-  async statfs(ino: number): Promise<Statfs> {
+  async statfs(ino: number, _fh: number): Promise<Statfs> {
     const filePath = this.getPath(ino);
     const fullPath = this.resolvePath(filePath);
     const stats = await fs.statfs(fullPath);
@@ -444,12 +447,12 @@ export class LocalProvider implements FilesystemProvider {
   }
 
   // Locking
-  async getlk(_ino: number, _fh: number): Promise<Flock> {
-    // File locking not implemented
-    throw new Error("File locking not supported");
+  async getlk(_ino: number, _fh: number, lock: Flock): Promise<Flock> {
+    // File locking not implemented - return lock unchanged
+    return lock;
   }
 
-  async setlk(_ino: number, _fh: number, _sleep: number): Promise<void> {
+  async setlk(_ino: number, _fh: number, _lock: Flock, _sleep: number): Promise<void> {
     // File locking not implemented
     throw new Error("File locking not supported");
   }
@@ -465,7 +468,7 @@ export class LocalProvider implements FilesystemProvider {
     throw new Error("Block mapping not supported");
   }
 
-  async ioctl(_ino: number, _cmd: number, _in_buf: Buffer | null, _in_bufsz: number, _out_bufsz: number): Promise<{ result: number; out_buf?: Buffer }> {
+  async ioctl(_ino: number, _fh: number, _cmd: number, _in_buf: Buffer | null, _in_bufsz: number, _out_bufsz: number, _flags: number): Promise<{ result: number; out_buf?: Buffer }> {
     // IOCTL not implemented
     throw new Error("IOCTL not supported");
   }
@@ -486,12 +489,12 @@ export class LocalProvider implements FilesystemProvider {
     await fileHandle.truncate(newSize);
   }
 
-  async readdirplus(ino: number, size: number, off: number): Promise<DirEntry[]> {
+  async readdirplus(ino: number, fh: number, size: number, off: number): Promise<DirEntry[]> {
     // Same as readdir for now
-    return this.readdir(ino, size, off);
+    return this.readdir(ino, fh, size, off);
   }
 
-  async copy_file_range(ino_in: number, off_in: number, ino_out: number, off_out: number, len: number, _flags: number): Promise<number> {
+  async copy_file_range(ino_in: number, _fh_in: number, off_in: number, ino_out: number, _fh_out: number, off_out: number, len: number, _flags: number): Promise<number> {
     const inPath = this.getPath(ino_in);
     const outPath = this.getPath(ino_out);
     const inFull = this.resolvePath(inPath);
@@ -522,7 +525,7 @@ export class LocalProvider implements FilesystemProvider {
     return stats.size;
   }
 
-  async tmpfile(parent: number, mode: number, flags: number): Promise<FileStat> {
+  async tmpfile(parent: number, mode: number, flags: number): Promise<{ stat: FileStat; fh: number }> {
     // Create a temporary file - use create for now
     const name = `.tmp.${Date.now()}.${Math.random().toString(36).substring(7)}`;
     return this.create(parent, name, mode, flags);

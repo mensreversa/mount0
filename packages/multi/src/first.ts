@@ -35,17 +35,17 @@ export class FirstProvider implements FilesystemProvider {
     return null;
   }
 
-  async getattr(ino: number): Promise<FileStat | null> {
-    return this.executeFirst((p) => p.getattr(ino));
+  async getattr(ino: number, fh: number): Promise<FileStat | null> {
+    return this.executeFirst((p) => p.getattr(ino, fh));
   }
 
-  async setattr(ino: number, to_set: number, attr: FileStat): Promise<void> {
-    return this.executeFirst((p) => p.setattr(ino, to_set, attr));
+  async setattr(ino: number, fh: number, to_set: number, attr: FileStat): Promise<void> {
+    return this.executeFirst((p) => p.setattr(ino, fh, to_set, attr));
   }
 
   // Directory operations
-  async readdir(ino: number, size: number, off: number): Promise<DirEntry[]> {
-    return this.executeFirst((p) => p.readdir(ino, size, off));
+  async readdir(ino: number, fh: number, size: number, off: number): Promise<DirEntry[]> {
+    return this.executeFirst((p) => p.readdir(ino, fh, size, off));
   }
 
   async opendir(ino: number, flags: number): Promise<number> {
@@ -86,7 +86,7 @@ export class FirstProvider implements FilesystemProvider {
   }
 
   // Create operations
-  async create(parent: number, name: string, mode: number, flags: number): Promise<FileStat> {
+  async create(parent: number, name: string, mode: number, flags: number): Promise<{ stat: FileStat; fh: number }> {
     return this.executeFirst((p) => p.create(parent, name, mode, flags));
   }
 
@@ -147,17 +147,17 @@ export class FirstProvider implements FilesystemProvider {
     return this.executeFirst((p) => p.access(ino, mask));
   }
 
-  async statfs(ino: number): Promise<Statfs> {
-    return this.executeFirst((p) => p.statfs(ino));
+  async statfs(ino: number, fh: number): Promise<Statfs> {
+    return this.executeFirst((p) => p.statfs(ino, fh));
   }
 
   // Locking
-  async getlk(ino: number, fh: number): Promise<Flock> {
-    return this.executeFirst((p) => p.getlk(ino, fh));
+  async getlk(ino: number, fh: number, lock: Flock): Promise<Flock> {
+    return this.executeFirst((p) => p.getlk(ino, fh, lock));
   }
 
-  async setlk(ino: number, fh: number, sleep: number): Promise<void> {
-    return this.executeFirst((p) => p.setlk(ino, fh, sleep));
+  async setlk(ino: number, fh: number, lock: Flock, sleep: number): Promise<void> {
+    return this.executeFirst((p) => p.setlk(ino, fh, lock, sleep));
   }
 
   async flock(ino: number, fh: number, op: number): Promise<void> {
@@ -169,8 +169,8 @@ export class FirstProvider implements FilesystemProvider {
     return this.executeFirst((p) => p.bmap(ino, blocksize, idx));
   }
 
-  async ioctl(ino: number, cmd: number, in_buf: Buffer | null, in_bufsz: number, out_bufsz: number): Promise<{ result: number; out_buf?: Buffer }> {
-    return this.executeFirst((p) => p.ioctl(ino, cmd, in_buf, in_bufsz, out_bufsz));
+  async ioctl(ino: number, fh: number, cmd: number, in_buf: Buffer | null, in_bufsz: number, out_bufsz: number, flags: number): Promise<{ result: number; out_buf?: Buffer }> {
+    return this.executeFirst((p) => p.ioctl(ino, fh, cmd, in_buf, in_bufsz, out_bufsz, flags));
   }
 
   async poll(ino: number, fh: number): Promise<number> {
@@ -181,19 +181,19 @@ export class FirstProvider implements FilesystemProvider {
     return this.executeFirst((p) => p.fallocate(ino, fh, offset, length, mode));
   }
 
-  async readdirplus(ino: number, size: number, off: number): Promise<DirEntry[]> {
-    return this.executeFirst((p) => p.readdirplus(ino, size, off));
+  async readdirplus(ino: number, fh: number, size: number, off: number): Promise<DirEntry[]> {
+    return this.executeFirst((p) => p.readdirplus(ino, fh, size, off));
   }
 
-  async copy_file_range(ino_in: number, off_in: number, ino_out: number, off_out: number, len: number, flags: number): Promise<number> {
-    return this.executeFirst((p) => p.copy_file_range(ino_in, off_in, ino_out, off_out, len, flags));
+  async copy_file_range(ino_in: number, fh_in: number, off_in: number, ino_out: number, fh_out: number, off_out: number, len: number, flags: number): Promise<number> {
+    return this.executeFirst((p) => p.copy_file_range(ino_in, fh_in, off_in, ino_out, fh_out, off_out, len, flags));
   }
 
   async lseek(ino: number, fh: number, off: number, whence: number): Promise<number> {
     return this.executeFirst((p) => p.lseek(ino, fh, off, whence));
   }
 
-  async tmpfile(parent: number, mode: number, flags: number): Promise<FileStat> {
+  async tmpfile(parent: number, mode: number, flags: number): Promise<{ stat: FileStat; fh: number }> {
     return this.executeFirst((p) => p.tmpfile(parent, mode, flags));
   }
 }

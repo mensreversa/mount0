@@ -91,12 +91,12 @@ export class EncryptedProvider implements FilesystemProvider {
     return null;
   }
 
-  async getattr(ino: number): Promise<FileStat | null> {
+  async getattr(ino: number, fh: number): Promise<FileStat | null> {
     if (ino === 1) {
-      return await this.provider.getattr(1);
+      return await this.provider.getattr(1, fh);
     }
     const providerIno = this.getProviderIno(ino);
-    const stat = await this.provider.getattr(providerIno);
+    const stat = await this.provider.getattr(providerIno, fh);
     if (stat) {
       this.setInoMapping(ino, stat.ino);
       return { ...stat, ino };
@@ -104,14 +104,14 @@ export class EncryptedProvider implements FilesystemProvider {
     return null;
   }
 
-  async setattr(ino: number, to_set: number, attr: FileStat): Promise<void> {
+  async setattr(ino: number, fh: number, to_set: number, attr: FileStat): Promise<void> {
     const providerIno = this.getProviderIno(ino);
-    return this.provider.setattr(providerIno, to_set, attr);
+    return this.provider.setattr(providerIno, fh, to_set, attr);
   }
 
-  async readdir(ino: number, size: number, off: number): Promise<DirEntry[]> {
+  async readdir(ino: number, fh: number, size: number, off: number): Promise<DirEntry[]> {
     const providerIno = this.getProviderIno(ino);
-    const entries = await this.provider.readdir(providerIno, size, off);
+    const entries = await this.provider.readdir(providerIno, fh, size, off);
     return entries.map((entry) => {
       const ino = this.nextIno++;
       this.setInoMapping(ino, entry.ino);
@@ -178,12 +178,12 @@ export class EncryptedProvider implements FilesystemProvider {
     return this.provider.release(providerIno, fh);
   }
 
-  async create(parent: number, name: string, mode: number, flags: number): Promise<FileStat> {
+  async create(parent: number, name: string, mode: number, flags: number): Promise<{ stat: FileStat; fh: number }> {
     const providerParent = this.getProviderIno(parent);
-    const stat = await this.provider.create(providerParent, name, mode, flags);
+    const result = await this.provider.create(providerParent, name, mode, flags);
     const ino = this.nextIno++;
-    this.setInoMapping(ino, stat.ino);
-    return { ...stat, ino };
+    this.setInoMapping(ino, result.stat.ino);
+    return { stat: { ...result.stat, ino }, fh: result.fh };
   }
 
   async mknod(parent: number, name: string, mode: number, rdev: number): Promise<FileStat> {
@@ -265,19 +265,19 @@ export class EncryptedProvider implements FilesystemProvider {
     return this.provider.access(providerIno, mask);
   }
 
-  async statfs(ino: number): Promise<Statfs> {
+  async statfs(ino: number, fh: number): Promise<Statfs> {
     const providerIno = this.getProviderIno(ino);
-    return this.provider.statfs(providerIno);
+    return this.provider.statfs(providerIno, fh);
   }
 
-  async getlk(ino: number, fh: number): Promise<Flock> {
+  async getlk(ino: number, fh: number, lock: Flock): Promise<Flock> {
     const providerIno = this.getProviderIno(ino);
-    return this.provider.getlk(providerIno, fh);
+    return this.provider.getlk(providerIno, fh, lock);
   }
 
-  async setlk(ino: number, fh: number, sleep: number): Promise<void> {
+  async setlk(ino: number, fh: number, lock: Flock, sleep: number): Promise<void> {
     const providerIno = this.getProviderIno(ino);
-    return this.provider.setlk(providerIno, fh, sleep);
+    return this.provider.setlk(providerIno, fh, lock, sleep);
   }
 
   async flock(ino: number, fh: number, op: number): Promise<void> {
@@ -290,9 +290,9 @@ export class EncryptedProvider implements FilesystemProvider {
     return this.provider.bmap(providerIno, blocksize, idx);
   }
 
-  async ioctl(ino: number, cmd: number, in_buf: Buffer | null, in_bufsz: number, out_bufsz: number): Promise<{ result: number; out_buf?: Buffer }> {
+  async ioctl(ino: number, fh: number, cmd: number, in_buf: Buffer | null, in_bufsz: number, out_bufsz: number, flags: number): Promise<{ result: number; out_buf?: Buffer }> {
     const providerIno = this.getProviderIno(ino);
-    return this.provider.ioctl(providerIno, cmd, in_buf, in_bufsz, out_bufsz);
+    return this.provider.ioctl(providerIno, fh, cmd, in_buf, in_bufsz, out_bufsz, flags);
   }
 
   async poll(ino: number, fh: number): Promise<number> {
@@ -305,9 +305,9 @@ export class EncryptedProvider implements FilesystemProvider {
     return this.provider.fallocate(providerIno, fh, offset, length, mode);
   }
 
-  async readdirplus(ino: number, size: number, offset: number): Promise<DirEntry[]> {
+  async readdirplus(ino: number, fh: number, size: number, offset: number): Promise<DirEntry[]> {
     const providerIno = this.getProviderIno(ino);
-    const entries = await this.provider.readdirplus(providerIno, size, offset);
+    const entries = await this.provider.readdirplus(providerIno, fh, size, offset);
     return entries.map((entry) => {
       const ino = this.nextIno++;
       this.setInoMapping(ino, entry.ino);
@@ -315,10 +315,10 @@ export class EncryptedProvider implements FilesystemProvider {
     });
   }
 
-  async copy_file_range(ino_in: number, off_in: number, ino_out: number, off_out: number, len: number, flags: number): Promise<number> {
+  async copy_file_range(ino_in: number, fh_in: number, off_in: number, ino_out: number, fh_out: number, off_out: number, len: number, flags: number): Promise<number> {
     const providerInoIn = this.getProviderIno(ino_in);
     const providerInoOut = this.getProviderIno(ino_out);
-    return this.provider.copy_file_range(providerInoIn, off_in, providerInoOut, off_out, len, flags);
+    return this.provider.copy_file_range(providerInoIn, fh_in, off_in, providerInoOut, fh_out, off_out, len, flags);
   }
 
   async lseek(ino: number, fh: number, off: number, whence: number): Promise<number> {
@@ -326,11 +326,11 @@ export class EncryptedProvider implements FilesystemProvider {
     return this.provider.lseek(providerIno, fh, off, whence);
   }
 
-  async tmpfile(parent: number, mode: number, flags: number): Promise<FileStat> {
+  async tmpfile(parent: number, mode: number, flags: number): Promise<{ stat: FileStat; fh: number }> {
     const providerParent = this.getProviderIno(parent);
-    const stat = await this.provider.tmpfile(providerParent, mode, flags);
+    const result = await this.provider.tmpfile(providerParent, mode, flags);
     const ino = this.nextIno++;
-    this.setInoMapping(ino, stat.ino);
-    return { ...stat, ino };
+    this.setInoMapping(ino, result.stat.ino);
+    return { stat: { ...result.stat, ino }, fh: result.fh };
   }
 }

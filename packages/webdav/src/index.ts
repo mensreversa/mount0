@@ -17,15 +17,15 @@ export class WebdavProvider implements FilesystemProvider {
     throw new Error("WebdavProvider not implemented");
   }
 
-  async getattr(_ino: number): Promise<FileStat | null> {
+  async getattr(_ino: number, _fh: number): Promise<FileStat | null> {
     throw new Error("WebdavProvider not implemented");
   }
 
-  async setattr(_ino: number, _to_set: number, _attr: FileStat): Promise<void> {
+  async setattr(_ino: number, _fh: number, _to_set: number, _attr: FileStat): Promise<void> {
     throw new Error("WebdavProvider not implemented");
   }
 
-  async readdir(_ino: number, _size: number, _off: number): Promise<DirEntry[]> {
+  async readdir(_ino: number, _fh: number, _size: number, _off: number): Promise<DirEntry[]> {
     throw new Error("WebdavProvider not implemented");
   }
 
@@ -65,7 +65,7 @@ export class WebdavProvider implements FilesystemProvider {
     throw new Error("WebdavProvider not implemented");
   }
 
-  async create(_parent: number, _name: string, _mode: number, _flags: number): Promise<FileStat> {
+  async create(_parent: number, _name: string, _mode: number, _flags: number): Promise<{ stat: FileStat; fh: number }> {
     throw new Error("WebdavProvider not implemented");
   }
 
@@ -121,15 +121,15 @@ export class WebdavProvider implements FilesystemProvider {
     throw new Error("WebdavProvider not implemented");
   }
 
-  async statfs(_ino: number): Promise<Statfs> {
+  async statfs(_ino: number, _fh: number): Promise<Statfs> {
     throw new Error("WebdavProvider not implemented");
   }
 
-  async getlk(_ino: number, _fh: number): Promise<Flock> {
+  async getlk(_ino: number, _fh: number, _lock: Flock): Promise<Flock> {
     throw new Error("WebdavProvider not implemented");
   }
 
-  async setlk(_ino: number, _fh: number, _sleep: number): Promise<void> {
+  async setlk(_ino: number, _fh: number, _lock: Flock, _sleep: number): Promise<void> {
     throw new Error("WebdavProvider not implemented");
   }
 
@@ -141,7 +141,7 @@ export class WebdavProvider implements FilesystemProvider {
     throw new Error("WebdavProvider not implemented");
   }
 
-  async ioctl(_ino: number, _cmd: number, _in_buf: Buffer | null, _in_bufsz: number, _out_bufsz: number): Promise<{ result: number; out_buf?: Buffer }> {
+  async ioctl(_ino: number, _fh: number, _cmd: number, _in_buf: Buffer | null, _in_bufsz: number, _out_bufsz: number, _flags: number): Promise<{ result: number; out_buf?: Buffer }> {
     throw new Error("WebdavProvider not implemented");
   }
 
@@ -153,11 +153,11 @@ export class WebdavProvider implements FilesystemProvider {
     throw new Error("WebdavProvider not implemented");
   }
 
-  async readdirplus(_ino: number, _size: number, _off: number): Promise<DirEntry[]> {
+  async readdirplus(_ino: number, _fh: number, _size: number, _off: number): Promise<DirEntry[]> {
     throw new Error("WebdavProvider not implemented");
   }
 
-  async copy_file_range(_ino_in: number, _off_in: number, _ino_out: number, _off_out: number, _len: number, _flags: number): Promise<number> {
+  async copy_file_range(_ino_in: number, _fh_in: number, _off_in: number, _ino_out: number, _fh_out: number, _off_out: number, _len: number, _flags: number): Promise<number> {
     throw new Error("WebdavProvider not implemented");
   }
 
@@ -165,7 +165,7 @@ export class WebdavProvider implements FilesystemProvider {
     throw new Error("WebdavProvider not implemented");
   }
 
-  async tmpfile(_parent: number, _mode: number, _flags: number): Promise<FileStat> {
+  async tmpfile(_parent: number, _mode: number, _flags: number): Promise<{ stat: FileStat; fh: number }> {
     throw new Error("WebdavProvider not implemented");
   }
 }

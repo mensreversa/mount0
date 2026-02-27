@@ -10,7 +10,7 @@
     "lint": "eslint src/**/*.ts",
     "format": "prettier --write \"src/**/*.{ts,js,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,js,json}\"",
-    "test": "jest"
+    "test": "jest --passWithNoTests"
   },
   "keywords": [
     "memory",
@@ -32,6 +32,18 @@
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node",
-    "passWithNoTests": true
+    "roots": [
+      "<rootDir>/test"
+    ],
+    "testMatch": [
+      "**/*.test.ts"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.ts",
+      "!src/**/*.d.ts"
+    ],
+    "moduleNameMapper": {
+      "^@mount0/core$": "<rootDir>/../core/src/index.ts"
+    }
   }
 }

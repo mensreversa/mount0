@@ -10,7 +10,7 @@ export class Raid1Provider extends BaseRaidProvider {
     super(config.providers);
   }
 
-  async create(parent: number, name: string, mode: number, flags: number): Promise<FileStat> {
+  async create(parent: number, name: string, mode: number, flags: number): Promise<{ stat: FileStat; fh: number }> {
     const providerInos = this.getProviderInos(parent);
     if (providerInos.length === 0) throw new Error("Parent not found");
 
@@ -19,10 +19,9 @@ export class Raid1Provider extends BaseRaidProvider {
 
     for (let i = 0; i < this.providers.length && i < providerInos.length; i++) {
       try {
-        const stat = await this.providers[i].create(providerInos[i], name, mode, flags);
-        stats.push(stat);
-        const fh = await this.providers[i].open(stat.ino, flags);
-        providerFhs.push(fh);
+        const result = await this.providers[i].create(providerInos[i], name, mode, flags);
+        stats.push(result.stat);
+        providerFhs.push(result.fh);
       } catch (error) {
         if (stats.length === 0) throw error;
       }
@@ -42,7 +41,7 @@ export class Raid1Provider extends BaseRaidProvider {
     }
     this.openFiles.get(raidIno)!.set(fh, providerFhs);
 
-    return { ...stats[0], ino: raidIno };
+    return { stat: { ...stats[0], ino: raidIno }, fh };
   }
 
   async read(ino: number, fh: number, buffer: Buffer, offset: number, length: number): Promise<number> {

@@ -25,54 +25,54 @@ static int fuse_running = 0;
 
 struct req_data {
   fuse_req_t req;
-  char op[16];
+  char op[24];
   union {
-    struct { fuse_ino_t parent; char name[256]; } lookup;
-    struct { fuse_ino_t ino; } getattr;
-    struct { fuse_ino_t ino; size_t size; off_t off; } readdir;
+    struct { fuse_ino_t parent; char *name; } lookup;
+    struct { fuse_ino_t ino; uint64_t fh; } getattr;
+    struct { fuse_ino_t ino; uint64_t fh; size_t size; off_t off; } readdir;
     struct { fuse_ino_t ino; uint32_t flags; } open;
     struct { fuse_ino_t ino; uint64_t fh; size_t size; off_t off; } read;
-    struct { fuse_ino_t ino; uint64_t fh; size_t size; off_t off; char data[4096]; size_t data_len; } write;
-    struct { fuse_ino_t ino; uint64_t fh; off_t off; size_t bufv_count; char bufv_data[4096]; size_t bufv_size; } write_buf;
+    struct { fuse_ino_t ino; uint64_t fh; size_t size; off_t off; void *data; size_t data_len; } write;
+    struct { fuse_ino_t ino; uint64_t fh; size_t size; off_t off; void *data; size_t data_len; } write_buf;
     struct { fuse_ino_t ino; uint64_t fh; } release;
-    struct { fuse_ino_t parent; char name[256]; uint32_t mode; uint32_t flags; } create;
-    struct { fuse_ino_t parent; char name[256]; } unlink;
-    struct { fuse_ino_t parent; char name[256]; uint32_t mode; } mkdir;
-    struct { fuse_ino_t parent; char name[256]; } rmdir;
-    struct { fuse_ino_t parent; char name[256]; fuse_ino_t newparent; char newname[256]; uint32_t flags; } rename;
-    struct { fuse_ino_t ino; int to_set; struct stat attr; } setattr;
+    struct { fuse_ino_t parent; char *name; uint32_t mode; uint32_t flags; } create;
+    struct { fuse_ino_t parent; char *name; } unlink;
+    struct { fuse_ino_t parent; char *name; uint32_t mode; } mkdir;
+    struct { fuse_ino_t parent; char *name; } rmdir;
+    struct { fuse_ino_t parent; char *name; fuse_ino_t newparent; char *newname; uint32_t flags; } rename;
+    struct { fuse_ino_t ino; uint64_t fh; int to_set; struct stat attr; } setattr;
     struct { fuse_ino_t ino; uint64_t fh; } flush;
     struct { fuse_ino_t ino; uint64_t fh; int datasync; } fsync;
     struct { fuse_ino_t ino; uint32_t flags; } opendir;
     struct { fuse_ino_t ino; uint64_t fh; } releasedir;
     struct { fuse_ino_t ino; uint64_t fh; int datasync; } fsyncdir;
     struct { fuse_ino_t ino; } readlink;
-    struct { char link[4096]; fuse_ino_t parent; char name[256]; } symlink;
-    struct { fuse_ino_t ino; fuse_ino_t newparent; char newname[256]; } link;
-    struct { fuse_ino_t parent; char name[256]; uint32_t mode; dev_t rdev; } mknod;
+    struct { char *link; fuse_ino_t parent; char *name; } symlink;
+    struct { fuse_ino_t ino; fuse_ino_t newparent; char *newname; } link;
+    struct { fuse_ino_t parent; char *name; uint32_t mode; dev_t rdev; } mknod;
     struct { fuse_ino_t ino; int mask; } access;
-    struct { fuse_ino_t ino; } statfs;
-    struct { fuse_ino_t ino; char name[256]; char value[4096]; size_t size; int flags; } setxattr;
-    struct { fuse_ino_t ino; char name[256]; size_t size; } getxattr;
+    struct { fuse_ino_t ino; uint64_t fh; } statfs;
+    struct { fuse_ino_t ino; char *name; void *value; size_t size; int flags; } setxattr;
+    struct { fuse_ino_t ino; char *name; size_t size; } getxattr;
     struct { fuse_ino_t ino; size_t size; } listxattr;
-    struct { fuse_ino_t ino; char name[256]; } removexattr;
-    struct { fuse_ino_t ino; uint64_t fh; } getlk;
-    struct { fuse_ino_t ino; uint64_t fh; int sleep; } setlk;
+    struct { fuse_ino_t ino; char *name; } removexattr;
+    struct { fuse_ino_t ino; uint64_t fh; struct flock lock; } getlk;
+    struct { fuse_ino_t ino; uint64_t fh; struct flock lock; int sleep; } setlk;
     struct { fuse_ino_t ino; uint64_t fh; int op; } flock;
     struct { fuse_ino_t ino; size_t blocksize; uint64_t idx; } bmap;
-    struct { fuse_ino_t ino; unsigned int cmd; size_t in_bufsz; size_t out_bufsz; char in_buf[4096]; } ioctl;
+    struct { fuse_ino_t ino; unsigned int cmd; void *in_buf; size_t in_bufsz; size_t out_bufsz; int flags; uint64_t fh; } ioctl;
     struct { fuse_ino_t ino; uint64_t fh; } poll;
     struct { fuse_ino_t ino; uint64_t fh; off_t offset; off_t length; int mode; } fallocate;
-    struct { fuse_ino_t ino; size_t size; off_t off; } readdirplus;
-    struct { fuse_ino_t ino; void *cookie; off_t offset; size_t bufv_count; char bufv_data[4096]; size_t bufv_size; } retrieve_reply;
-    struct { fuse_ino_t ino_in; off_t off_in; fuse_ino_t ino_out; off_t off_out; size_t len; int flags; } copy_file_range;
+    struct { fuse_ino_t ino; uint64_t fh; size_t size; off_t off; } readdirplus;
+    struct { fuse_ino_t ino; void *cookie; off_t offset; void *data; size_t data_len; } retrieve_reply;
+    struct { fuse_ino_t ino_in; uint64_t fh_in; off_t off_in; fuse_ino_t ino_out; uint64_t fh_out; off_t off_out; size_t len; int flags; } copy_file_range;
     struct { fuse_ino_t ino; uint64_t fh; off_t off; int whence; } lseek;
     struct { fuse_ino_t parent; uint32_t mode; uint32_t flags; } tmpfile;
     struct { fuse_ino_t ino; int flags; int mask; } statx;
     struct { } init;
     struct { } destroy;
     struct { fuse_ino_t ino; uint64_t nlookup; } forget;
-    struct { size_t count; fuse_ino_t inos[64]; uint64_t nlookups[64]; } forget_multi;
+    struct { size_t count; fuse_ino_t *inos; uint64_t *nlookups; } forget_multi;
   } u;
 };
 
@@ -94,6 +94,20 @@ static void __attribute__((unused)) debug_log(const char *op, const char *fmt, .
 static void fuse_serialize_stat(napi_env env, const struct stat *st, napi_value stat_obj);
 static void fuse_parse_stat(napi_env env, napi_value stat_obj, struct stat *st);
 
+static void fuse_serialize_flock(napi_env env, const struct flock *lock, napi_value lock_obj) {
+  napi_value val;
+  napi_create_int32(env, lock->l_type, &val);
+  napi_set_named_property(env, lock_obj, "type", val);
+  napi_create_int32(env, lock->l_whence, &val);
+  napi_set_named_property(env, lock_obj, "whence", val);
+  napi_create_int64(env, (int64_t)lock->l_start, &val);
+  napi_set_named_property(env, lock_obj, "start", val);
+  napi_create_int64(env, (int64_t)lock->l_len, &val);
+  napi_set_named_property(env, lock_obj, "len", val);
+  napi_create_int32(env, lock->l_pid, &val);
+  napi_set_named_property(env, lock_obj, "pid", val);
+}
+
 static void call_js(napi_env env, napi_value js_cb, void *context, void *data) {
   struct req_data *d = (struct req_data *)data;
   if (!env || !js_cb || !d) return;
@@ -101,6 +115,8 @@ static void call_js(napi_env env, napi_value js_cb, void *context, void *data) {
   napi_value req_ptr = NULL, params, val;
   if (d->req != NULL) {
     napi_create_double(env, (double)(uintptr_t)d->req, &req_ptr);
+  } else {
+    napi_create_double(env, 0.0, &req_ptr);
   }
   napi_create_object(env, &params);
   
@@ -110,14 +126,21 @@ static void call_js(napi_env env, napi_value js_cb, void *context, void *data) {
   if (strcmp(d->op, "lookup") == 0) {
     napi_create_double(env, (double)d->u.lookup.parent, &val);
     napi_set_named_property(env, params, "parent", val);
-    napi_create_string_utf8(env, d->u.lookup.name, NAPI_AUTO_LENGTH, &val);
-    napi_set_named_property(env, params, "name", val);
+    if (d->u.lookup.name) {
+      napi_create_string_utf8(env, d->u.lookup.name, NAPI_AUTO_LENGTH, &val);
+      napi_set_named_property(env, params, "name", val);
+      free(d->u.lookup.name);
+    }
   } else if (strcmp(d->op, "getattr") == 0) {
     napi_create_double(env, (double)d->u.getattr.ino, &val);
     napi_set_named_property(env, params, "ino", val);
+    napi_create_double(env, (double)d->u.getattr.fh, &val);
+    napi_set_named_property(env, params, "fh", val);
   } else if (strcmp(d->op, "readdir") == 0) {
     napi_create_double(env, (double)d->u.readdir.ino, &val);
     napi_set_named_property(env, params, "ino", val);
+    napi_create_double(env, (double)d->u.readdir.fh, &val);
+    napi_set_named_property(env, params, "fh", val);
     napi_create_double(env, (double)d->u.readdir.size, &val);
     napi_set_named_property(env, params, "size", val);
     napi_create_double(env, (double)d->u.readdir.off, &val);
@@ -136,7 +159,7 @@ static void call_js(napi_env env, napi_value js_cb, void *context, void *data) {
     napi_set_named_property(env, params, "size", val);
     napi_create_double(env, (double)d->u.read.off, &val);
     napi_set_named_property(env, params, "off", val);
-  } else if (strcmp(d->op, "write") == 0) {
+  } else if (strcmp(d->op, "write") == 0 || strcmp(d->op, "write_buf") == 0) {
     napi_create_double(env, (double)d->u.write.ino, &val);
     napi_set_named_property(env, params, "ino", val);
     napi_create_double(env, (double)d->u.write.fh, &val);
@@ -145,9 +168,10 @@ static void call_js(napi_env env, napi_value js_cb, void *context, void *data) {
     napi_set_named_property(env, params, "size", val);
     napi_create_double(env, (double)d->u.write.off, &val);
     napi_set_named_property(env, params, "off", val);
-    if (d->u.write.data_len > 0) {
-      napi_create_string_utf8(env, d->u.write.data, d->u.write.data_len, &val);
+    if (d->u.write.data_len > 0 && d->u.write.data) {
+      napi_create_buffer_copy(env, d->u.write.data_len, d->u.write.data, NULL, &val);
       napi_set_named_property(env, params, "data", val);
+      free(d->u.write.data);
     }
   } else if (strcmp(d->op, "release") == 0) {
     napi_create_double(env, (double)d->u.release.ino, &val);
@@ -157,8 +181,11 @@ static void call_js(napi_env env, napi_value js_cb, void *context, void *data) {
   } else if (strcmp(d->op, "create") == 0) {
     napi_create_double(env, (double)d->u.create.parent, &val);
     napi_set_named_property(env, params, "parent", val);
-    napi_create_string_utf8(env, d->u.create.name, NAPI_AUTO_LENGTH, &val);
-    napi_set_named_property(env, params, "name", val);
+    if (d->u.create.name) {
+      napi_create_string_utf8(env, d->u.create.name, NAPI_AUTO_LENGTH, &val);
+      napi_set_named_property(env, params, "name", val);
+      free(d->u.create.name);
+    }
     napi_create_uint32(env, d->u.create.mode, &val);
     napi_set_named_property(env, params, "mode", val);
     napi_create_uint32(env, d->u.create.flags, &val);
@@ -166,24 +193,36 @@ static void call_js(napi_env env, napi_value js_cb, void *context, void *data) {
   } else if (strcmp(d->op, "unlink") == 0 || strcmp(d->op, "rmdir") == 0) {
     napi_create_double(env, (double)d->u.unlink.parent, &val);
     napi_set_named_property(env, params, "parent", val);
-    napi_create_string_utf8(env, d->u.unlink.name, NAPI_AUTO_LENGTH, &val);
-    napi_set_named_property(env, params, "name", val);
+    if (d->u.unlink.name) {
+      napi_create_string_utf8(env, d->u.unlink.name, NAPI_AUTO_LENGTH, &val);
+      napi_set_named_property(env, params, "name", val);
+      free(d->u.unlink.name);
+    }
   } else if (strcmp(d->op, "mkdir") == 0) {
     napi_create_double(env, (double)d->u.mkdir.parent, &val);
     napi_set_named_property(env, params, "parent", val);
-    napi_create_string_utf8(env, d->u.mkdir.name, NAPI_AUTO_LENGTH, &val);
-    napi_set_named_property(env, params, "name", val);
+    if (d->u.mkdir.name) {
+      napi_create_string_utf8(env, d->u.mkdir.name, NAPI_AUTO_LENGTH, &val);
+      napi_set_named_property(env, params, "name", val);
+      free(d->u.mkdir.name);
+    }
     napi_create_uint32(env, d->u.mkdir.mode, &val);
     napi_set_named_property(env, params, "mode", val);
   } else if (strcmp(d->op, "rename") == 0) {
     napi_create_double(env, (double)d->u.rename.parent, &val);
     napi_set_named_property(env, params, "parent", val);
-    napi_create_string_utf8(env, d->u.rename.name, NAPI_AUTO_LENGTH, &val);
-    napi_set_named_property(env, params, "name", val);
+    if (d->u.rename.name) {
+      napi_create_string_utf8(env, d->u.rename.name, NAPI_AUTO_LENGTH, &val);
+      napi_set_named_property(env, params, "name", val);
+      free(d->u.rename.name);
+    }
     napi_create_double(env, (double)d->u.rename.newparent, &val);
     napi_set_named_property(env, params, "newparent", val);
-    napi_create_string_utf8(env, d->u.rename.newname, NAPI_AUTO_LENGTH, &val);
-    napi_set_named_property(env, params, "newname", val);
+    if (d->u.rename.newname) {
+      napi_create_string_utf8(env, d->u.rename.newname, NAPI_AUTO_LENGTH, &val);
+      napi_set_named_property(env, params, "newname", val);
+      free(d->u.rename.newname);
+    }
     napi_create_uint32(env, d->u.rename.flags, &val);
     napi_set_named_property(env, params, "flags", val);
   } else if (strcmp(d->op, "setattr") == 0) {
@@ -195,6 +234,8 @@ static void call_js(napi_env env, napi_value js_cb, void *context, void *data) {
     napi_create_object(env, &attr_obj);
     fuse_serialize_stat(env, &d->u.setattr.attr, attr_obj);
     napi_set_named_property(env, params, "attr", attr_obj);
+    napi_create_double(env, (double)d->u.setattr.fh, &val);
+    napi_set_named_property(env, params, "fh", val);
   } else if (strcmp(d->op, "flush") == 0) {
     napi_create_double(env, (double)d->u.flush.ino, &val);
     napi_set_named_property(env, params, "ino", val);
@@ -228,24 +269,36 @@ static void call_js(napi_env env, napi_value js_cb, void *context, void *data) {
     napi_create_double(env, (double)d->u.readlink.ino, &val);
     napi_set_named_property(env, params, "ino", val);
   } else if (strcmp(d->op, "symlink") == 0) {
-    napi_create_string_utf8(env, d->u.symlink.link, NAPI_AUTO_LENGTH, &val);
-    napi_set_named_property(env, params, "link", val);
+    if (d->u.symlink.link) {
+      napi_create_string_utf8(env, d->u.symlink.link, NAPI_AUTO_LENGTH, &val);
+      napi_set_named_property(env, params, "link", val);
+      free(d->u.symlink.link);
+    }
     napi_create_double(env, (double)d->u.symlink.parent, &val);
     napi_set_named_property(env, params, "parent", val);
-    napi_create_string_utf8(env, d->u.symlink.name, NAPI_AUTO_LENGTH, &val);
-    napi_set_named_property(env, params, "name", val);
+    if (d->u.symlink.name) {
+      napi_create_string_utf8(env, d->u.symlink.name, NAPI_AUTO_LENGTH, &val);
+      napi_set_named_property(env, params, "name", val);
+      free(d->u.symlink.name);
+    }
   } else if (strcmp(d->op, "link") == 0) {
     napi_create_double(env, (double)d->u.link.ino, &val);
     napi_set_named_property(env, params, "ino", val);
     napi_create_double(env, (double)d->u.link.newparent, &val);
     napi_set_named_property(env, params, "newparent", val);
-    napi_create_string_utf8(env, d->u.link.newname, NAPI_AUTO_LENGTH, &val);
-    napi_set_named_property(env, params, "newname", val);
+    if (d->u.link.newname) {
+      napi_create_string_utf8(env, d->u.link.newname, NAPI_AUTO_LENGTH, &val);
+      napi_set_named_property(env, params, "newname", val);
+      free(d->u.link.newname);
+    }
   } else if (strcmp(d->op, "mknod") == 0) {
     napi_create_double(env, (double)d->u.mknod.parent, &val);
     napi_set_named_property(env, params, "parent", val);
-    napi_create_string_utf8(env, d->u.mknod.name, NAPI_AUTO_LENGTH, &val);
-    napi_set_named_property(env, params, "name", val);
+    if (d->u.mknod.name) {
+      napi_create_string_utf8(env, d->u.mknod.name, NAPI_AUTO_LENGTH, &val);
+      napi_set_named_property(env, params, "name", val);
+      free(d->u.mknod.name);
+    }
     napi_create_uint32(env, d->u.mknod.mode, &val);
     napi_set_named_property(env, params, "mode", val);
     napi_create_double(env, (double)d->u.mknod.rdev, &val);
@@ -258,46 +311,55 @@ static void call_js(napi_env env, napi_value js_cb, void *context, void *data) {
   } else if (strcmp(d->op, "statfs") == 0) {
     napi_create_double(env, (double)d->u.statfs.ino, &val);
     napi_set_named_property(env, params, "ino", val);
+    napi_create_double(env, (double)d->u.statfs.fh, &val);
+    napi_set_named_property(env, params, "fh", val);
   } else if (strcmp(d->op, "setxattr") == 0) {
     napi_create_double(env, (double)d->u.setxattr.ino, &val);
     napi_set_named_property(env, params, "ino", val);
-    napi_create_string_utf8(env, d->u.setxattr.name, NAPI_AUTO_LENGTH, &val);
-    napi_set_named_property(env, params, "name", val);
-    napi_create_string_utf8(env, d->u.setxattr.value, d->u.setxattr.size < sizeof(d->u.setxattr.value) ? d->u.setxattr.size : sizeof(d->u.setxattr.value) - 1, &val);
-    napi_set_named_property(env, params, "value", val);
+    if (d->u.setxattr.name) {
+      napi_create_string_utf8(env, d->u.setxattr.name, NAPI_AUTO_LENGTH, &val);
+      napi_set_named_property(env, params, "name", val);
+      free(d->u.setxattr.name);
+    }
+    if (d->u.setxattr.value) {
+      napi_create_buffer_copy(env, d->u.setxattr.size, d->u.setxattr.value, NULL, &val);
+      napi_set_named_property(env, params, "value", val);
+      free(d->u.setxattr.value);
+    }
     napi_create_double(env, (double)d->u.setxattr.size, &val);
     napi_set_named_property(env, params, "size", val);
     napi_create_int32(env, d->u.setxattr.flags, &val);
     napi_set_named_property(env, params, "flags", val);
-  } else if (strcmp(d->op, "getxattr") == 0) {
+  } else if (strcmp(d->op, "getxattr") == 0 || strcmp(d->op, "removexattr") == 0) {
     napi_create_double(env, (double)d->u.getxattr.ino, &val);
     napi_set_named_property(env, params, "ino", val);
-    napi_create_string_utf8(env, d->u.getxattr.name, NAPI_AUTO_LENGTH, &val);
-    napi_set_named_property(env, params, "name", val);
-    napi_create_double(env, (double)d->u.getxattr.size, &val);
-    napi_set_named_property(env, params, "size", val);
+    if (d->u.getxattr.name) {
+      napi_create_string_utf8(env, d->u.getxattr.name, NAPI_AUTO_LENGTH, &val);
+      napi_set_named_property(env, params, "name", val);
+      free(d->u.getxattr.name);
+    }
+    if (strcmp(d->op, "getxattr") == 0) {
+      napi_create_double(env, (double)d->u.getxattr.size, &val);
+      napi_set_named_property(env, params, "size", val);
+    }
   } else if (strcmp(d->op, "listxattr") == 0) {
     napi_create_double(env, (double)d->u.listxattr.ino, &val);
     napi_set_named_property(env, params, "ino", val);
     napi_create_double(env, (double)d->u.listxattr.size, &val);
     napi_set_named_property(env, params, "size", val);
-  } else if (strcmp(d->op, "removexattr") == 0) {
-    napi_create_double(env, (double)d->u.removexattr.ino, &val);
-    napi_set_named_property(env, params, "ino", val);
-    napi_create_string_utf8(env, d->u.removexattr.name, NAPI_AUTO_LENGTH, &val);
-    napi_set_named_property(env, params, "name", val);
-  } else if (strcmp(d->op, "getlk") == 0) {
+  } else if (strcmp(d->op, "getlk") == 0 || strcmp(d->op, "setlk") == 0) {
     napi_create_double(env, (double)d->u.getlk.ino, &val);
     napi_set_named_property(env, params, "ino", val);
     napi_create_double(env, (double)d->u.getlk.fh, &val);
     napi_set_named_property(env, params, "fh", val);
-  } else if (strcmp(d->op, "setlk") == 0) {
-    napi_create_double(env, (double)d->u.setlk.ino, &val);
-    napi_set_named_property(env, params, "ino", val);
-    napi_create_double(env, (double)d->u.setlk.fh, &val);
-    napi_set_named_property(env, params, "fh", val);
-    napi_create_int32(env, d->u.setlk.sleep, &val);
-    napi_set_named_property(env, params, "sleep", val);
+    napi_value lock_obj;
+    napi_create_object(env, &lock_obj);
+    fuse_serialize_flock(env, &d->u.getlk.lock, lock_obj);
+    napi_set_named_property(env, params, "lock", lock_obj);
+    if (strcmp(d->op, "setlk") == 0) {
+      napi_create_int32(env, d->u.setlk.sleep, &val);
+      napi_set_named_property(env, params, "sleep", val);
+    }
   } else if (strcmp(d->op, "flock") == 0) {
     napi_create_double(env, (double)d->u.flock.ino, &val);
     napi_set_named_property(env, params, "ino", val);
@@ -321,10 +383,15 @@ static void call_js(napi_env env, napi_value js_cb, void *context, void *data) {
     napi_set_named_property(env, params, "in_bufsz", val);
     napi_create_double(env, (double)d->u.ioctl.out_bufsz, &val);
     napi_set_named_property(env, params, "out_bufsz", val);
-    if (d->u.ioctl.in_bufsz > 0) {
-      napi_create_string_utf8(env, d->u.ioctl.in_buf, d->u.ioctl.in_bufsz < sizeof(d->u.ioctl.in_buf) ? d->u.ioctl.in_bufsz : sizeof(d->u.ioctl.in_buf) - 1, &val);
+    if (d->u.ioctl.in_bufsz > 0 && d->u.ioctl.in_buf) {
+      napi_create_buffer_copy(env, d->u.ioctl.in_bufsz, d->u.ioctl.in_buf, NULL, &val);
       napi_set_named_property(env, params, "in_buf", val);
+      free(d->u.ioctl.in_buf);
     }
+    napi_create_int32(env, d->u.ioctl.flags, &val);
+    napi_set_named_property(env, params, "flags", val);
+    napi_create_double(env, (double)d->u.ioctl.fh, &val);
+    napi_set_named_property(env, params, "fh", val);
   } else if (strcmp(d->op, "poll") == 0) {
     napi_create_double(env, (double)d->u.poll.ino, &val);
     napi_set_named_property(env, params, "ino", val);
@@ -344,6 +411,8 @@ static void call_js(napi_env env, napi_value js_cb, void *context, void *data) {
   } else if (strcmp(d->op, "readdirplus") == 0) {
     napi_create_double(env, (double)d->u.readdirplus.ino, &val);
     napi_set_named_property(env, params, "ino", val);
+    napi_create_double(env, (double)d->u.readdirplus.fh, &val);
+    napi_set_named_property(env, params, "fh", val);
     napi_create_double(env, (double)d->u.readdirplus.size, &val);
     napi_set_named_property(env, params, "size", val);
     napi_create_double(env, (double)d->u.readdirplus.off, &val);
@@ -351,10 +420,14 @@ static void call_js(napi_env env, napi_value js_cb, void *context, void *data) {
   } else if (strcmp(d->op, "copy_file_range") == 0) {
     napi_create_double(env, (double)d->u.copy_file_range.ino_in, &val);
     napi_set_named_property(env, params, "ino_in", val);
+    napi_create_double(env, (double)d->u.copy_file_range.fh_in, &val);
+    napi_set_named_property(env, params, "fh_in", val);
     napi_create_double(env, (double)d->u.copy_file_range.off_in, &val);
     napi_set_named_property(env, params, "off_in", val);
     napi_create_double(env, (double)d->u.copy_file_range.ino_out, &val);
     napi_set_named_property(env, params, "ino_out", val);
+    napi_create_double(env, (double)d->u.copy_file_range.fh_out, &val);
+    napi_set_named_property(env, params, "fh_out", val);
     napi_create_double(env, (double)d->u.copy_file_range.off_out, &val);
     napi_set_named_property(env, params, "off_out", val);
     napi_create_double(env, (double)d->u.copy_file_range.len, &val);
@@ -384,10 +457,6 @@ static void call_js(napi_env env, napi_value js_cb, void *context, void *data) {
     napi_set_named_property(env, params, "flags", val);
     napi_create_int32(env, d->u.statx.mask, &val);
     napi_set_named_property(env, params, "mask", val);
-  } else if (strcmp(d->op, "init") == 0) {
-    // init has no parameters
-  } else if (strcmp(d->op, "destroy") == 0) {
-    // destroy has no parameters
   } else if (strcmp(d->op, "forget") == 0) {
     napi_create_double(env, (double)d->u.forget.ino, &val);
     napi_set_named_property(env, params, "ino", val);
@@ -399,27 +468,18 @@ static void call_js(napi_env env, napi_value js_cb, void *context, void *data) {
     napi_value inos_array, nlookups_array;
     napi_create_array(env, &inos_array);
     napi_create_array(env, &nlookups_array);
-    for (size_t i = 0; i < d->u.forget_multi.count; i++) {
-      napi_create_double(env, (double)d->u.forget_multi.inos[i], &val);
-      napi_set_element(env, inos_array, i, val);
-      napi_create_double(env, (double)d->u.forget_multi.nlookups[i], &val);
-      napi_set_element(env, nlookups_array, i, val);
+    if (d->u.forget_multi.inos && d->u.forget_multi.nlookups) {
+      for (size_t i = 0; i < d->u.forget_multi.count; i++) {
+        napi_create_double(env, (double)d->u.forget_multi.inos[i], &val);
+        napi_set_element(env, inos_array, i, val);
+        napi_create_double(env, (double)d->u.forget_multi.nlookups[i], &val);
+        napi_set_element(env, nlookups_array, i, val);
+      }
+      free(d->u.forget_multi.inos);
+      free(d->u.forget_multi.nlookups);
     }
     napi_set_named_property(env, params, "inos", inos_array);
     napi_set_named_property(env, params, "nlookups", nlookups_array);
-  } else if (strcmp(d->op, "write_buf") == 0) {
-    napi_create_double(env, (double)d->u.write_buf.ino, &val);
-    napi_set_named_property(env, params, "ino", val);
-    napi_create_double(env, (double)d->u.write_buf.fh, &val);
-    napi_set_named_property(env, params, "fh", val);
-    napi_create_double(env, (double)d->u.write_buf.off, &val);
-    napi_set_named_property(env, params, "off", val);
-    if (d->u.write_buf.bufv_size > 0) {
-      napi_create_string_utf8(env, d->u.write_buf.bufv_data, d->u.write_buf.bufv_size, &val);
-      napi_set_named_property(env, params, "data", val);
-    }
-    napi_create_double(env, (double)d->u.write_buf.bufv_size, &val);
-    napi_set_named_property(env, params, "size", val);
   } else if (strcmp(d->op, "retrieve_reply") == 0) {
     napi_create_double(env, (double)d->u.retrieve_reply.ino, &val);
     napi_set_named_property(env, params, "ino", val);
@@ -427,19 +487,13 @@ static void call_js(napi_env env, napi_value js_cb, void *context, void *data) {
     napi_set_named_property(env, params, "cookie", val);
     napi_create_double(env, (double)d->u.retrieve_reply.offset, &val);
     napi_set_named_property(env, params, "offset", val);
-    if (d->u.retrieve_reply.bufv_size > 0) {
-      napi_create_string_utf8(env, d->u.retrieve_reply.bufv_data, d->u.retrieve_reply.bufv_size, &val);
+    if (d->u.retrieve_reply.data_len > 0 && d->u.retrieve_reply.data) {
+      napi_create_buffer_copy(env, d->u.retrieve_reply.data_len, d->u.retrieve_reply.data, NULL, &val);
       napi_set_named_property(env, params, "data", val);
+      free(d->u.retrieve_reply.data);
     }
-    napi_create_double(env, (double)d->u.retrieve_reply.bufv_size, &val);
-    napi_set_named_property(env, params, "size", val);
   }
   
-  // Always pass both req_ptr and params to maintain consistent handler signature
-  // For init and destroy, req_ptr will be 0 (no request)
-  if (d->req == NULL) {
-    napi_create_double(env, 0.0, &req_ptr);
-  }
   napi_value argv[] = {req_ptr, params};
   napi_call_function(env, js_cb, js_cb, 2, argv, NULL);
   free(d);
@@ -460,7 +514,7 @@ static void fuse_lookup(fuse_req_t req, fuse_ino_t parent, const char *name) {
   d->req = req;
   strncpy(d->op, "lookup", sizeof(d->op) - 1);
   d->u.lookup.parent = parent;
-  strncpy(d->u.lookup.name, name, sizeof(d->u.lookup.name) - 1);
+  d->u.lookup.name = strdup(name);
   send_to_js(req, d);
 }
 
@@ -469,6 +523,7 @@ static void fuse_getattr(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *
   d->req = req;
   strncpy(d->op, "getattr", sizeof(d->op) - 1);
   d->u.getattr.ino = ino;
+  d->u.getattr.fh = fi ? fi->fh : 0;
   send_to_js(req, d);
 }
 
@@ -503,39 +558,14 @@ static void __attribute__((unused)) stat_to_entry_param(const struct stat *st, s
   e->entry_timeout = 1.0;
 }
 
-static char *dirbuf = NULL;
-static size_t dirbuf_size = 0;
-static size_t dirbuf_used = 0;
-
-static int dirbuf_add(fuse_req_t req, const char *name) {
-  struct stat st = {0};
-  st.st_ino = 1;
-  st.st_mode = S_IFDIR | 0755;
-  
-#ifdef __APPLE__
-  struct fuse_darwin_attr attr = {0};
-  stat_to_darwin_attr(&st, &attr);
-  const void *attr_ptr = &attr;
-#else
-  const void *attr_ptr = &st;
-#endif
-  
-  size_t addsize = fuse_add_direntry(req, NULL, 0, name, NULL, 0);
-  if (dirbuf_used + addsize > dirbuf_size) {
-    dirbuf_size = dirbuf_used + addsize + 4096;
-    dirbuf = realloc(dirbuf, dirbuf_size);
-  }
-  
-  fuse_add_direntry(req, dirbuf + dirbuf_used, addsize, name, attr_ptr, dirbuf_used + addsize);
-  dirbuf_used += addsize;
-  return 0;
-}
+// dirbuf global removed to ensure thread-safety during parallel readdir calls
 
 static void fuse_readdir(fuse_req_t req, fuse_ino_t ino, size_t size, off_t off, struct fuse_file_info *fi) {
   struct req_data *d = calloc(1, sizeof(struct req_data));
   d->req = req;
   strncpy(d->op, "readdir", sizeof(d->op) - 1);
   d->u.readdir.ino = ino;
+  d->u.readdir.fh = fi ? fi->fh : 0;
   d->u.readdir.size = size;
   d->u.readdir.off = off;
   send_to_js(req, d);
@@ -578,9 +608,9 @@ static void fuse_write(fuse_req_t req, fuse_ino_t ino, const char *buf, size_t s
   d->u.write.fh = fi ? fi->fh : 0;
   d->u.write.size = size;
   d->u.write.off = off;
-  size_t copy_size = size < sizeof(d->u.write.data) ? size : sizeof(d->u.write.data) - 1;
-  memcpy(d->u.write.data, buf, copy_size);
-  d->u.write.data_len = copy_size;
+  d->u.write.data = malloc(size);
+  memcpy(d->u.write.data, buf, size);
+  d->u.write.data_len = size;
   send_to_js(req, d);
 }
 
@@ -589,7 +619,7 @@ static void fuse_create(fuse_req_t req, fuse_ino_t parent, const char *name, mod
   d->req = req;
   strncpy(d->op, "create", sizeof(d->op) - 1);
   d->u.create.parent = parent;
-  strncpy(d->u.create.name, name, sizeof(d->u.create.name) - 1);
+  d->u.create.name = strdup(name);
   d->u.create.mode = mode;
   d->u.create.flags = fi ? fi->flags : 0;
   send_to_js(req, d);
@@ -600,7 +630,7 @@ static void fuse_unlink(fuse_req_t req, fuse_ino_t parent, const char *name) {
   d->req = req;
   strncpy(d->op, "unlink", sizeof(d->op) - 1);
   d->u.unlink.parent = parent;
-  strncpy(d->u.unlink.name, name, sizeof(d->u.unlink.name) - 1);
+  d->u.unlink.name = strdup(name);
   send_to_js(req, d);
 }
 
@@ -609,7 +639,7 @@ static void fuse_mkdir(fuse_req_t req, fuse_ino_t parent, const char *name, mode
   d->req = req;
   strncpy(d->op, "mkdir", sizeof(d->op) - 1);
   d->u.mkdir.parent = parent;
-  strncpy(d->u.mkdir.name, name, sizeof(d->u.mkdir.name) - 1);
+  d->u.mkdir.name = strdup(name);
   d->u.mkdir.mode = mode;
   send_to_js(req, d);
 }
@@ -619,7 +649,7 @@ static void fuse_rmdir(fuse_req_t req, fuse_ino_t parent, const char *name) {
   d->req = req;
   strncpy(d->op, "rmdir", sizeof(d->op) - 1);
   d->u.rmdir.parent = parent;
-  strncpy(d->u.rmdir.name, name, sizeof(d->u.rmdir.name) - 1);
+  d->u.rmdir.name = strdup(name);
   send_to_js(req, d);
 }
 
@@ -628,9 +658,9 @@ static void fuse_rename(fuse_req_t req, fuse_ino_t parent, const char *name, fus
   d->req = req;
   strncpy(d->op, "rename", sizeof(d->op) - 1);
   d->u.rename.parent = parent;
-  strncpy(d->u.rename.name, name, sizeof(d->u.rename.name) - 1);
+  d->u.rename.name = strdup(name);
   d->u.rename.newparent = newparent;
-  strncpy(d->u.rename.newname, newname, sizeof(d->u.rename.newname) - 1);
+  d->u.rename.newname = strdup(newname);
   d->u.rename.flags = flags;
   send_to_js(req, d);
 }
@@ -641,6 +671,7 @@ static void fuse_setattr(fuse_req_t req, fuse_ino_t ino, struct fuse_darwin_attr
   d->req = req;
   strncpy(d->op, "setattr", sizeof(d->op) - 1);
   d->u.setattr.ino = ino;
+  d->u.setattr.fh = fi ? fi->fh : 0;
   d->u.setattr.to_set = to_set;
   // Convert darwin_attr to stat for serialization
   struct stat st = {0};
@@ -665,6 +696,7 @@ static void fuse_setattr(fuse_req_t req, fuse_ino_t ino, struct stat *attr, int 
   d->req = req;
   strncpy(d->op, "setattr", sizeof(d->op) - 1);
   d->u.setattr.ino = ino;
+  d->u.setattr.fh = fi ? fi->fh : 0;
   d->u.setattr.to_set = to_set;
   d->u.setattr.attr = *attr;
   send_to_js(req, d);
@@ -711,12 +743,13 @@ static void fuse_forget(fuse_req_t req, fuse_ino_t ino, uint64_t nlookup) {
 }
 
 static void fuse_forget_multi(fuse_req_t req, size_t count, struct fuse_forget_data *forgets) {
-  // Forward to JavaScript - no reply needed for forget_multi
   struct req_data *d = calloc(1, sizeof(struct req_data));
   d->req = req;
   strncpy(d->op, "forget_multi", sizeof(d->op) - 1);
-  d->u.forget_multi.count = count > 64 ? 64 : count;
-  for (size_t i = 0; i < d->u.forget_multi.count; i++) {
+  d->u.forget_multi.count = count;
+  d->u.forget_multi.inos = malloc(sizeof(fuse_ino_t) * count);
+  d->u.forget_multi.nlookups = malloc(sizeof(uint64_t) * count);
+  for (size_t i = 0; i < count; i++) {
     d->u.forget_multi.inos[i] = forgets[i].ino;
     d->u.forget_multi.nlookups[i] = forgets[i].nlookup;
   }
@@ -782,9 +815,9 @@ static void fuse_symlink(fuse_req_t req, const char *link, fuse_ino_t parent, co
   struct req_data *d = calloc(1, sizeof(struct req_data));
   d->req = req;
   strncpy(d->op, "symlink", sizeof(d->op) - 1);
-  strncpy(d->u.symlink.link, link, sizeof(d->u.symlink.link) - 1);
+  d->u.symlink.link = strdup(link);
   d->u.symlink.parent = parent;
-  strncpy(d->u.symlink.name, name, sizeof(d->u.symlink.name) - 1);
+  d->u.symlink.name = strdup(name);
   send_to_js(req, d);
 }
 
@@ -794,7 +827,7 @@ static void fuse_link(fuse_req_t req, fuse_ino_t ino, fuse_ino_t newparent, cons
   strncpy(d->op, "link", sizeof(d->op) - 1);
   d->u.link.ino = ino;
   d->u.link.newparent = newparent;
-  strncpy(d->u.link.newname, newname, sizeof(d->u.link.newname) - 1);
+  d->u.link.newname = strdup(newname);
   send_to_js(req, d);
 }
 
@@ -803,7 +836,7 @@ static void fuse_mknod(fuse_req_t req, fuse_ino_t parent, const char *name, mode
   d->req = req;
   strncpy(d->op, "mknod", sizeof(d->op) - 1);
   d->u.mknod.parent = parent;
-  strncpy(d->u.mknod.name, name, sizeof(d->u.mknod.name) - 1);
+  d->u.mknod.name = strdup(name);
   d->u.mknod.mode = mode;
   d->u.mknod.rdev = rdev;
   send_to_js(req, d);
@@ -823,6 +856,7 @@ static void fuse_statfs(fuse_req_t req, fuse_ino_t ino) {
   d->req = req;
   strncpy(d->op, "statfs", sizeof(d->op) - 1);
   d->u.statfs.ino = ino;
+  d->u.statfs.fh = 0; // statfs doesn't have fi in standard lowlevel, but our struct has it for future-proofing
   send_to_js(req, d);
 }
 
@@ -832,9 +866,9 @@ static void fuse_setxattr(fuse_req_t req, fuse_ino_t ino, const char *name, cons
   d->req = req;
   strncpy(d->op, "setxattr", sizeof(d->op) - 1);
   d->u.setxattr.ino = ino;
-  strncpy(d->u.setxattr.name, name, sizeof(d->u.setxattr.name) - 1);
-  size_t copy_size = size < sizeof(d->u.setxattr.value) ? size : sizeof(d->u.setxattr.value) - 1;
-  memcpy(d->u.setxattr.value, value, copy_size);
+  d->u.setxattr.name = strdup(name);
+  d->u.setxattr.value = malloc(size);
+  memcpy(d->u.setxattr.value, value, size);
   d->u.setxattr.size = size;
   d->u.setxattr.flags = flags;
   send_to_js(req, d);
@@ -846,7 +880,7 @@ static void fuse_getxattr(fuse_req_t req, fuse_ino_t ino, const char *name, size
   d->req = req;
   strncpy(d->op, "getxattr", sizeof(d->op) - 1);
   d->u.getxattr.ino = ino;
-  strncpy(d->u.getxattr.name, name, sizeof(d->u.getxattr.name) - 1);
+  d->u.getxattr.name = strdup(name);
   d->u.getxattr.size = size;
   send_to_js(req, d);
 }
@@ -865,7 +899,7 @@ static void fuse_removexattr(fuse_req_t req, fuse_ino_t ino, const char *name) {
   d->req = req;
   strncpy(d->op, "removexattr", sizeof(d->op) - 1);
   d->u.removexattr.ino = ino;
-  strncpy(d->u.removexattr.name, name, sizeof(d->u.removexattr.name) - 1);
+  d->u.removexattr.name = strdup(name);
   send_to_js(req, d);
 }
 
@@ -875,6 +909,7 @@ static void fuse_getlk(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi
   strncpy(d->op, "getlk", sizeof(d->op) - 1);
   d->u.getlk.ino = ino;
   d->u.getlk.fh = fi ? fi->fh : 0;
+  d->u.getlk.lock = *lock;
   send_to_js(req, d);
 }
 
@@ -884,6 +919,7 @@ static void fuse_setlk(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi
   strncpy(d->op, "setlk", sizeof(d->op) - 1);
   d->u.setlk.ino = ino;
   d->u.setlk.fh = fi ? fi->fh : 0;
+  d->u.setlk.lock = *lock;
   d->u.setlk.sleep = sleep;
   send_to_js(req, d);
 }
@@ -915,11 +951,13 @@ static void fuse_ioctl(fuse_req_t req, fuse_ino_t ino, unsigned int cmd, void *a
   strncpy(d->op, "ioctl", sizeof(d->op) - 1);
   d->u.ioctl.ino = ino;
   d->u.ioctl.cmd = cmd;
+  d->u.ioctl.fh = fi ? fi->fh : 0;
+  d->u.ioctl.flags = (int)flags;
   d->u.ioctl.in_bufsz = in_bufsz;
   d->u.ioctl.out_bufsz = out_bufsz;
   if (in_buf && in_bufsz > 0) {
-    size_t copy_size = in_bufsz < sizeof(d->u.ioctl.in_buf) ? in_bufsz : sizeof(d->u.ioctl.in_buf) - 1;
-    memcpy(d->u.ioctl.in_buf, in_buf, copy_size);
+    d->u.ioctl.in_buf = malloc(in_bufsz);
+    memcpy(d->u.ioctl.in_buf, in_buf, in_bufsz);
   }
   send_to_js(req, d);
 }
@@ -951,6 +989,7 @@ static void fuse_readdirplus(fuse_req_t req, fuse_ino_t ino, size_t size, off_t 
   d->req = req;
   strncpy(d->op, "readdirplus", sizeof(d->op) - 1);
   d->u.readdirplus.ino = ino;
+  d->u.readdirplus.fh = fi ? fi->fh : 0;
   d->u.readdirplus.size = size;
   d->u.readdirplus.off = off;
   send_to_js(req, d);
@@ -961,8 +1000,10 @@ static void fuse_copy_file_range(fuse_req_t req, fuse_ino_t ino_in, off_t off_in
   d->req = req;
   strncpy(d->op, "copy_file_range", sizeof(d->op) - 1);
   d->u.copy_file_range.ino_in = ino_in;
+  d->u.copy_file_range.fh_in = fi_in ? fi_in->fh : 0;
   d->u.copy_file_range.off_in = off_in;
   d->u.copy_file_range.ino_out = ino_out;
+  d->u.copy_file_range.fh_out = fi_out ? fi_out->fh : 0;
   d->u.copy_file_range.off_out = off_out;
   d->u.copy_file_range.len = len;
   d->u.copy_file_range.flags = flags;
@@ -1007,16 +1048,11 @@ static void fuse_write_buf(fuse_req_t req, fuse_ino_t ino, struct fuse_bufvec *b
   d->u.write_buf.ino = ino;
   d->u.write_buf.fh = fi ? fi->fh : 0;
   d->u.write_buf.off = off;
-  // Extract data from bufv (simplified - only handle first buffer)
-  if (bufv && bufv->count > 0 && bufv->buf[0].mem) {
-    size_t copy_size = bufv->buf[0].size < sizeof(d->u.write_buf.bufv_data) ? bufv->buf[0].size : sizeof(d->u.write_buf.bufv_data) - 1;
-    memcpy(d->u.write_buf.bufv_data, bufv->buf[0].mem, copy_size);
-    d->u.write_buf.bufv_size = copy_size;
-    d->u.write_buf.bufv_count = 1;
-  } else {
-    d->u.write_buf.bufv_size = 0;
-    d->u.write_buf.bufv_count = 0;
-  }
+  size_t total_size = fuse_buf_size(bufv);
+  d->u.write_buf.size = total_size;
+  d->u.write_buf.data = malloc(total_size);
+  fuse_buf_copy(&(struct fuse_bufvec){ .count = 1, .buf = {{ .size = total_size, .mem = d->u.write_buf.data }} }, bufv, 0);
+  d->u.write_buf.data_len = total_size;
   send_to_js(req, d);
 }
 
@@ -1027,16 +1063,10 @@ static void fuse_retrieve_reply(fuse_req_t req, void *cookie, fuse_ino_t ino, of
   d->u.retrieve_reply.ino = ino;
   d->u.retrieve_reply.cookie = cookie;
   d->u.retrieve_reply.offset = offset;
-  // Extract data from bufv (simplified - only handle first buffer)
-  if (bufv && bufv->count > 0 && bufv->buf[0].mem) {
-    size_t copy_size = bufv->buf[0].size < sizeof(d->u.retrieve_reply.bufv_data) ? bufv->buf[0].size : sizeof(d->u.retrieve_reply.bufv_data) - 1;
-    memcpy(d->u.retrieve_reply.bufv_data, bufv->buf[0].mem, copy_size);
-    d->u.retrieve_reply.bufv_size = copy_size;
-    d->u.retrieve_reply.bufv_count = 1;
-  } else {
-    d->u.retrieve_reply.bufv_size = 0;
-    d->u.retrieve_reply.bufv_count = 0;
-  }
+  size_t total_size = fuse_buf_size(bufv);
+  d->u.retrieve_reply.data = malloc(total_size);
+  fuse_buf_copy(&(struct fuse_bufvec){ .count = 1, .buf = {{ .size = total_size, .mem = d->u.retrieve_reply.data }} }, bufv, 0);
+  d->u.retrieve_reply.data_len = total_size;
   send_to_js(req, d);
 }
 
@@ -1360,8 +1390,8 @@ static napi_value fuse_napi_reply_getattr(napi_env env, napi_callback_info info)
 }
 
 static napi_value fuse_napi_reply_create(napi_env env, napi_callback_info info) {
-  napi_value args[2];
-  size_t argc = 2;
+  napi_value args[3];
+  size_t argc = 3;
   napi_get_cb_info(env, info, &argc, args, NULL, NULL);
   
   double req_ptr_double;
@@ -1372,7 +1402,13 @@ static napi_value fuse_napi_reply_create(napi_env env, napi_callback_info info) 
   fuse_parse_stat(env, args[1], &st);
   
   struct fuse_file_info fi = {0};
-  fi.fh = 0;
+  if (argc > 2) {
+    double fh_double;
+    napi_get_value_double(env, args[2], &fh_double);
+    fi.fh = (uint64_t)fh_double;
+  } else {
+    fi.fh = 0;
+  }
   
 #ifdef __APPLE__
   struct fuse_darwin_entry_param e = {0};
@@ -1398,20 +1434,158 @@ static napi_value fuse_napi_reply_readdir(napi_env env, napi_callback_info info)
   uint32_t length;
   napi_get_array_length(env, args[1], &length);
   
-  dirbuf_used = 0;
+  size_t local_dirbuf_size = 4096;
+  char *local_dirbuf = malloc(local_dirbuf_size);
+  size_t local_dirbuf_used = 0;
+  
   for (uint32_t i = 0; i < length; i++) {
-    napi_value elem;
+    napi_value elem, val;
     napi_get_element(env, args[1], i, &elem);
-    char name[256];
-    size_t name_len;
-    napi_get_value_string_utf8(env, elem, name, sizeof(name), &name_len);
-    if (name_len > 0) {
-      dirbuf_add(req, name);
+    
+    napi_valuetype type;
+    napi_typeof(env, elem, &type);
+    
+    char name[256] = {0};
+    uint32_t mode = S_IFDIR | 0755;
+    uint32_t ino = 1;
+    
+    if (type == napi_string) {
+      size_t name_len;
+      napi_get_value_string_utf8(env, elem, name, sizeof(name), &name_len);
+    } else if (type == napi_object) {
+      size_t name_len;
+      napi_get_named_property(env, elem, "name", &val);
+      napi_get_value_string_utf8(env, val, name, sizeof(name), &name_len);
+      
+      napi_get_named_property(env, elem, "mode", &val);
+      napi_get_value_uint32(env, val, &mode);
+      
+      napi_get_named_property(env, elem, "ino", &val);
+      napi_get_value_uint32(env, val, &ino);
     }
+    
+    struct stat st = {0};
+    st.st_ino = (ino_t)ino;
+    st.st_mode = (mode_t)mode;
+
+#ifdef __APPLE__
+    struct fuse_darwin_attr attr = {0};
+    stat_to_darwin_attr(&st, &attr);
+    const void *attr_ptr = &attr;
+#else
+    const void *attr_ptr = &st;
+#endif
+
+    size_t addsize = fuse_add_direntry(req, NULL, 0, name, NULL, 0);
+    if (local_dirbuf_used + addsize > local_dirbuf_size) {
+      local_dirbuf_size = local_dirbuf_used + addsize + 4096;
+      local_dirbuf = realloc(local_dirbuf, local_dirbuf_size);
+    }
+    
+    fuse_add_direntry(req, local_dirbuf + local_dirbuf_used, addsize, name, attr_ptr, local_dirbuf_used + addsize);
+    local_dirbuf_used += addsize;
   }
-  fuse_reply_buf(req, dirbuf, dirbuf_used);
+  
+  fuse_reply_buf(req, local_dirbuf, local_dirbuf_used);
+  free(local_dirbuf);
   return NULL;
 }
+
+static napi_value fuse_napi_reply_readdirplus(napi_env env, napi_callback_info info) {
+  napi_value args[2];
+  size_t argc = 2;
+  napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+  
+  double req_ptr_double;
+  napi_get_value_double(env, args[0], &req_ptr_double);
+  fuse_req_t req = (fuse_req_t)(uintptr_t)req_ptr_double;
+  
+  uint32_t length;
+  napi_get_array_length(env, args[1], &length);
+  
+  size_t local_dirbuf_size = 4096;
+  char *local_dirbuf = malloc(local_dirbuf_size);
+  size_t local_dirbuf_used = 0;
+  
+  for (uint32_t i = 0; i < length; i++) {
+    napi_value elem, val;
+    napi_get_element(env, args[1], i, &elem);
+    
+    napi_valuetype type;
+    napi_typeof(env, elem, &type);
+    
+    char name[256] = {0};
+    
+#ifdef __APPLE__
+    struct fuse_darwin_entry_param e = {0};
+    e.attr_timeout = 1.0;
+    e.entry_timeout = 1.0;
+#else
+    struct fuse_entry_param e = {0};
+    e.attr_timeout = 1.0;
+    e.entry_timeout = 1.0;
+#endif
+    
+    if (type == napi_string) {
+      size_t name_len;
+      napi_get_value_string_utf8(env, elem, name, sizeof(name), &name_len);
+      e.ino = 1;
+#ifdef __APPLE__
+      e.attr.mode = S_IFDIR | 0755;
+      e.attr.ino = 1;
+#else
+      e.attr.st_mode = S_IFDIR | 0755;
+      e.attr.st_ino = 1;
+#endif
+    } else if (type == napi_object) {
+      size_t name_len;
+      napi_get_named_property(env, elem, "name", &val);
+      napi_get_value_string_utf8(env, val, name, sizeof(name), &name_len);
+      
+      bool has_stat;
+      napi_has_named_property(env, elem, "stat", &has_stat);
+      if (has_stat) {
+        napi_get_named_property(env, elem, "stat", &val);
+        struct stat st = {0};
+        fuse_parse_stat(env, val, &st);
+#ifdef __APPLE__
+        stat_to_darwin_entry_param(&st, &e);
+#else
+        stat_to_entry_param(&st, &e);
+#endif
+      } else {
+        uint32_t mode = S_IFDIR | 0755;
+        uint32_t ino = 1;
+        napi_get_named_property(env, elem, "mode", &val);
+        napi_get_value_uint32(env, val, &mode);
+        napi_get_named_property(env, elem, "ino", &val);
+        napi_get_value_uint32(env, val, &ino);
+        e.ino = ino;
+#ifdef __APPLE__
+        e.attr.mode = mode;
+        e.attr.ino = ino;
+#else
+        e.attr.st_mode = mode;
+        e.attr.st_ino = ino;
+#endif
+      }
+    }
+    
+    size_t addsize = fuse_add_direntry_plus(req, NULL, 0, name, NULL, 0);
+    if (local_dirbuf_used + addsize > local_dirbuf_size) {
+      local_dirbuf_size = local_dirbuf_used + addsize + 4096;
+      local_dirbuf = realloc(local_dirbuf, local_dirbuf_size);
+    }
+    
+    fuse_add_direntry_plus(req, local_dirbuf + local_dirbuf_used, addsize, name, &e, local_dirbuf_used + addsize);
+    local_dirbuf_used += addsize;
+  }
+  
+  fuse_reply_buf(req, local_dirbuf, local_dirbuf_used);
+  free(local_dirbuf);
+  return NULL;
+}
+
 
 static napi_value fuse_napi_reply_read(napi_env env, napi_callback_info info) {
   napi_value args[2];
@@ -1422,10 +1596,10 @@ static napi_value fuse_napi_reply_read(napi_env env, napi_callback_info info) {
   napi_get_value_double(env, args[0], &req_ptr_double);
   fuse_req_t req = (fuse_req_t)(uintptr_t)req_ptr_double;
   
-  char result[4096];
+  void* data;
   size_t len;
-  napi_get_value_string_utf8(env, args[1], result, sizeof(result), &len);
-  fuse_reply_buf(req, result, len);
+  napi_get_buffer_info(env, args[1], &data, &len);
+  fuse_reply_buf(req, (const char*)data, len);
   return NULL;
 }
 
@@ -1543,10 +1717,10 @@ static napi_value fuse_napi_reply_buf(napi_env env, napi_callback_info info) {
   napi_get_value_double(env, args[0], &req_ptr_double);
   fuse_req_t req = (fuse_req_t)(uintptr_t)req_ptr_double;
   
-  char buf[4096];
+  void* data;
   size_t len;
-  napi_get_value_string_utf8(env, args[1], buf, sizeof(buf), &len);
-  fuse_reply_buf(req, buf, len);
+  napi_get_buffer_info(env, args[1], &data, &len);
+  fuse_reply_buf(req, (const char*)data, len);
   return NULL;
 }
 
@@ -1645,12 +1819,23 @@ static napi_value fuse_napi_reply_ioctl(napi_env env, napi_callback_info info) {
   int32_t result;
   napi_get_value_int32(env, args[1], &result);
   
-  char buf[4096];
+  void* data = NULL;
   size_t len = 0;
   if (argc > 2) {
-    napi_get_value_string_utf8(env, args[2], buf, sizeof(buf), &len);
+    napi_valuetype type;
+    napi_typeof(env, args[2], &type);
+    if (type == napi_object) {
+      napi_get_buffer_info(env, args[2], &data, &len);
+    } else if (type == napi_string) {
+      // Fallback for strings if needed, but Buffers are preferred
+      char* str_data = malloc(4096);
+      napi_get_value_string_utf8(env, args[2], str_data, 4096, &len);
+      fuse_reply_ioctl(req, result, str_data, len);
+      free(str_data);
+      return NULL;
+    }
   }
-  fuse_reply_ioctl(req, result, len > 0 ? buf : NULL, len);
+  fuse_reply_ioctl(req, result, data, len);
   return NULL;
 }
 
@@ -1738,7 +1923,7 @@ static napi_value Init(napi_env env, napi_value exports) {
     {"reply_release", NULL, fuse_napi_reply_release, NULL, NULL, NULL, napi_default, NULL},
     {"reply_create", NULL, fuse_napi_reply_create, NULL, NULL, NULL, napi_default, NULL},
     {"reply_unlink", NULL, fuse_napi_reply_int, NULL, NULL, NULL, napi_default, NULL},
-    {"reply_mkdir", NULL, fuse_napi_reply_int, NULL, NULL, NULL, napi_default, NULL},
+    {"reply_mkdir", NULL, fuse_napi_reply_lookup, NULL, NULL, NULL, napi_default, NULL},
     {"reply_rmdir", NULL, fuse_napi_reply_int, NULL, NULL, NULL, napi_default, NULL},
     {"reply_rename", NULL, fuse_napi_reply_int, NULL, NULL, NULL, napi_default, NULL},
     {"reply_truncate", NULL, fuse_napi_reply_int, NULL, NULL, NULL, napi_default, NULL},
@@ -1765,7 +1950,7 @@ static napi_value Init(napi_env env, napi_value exports) {
     {"reply_ioctl", NULL, fuse_napi_reply_ioctl, NULL, NULL, NULL, napi_default, NULL},
     {"reply_poll", NULL, fuse_napi_reply_poll, NULL, NULL, NULL, napi_default, NULL},
     {"reply_fallocate", NULL, fuse_napi_reply_int, NULL, NULL, NULL, napi_default, NULL},
-    {"reply_readdirplus", NULL, fuse_napi_reply_readdir, NULL, NULL, NULL, napi_default, NULL},
+    {"reply_readdirplus", NULL, fuse_napi_reply_readdirplus, NULL, NULL, NULL, napi_default, NULL},
     {"reply_copy_file_range", NULL, fuse_napi_reply_write, NULL, NULL, NULL, napi_default, NULL},
     {"reply_lseek", NULL, fuse_napi_reply_lseek, NULL, NULL, NULL, napi_default, NULL},
     {"reply_tmpfile", NULL, fuse_napi_reply_create, NULL, NULL, NULL, napi_default, NULL},

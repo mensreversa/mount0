@@ -50,8 +50,8 @@ export class RouterProvider implements FilesystemProvider {
       if (!provider) {
         throw new Error("No provider found");
       }
-      // Call getattr(1) on the matched provider
-      const stat = await provider.getattr(1);
+      // Call getattr(1, 0) on the matched provider
+      const stat = await provider.getattr(1, 0);
       if (stat) {
         this.inoToProvider.set(stat.ino, provider);
       }
@@ -62,7 +62,7 @@ export class RouterProvider implements FilesystemProvider {
     return stat;
   }
 
-  async getattr(ino: number): Promise<FileStat | null> {
+  async getattr(ino: number, fh: number): Promise<FileStat | null> {
     if (ino === 1)
       return {
         mode: 0o40755,
@@ -79,14 +79,14 @@ export class RouterProvider implements FilesystemProvider {
         blksize: 4096,
         blocks: 0,
       };
-    return this.getProvider(ino).getattr(ino);
+    return this.getProvider(ino).getattr(ino, fh);
   }
 
-  async setattr(ino: number, to_set: number, attr: FileStat): Promise<void> {
-    return this.getProvider(ino).setattr(ino, to_set, attr);
+  async setattr(ino: number, fh: number, to_set: number, attr: FileStat): Promise<void> {
+    return this.getProvider(ino).setattr(ino, fh, to_set, attr);
   }
 
-  async readdir(ino: number, size: number, off: number): Promise<DirEntry[]> {
+  async readdir(ino: number, fh: number, size: number, off: number): Promise<DirEntry[]> {
     if (ino === 1) {
       const topLevel = new Set<string>();
       const entries = await Promise.all(
@@ -100,7 +100,7 @@ export class RouterProvider implements FilesystemProvider {
             return rp.path === top;
           })
           .map(async (rp) => {
-            const stat = await rp.provider.getattr(1);
+            const stat = await rp.provider.getattr(1, 0);
             if (stat) {
               this.inoToProvider.set(stat.ino, rp.provider);
               return { name: rp.path.slice(1), mode: stat.mode, ino: stat.ino };
@@ -110,7 +110,7 @@ export class RouterProvider implements FilesystemProvider {
       );
       return entries.filter((e) => e !== null).slice(off) as DirEntry[];
     }
-    const entries = await this.getProvider(ino).readdir(ino, size, off);
+    const entries = await this.getProvider(ino).readdir(ino, fh, size, off);
     entries.forEach((e) => {
       if (!this.inoToProvider.has(e.ino)) this.inoToProvider.set(e.ino, this.getProvider(ino));
     });
@@ -152,10 +152,10 @@ export class RouterProvider implements FilesystemProvider {
     return this.getProvider(ino).release(ino, fh);
   }
 
-  async create(parent: number, name: string, mode: number, flags: number): Promise<FileStat> {
-    const stat = await this.getProvider(parent).create(parent, name, mode, flags);
-    this.inoToProvider.set(stat.ino, this.getProvider(parent));
-    return stat;
+  async create(parent: number, name: string, mode: number, flags: number): Promise<{ stat: FileStat; fh: number }> {
+    const result = await this.getProvider(parent).create(parent, name, mode, flags);
+    this.inoToProvider.set(result.stat.ino, this.getProvider(parent));
+    return result;
   }
 
   async mknod(parent: number, name: string, mode: number, rdev: number): Promise<FileStat> {
@@ -281,13 +281,13 @@ export class RouterProvider implements FilesystemProvider {
     return this.getProvider(ino).access(ino, mask);
   }
 
-  async statfs(ino: number): Promise<Statfs> {
+  async statfs(ino: number, fh: number): Promise<Statfs> {
     // For root inode, use the first provider
     if (ino === 1) {
       if (this.providers.length > 0) {
         const provider = this.providers[0].provider;
         if (provider.statfs) {
-          return provider.statfs(1);
+          return provider.statfs(1, fh);
         }
       }
       // Return default statfs for root if no provider
@@ -300,15 +300,15 @@ export class RouterProvider implements FilesystemProvider {
         ffree: 0,
       };
     }
-    return this.getProvider(ino).statfs(ino);
+    return this.getProvider(ino).statfs(ino, fh);
   }
 
-  async getlk(ino: number, fh: number): Promise<Flock> {
-    return this.getProvider(ino).getlk(ino, fh);
+  async getlk(ino: number, fh: number, lock: Flock): Promise<Flock> {
+    return this.getProvider(ino).getlk(ino, fh, lock);
   }
 
-  async setlk(ino: number, fh: number, sleep: number): Promise<void> {
-    return this.getProvider(ino).setlk(ino, fh, sleep);
+  async setlk(ino: number, fh: number, lock: Flock, sleep: number): Promise<void> {
+    return this.getProvider(ino).setlk(ino, fh, lock, sleep);
   }
 
   async flock(ino: number, fh: number, op: number): Promise<void> {
@@ -318,8 +318,8 @@ export class RouterProvider implements FilesystemProvider {
     return this.getProvider(ino).bmap(ino, blocksize, idx);
   }
 
-  async ioctl(ino: number, cmd: number, in_buf: Buffer | null, in_bufsz: number, out_bufsz: number): Promise<{ result: number; out_buf?: Buffer }> {
-    return this.getProvider(ino).ioctl(ino, cmd, in_buf, in_bufsz, out_bufsz);
+  async ioctl(ino: number, fh: number, cmd: number, in_buf: Buffer | null, in_bufsz: number, out_bufsz: number, flags: number): Promise<{ result: number; out_buf?: Buffer }> {
+    return this.getProvider(ino).ioctl(ino, fh, cmd, in_buf, in_bufsz, out_bufsz, flags);
   }
 
   async poll(ino: number, fh: number): Promise<number> {
@@ -330,26 +330,26 @@ export class RouterProvider implements FilesystemProvider {
     return this.getProvider(ino).fallocate(ino, fh, offset, length, mode);
   }
 
-  async readdirplus(ino: number, size: number, off: number): Promise<DirEntry[]> {
-    const entries = await this.getProvider(ino).readdirplus(ino, size, off);
+  async readdirplus(ino: number, fh: number, size: number, off: number): Promise<DirEntry[]> {
+    const entries = await this.getProvider(ino).readdirplus(ino, fh, size, off);
     entries.forEach((e) => {
       if (!this.inoToProvider.has(e.ino)) this.inoToProvider.set(e.ino, this.getProvider(ino));
     });
     return entries;
   }
 
-  async copy_file_range(ino_in: number, off_in: number, ino_out: number, off_out: number, len: number, flags: number): Promise<number> {
-    return this.getProvider(ino_in).copy_file_range(ino_in, off_in, ino_out, off_out, len, flags);
+  async copy_file_range(ino_in: number, fh_in: number, off_in: number, ino_out: number, fh_out: number, off_out: number, len: number, flags: number): Promise<number> {
+    return this.getProvider(ino_in).copy_file_range(ino_in, fh_in, off_in, ino_out, fh_out, off_out, len, flags);
   }
 
   async lseek(ino: number, fh: number, off: number, whence: number): Promise<number> {
     return this.getProvider(ino).lseek(ino, fh, off, whence);
   }
 
-  async tmpfile(parent: number, mode: number, flags: number): Promise<FileStat> {
-    const stat = await this.getProvider(parent).tmpfile(parent, mode, flags);
-    this.inoToProvider.set(stat.ino, this.getProvider(parent));
-    return stat;
+  async tmpfile(parent: number, mode: number, flags: number): Promise<{ stat: FileStat; fh: number }> {
+    const result = await this.getProvider(parent).tmpfile(parent, mode, flags);
+    this.inoToProvider.set(result.stat.ino, this.getProvider(parent));
+    return result;
   }
 
   async forget(ino: number, nlookup: number): Promise<void> {

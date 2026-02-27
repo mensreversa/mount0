@@ -26,11 +26,11 @@ export interface FilesystemProvider {
 
   // Core operations
   lookup(parent: number, name: string): Promise<FileStat | null>;
-  getattr(ino: number): Promise<FileStat | null>;
-  setattr(ino: number, to_set: number, attr: FileStat): Promise<void>;
+  getattr(ino: number, fh: number): Promise<FileStat | null>;
+  setattr(ino: number, fh: number, to_set: number, attr: FileStat): Promise<void>;
 
   // Directory operations
-  readdir(ino: number, size: number, off: number): Promise<DirEntry[]>;
+  readdir(ino: number, fh: number, size: number, off: number): Promise<DirEntry[]>;
   opendir(ino: number, flags: number): Promise<number>;
   releasedir(ino: number, fh: number): Promise<void>;
   fsyncdir(ino: number, fh: number, datasync: number): Promise<void>;
@@ -45,7 +45,7 @@ export interface FilesystemProvider {
   release(ino: number, fh: number): Promise<void>;
 
   // Create operations
-  create(parent: number, name: string, mode: number, flags: number): Promise<FileStat>;
+  create(parent: number, name: string, mode: number, flags: number): Promise<{ stat: FileStat; fh: number }>;
   mknod(parent: number, name: string, mode: number, rdev: number): Promise<FileStat>;
   mkdir(parent: number, name: string, mode: number): Promise<FileStat>;
 
@@ -69,22 +69,22 @@ export interface FilesystemProvider {
 
   // Other operations
   access(ino: number, mask: number): Promise<void>;
-  statfs(ino: number): Promise<Statfs>;
+  statfs(ino: number, fh: number): Promise<Statfs>;
 
   // Locking
-  getlk(ino: number, fh: number): Promise<Flock>;
-  setlk(ino: number, fh: number, sleep: number): Promise<void>;
+  getlk(ino: number, fh: number, lock: Flock): Promise<Flock>;
+  setlk(ino: number, fh: number, lock: Flock, sleep: number): Promise<void>;
   flock(ino: number, fh: number, op: number): Promise<void>;
 
   // Advanced operations
   bmap(ino: number, blocksize: number, idx: number): Promise<number>;
-  ioctl(ino: number, cmd: number, in_buf: Buffer | null, in_bufsz: number, out_bufsz: number): Promise<{ result: number; out_buf?: Buffer }>;
+  ioctl(ino: number, fh: number, cmd: number, in_buf: Buffer | null, in_bufsz: number, out_bufsz: number, flags: number): Promise<{ result: number; out_buf?: Buffer }>;
   poll(ino: number, fh: number): Promise<number>;
   fallocate(ino: number, fh: number, offset: number, length: number, mode: number): Promise<void>;
-  readdirplus(ino: number, size: number, off: number): Promise<DirEntry[]>;
+  readdirplus(ino: number, fh: number, size: number, off: number): Promise<DirEntry[]>;
   retrieve_reply?(ino: number, cookie: number, offset: number, buffer: Buffer): Promise<void>;
   statx?(ino: number, flags: number, mask: number): Promise<FileStat | null>;
-  copy_file_range(ino_in: number, off_in: number, ino_out: number, off_out: number, len: number, flags: number): Promise<number>;
+  copy_file_range(ino_in: number, fh_in: number, off_in: number, ino_out: number, fh_out: number, off_out: number, len: number, flags: number): Promise<number>;
   lseek(ino: number, fh: number, off: number, whence: number): Promise<number>;
-  tmpfile(parent: number, mode: number, flags: number): Promise<FileStat>;
+  tmpfile(parent: number, mode: number, flags: number): Promise<{ stat: FileStat; fh: number }>;
 }

@@ -55,19 +55,19 @@ export abstract class BaseCacheProvider implements FilesystemProvider {
     return null;
   }
 
-  async getattr(ino: number): Promise<FileStat | null> {
+  async getattr(ino: number, fh: number): Promise<FileStat | null> {
     if (ino === 1) {
-      const stat = await this.slave.getattr(1);
-      return stat || this.master.getattr(1);
+      const stat = await this.slave.getattr(1, fh);
+      return stat || this.master.getattr(1, fh);
     }
     const slaveIno = this.getSlaveIno(ino);
-    const stat = await this.slave.getattr(slaveIno);
+    const stat = await this.slave.getattr(slaveIno, fh);
     if (stat) {
       this.setInoMapping(ino, this.getMasterIno(ino), stat.ino);
       return { ...stat, ino };
     }
     const masterIno = this.getMasterIno(ino);
-    const masterStat = await this.master.getattr(masterIno);
+    const masterStat = await this.master.getattr(masterIno, fh);
     if (masterStat) {
       this.setInoMapping(ino, masterStat.ino);
       return { ...masterStat, ino };
@@ -75,20 +75,20 @@ export abstract class BaseCacheProvider implements FilesystemProvider {
     return null;
   }
 
-  async setattr(ino: number, to_set: number, attr: FileStat): Promise<void> {
+  async setattr(ino: number, fh: number, to_set: number, attr: FileStat): Promise<void> {
     const masterIno = this.getMasterIno(ino);
-    await this.master.setattr(masterIno, to_set, attr);
+    await this.master.setattr(masterIno, fh, to_set, attr);
     const slaveIno = this.getSlaveIno(ino);
     try {
-      await this.slave.setattr(slaveIno, to_set, attr);
+      await this.slave.setattr(slaveIno, fh, to_set, attr);
     } catch {
       // Ignore slave errors
     }
   }
 
-  async readdir(ino: number, size: number, offset: number): Promise<DirEntry[]> {
+  async readdir(ino: number, fh: number, size: number, offset: number): Promise<DirEntry[]> {
     const slaveIno = this.getSlaveIno(ino);
-    const entries = await this.slave.readdir(slaveIno, size, offset);
+    const entries = await this.slave.readdir(slaveIno, fh, size, offset);
     if (entries.length > 0) {
       return entries.map((entry) => {
         const ino = this.nextIno++;
@@ -97,7 +97,7 @@ export abstract class BaseCacheProvider implements FilesystemProvider {
       });
     }
     const masterIno = this.getMasterIno(ino);
-    const masterEntries = await this.master.readdir(masterIno, size, offset);
+    const masterEntries = await this.master.readdir(masterIno, fh, size, offset);
     return masterEntries.map((entry) => {
       const ino = this.nextIno++;
       this.setInoMapping(ino, entry.ino);
@@ -161,19 +161,19 @@ export abstract class BaseCacheProvider implements FilesystemProvider {
     }
   }
 
-  async create(parent: number, name: string, mode: number, flags: number): Promise<FileStat> {
+  async create(parent: number, name: string, mode: number, flags: number): Promise<{ stat: FileStat; fh: number }> {
     const masterParent = this.getMasterIno(parent);
-    const stat = await this.master.create(masterParent, name, mode, flags);
+    const masterResult = await this.master.create(masterParent, name, mode, flags);
     const ino = this.nextIno++;
-    this.setInoMapping(ino, stat.ino);
+    this.setInoMapping(ino, masterResult.stat.ino);
     try {
       const slaveParent = this.getSlaveIno(parent);
-      const slaveStat = await this.slave.create(slaveParent, name, mode, flags);
-      this.setInoMapping(ino, stat.ino, slaveStat.ino);
+      const slaveResult = await this.slave.create(slaveParent, name, mode, flags);
+      this.setInoMapping(ino, masterResult.stat.ino, slaveResult.stat.ino);
     } catch {
       // Ignore slave errors
     }
-    return { ...stat, ino };
+    return { stat: { ...masterResult.stat, ino }, fh: masterResult.fh };
   }
 
   async mknod(parent: number, name: string, mode: number, rdev: number): Promise<FileStat> {
@@ -325,19 +325,19 @@ export abstract class BaseCacheProvider implements FilesystemProvider {
     }
   }
 
-  async statfs(ino: number): Promise<Statfs> {
+  async statfs(ino: number, fh: number): Promise<Statfs> {
     const masterIno = this.getMasterIno(ino);
-    return this.master.statfs(masterIno);
+    return this.master.statfs(masterIno, fh);
   }
 
-  async getlk(ino: number, fh: number): Promise<Flock> {
+  async getlk(ino: number, fh: number, lock: Flock): Promise<Flock> {
     const masterIno = this.getMasterIno(ino);
-    return this.master.getlk(masterIno, fh);
+    return this.master.getlk(masterIno, fh, lock);
   }
 
-  async setlk(ino: number, fh: number, sleep: number): Promise<void> {
+  async setlk(ino: number, fh: number, lock: Flock, sleep: number): Promise<void> {
     const masterIno = this.getMasterIno(ino);
-    return this.master.setlk(masterIno, fh, sleep);
+    return this.master.setlk(masterIno, fh, lock, sleep);
   }
 
   async flock(ino: number, fh: number, op: number): Promise<void> {
@@ -350,9 +350,9 @@ export abstract class BaseCacheProvider implements FilesystemProvider {
     return this.master.bmap(masterIno, blocksize, idx);
   }
 
-  async ioctl(ino: number, cmd: number, in_buf: Buffer | null, in_bufsz: number, out_bufsz: number): Promise<{ result: number; out_buf?: Buffer }> {
+  async ioctl(ino: number, fh: number, cmd: number, in_buf: Buffer | null, in_bufsz: number, out_bufsz: number, flags: number): Promise<{ result: number; out_buf?: Buffer }> {
     const masterIno = this.getMasterIno(ino);
-    return this.master.ioctl(masterIno, cmd, in_buf, in_bufsz, out_bufsz);
+    return this.master.ioctl(masterIno, fh, cmd, in_buf, in_bufsz, out_bufsz, flags);
   }
 
   async poll(ino: number, fh: number): Promise<number> {
@@ -371,14 +371,14 @@ export abstract class BaseCacheProvider implements FilesystemProvider {
     }
   }
 
-  async readdirplus(ino: number, size: number, offset: number): Promise<DirEntry[]> {
-    return this.readdir(ino, size, offset);
+  async readdirplus(ino: number, fh: number, size: number, offset: number): Promise<DirEntry[]> {
+    return this.readdir(ino, fh, size, offset);
   }
 
-  async copy_file_range(ino_in: number, off_in: number, ino_out: number, off_out: number, len: number, flags: number): Promise<number> {
+  async copy_file_range(ino_in: number, fh_in: number, off_in: number, ino_out: number, fh_out: number, off_out: number, len: number, flags: number): Promise<number> {
     const masterInoIn = this.getMasterIno(ino_in);
     const masterInoOut = this.getMasterIno(ino_out);
-    return this.master.copy_file_range(masterInoIn, off_in, masterInoOut, off_out, len, flags);
+    return this.master.copy_file_range(masterInoIn, fh_in, off_in, masterInoOut, fh_out, off_out, len, flags);
   }
 
   async lseek(ino: number, fh: number, off: number, whence: number): Promise<number> {
@@ -386,12 +386,12 @@ export abstract class BaseCacheProvider implements FilesystemProvider {
     return this.master.lseek(masterIno, fh, off, whence);
   }
 
-  async tmpfile(parent: number, mode: number, flags: number): Promise<FileStat> {
+  async tmpfile(parent: number, mode: number, flags: number): Promise<{ stat: FileStat; fh: number }> {
     const masterParent = this.getMasterIno(parent);
-    const stat = await this.master.tmpfile(masterParent, mode, flags);
+    const result = await this.master.tmpfile(masterParent, mode, flags);
     const ino = this.nextIno++;
-    this.setInoMapping(ino, stat.ino);
-    return { ...stat, ino };
+    this.setInoMapping(ino, result.stat.ino);
+    return { stat: { ...result.stat, ino }, fh: result.fh };
   }
 
   async flush(ino: number, fh: number): Promise<void> {

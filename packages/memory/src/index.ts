@@ -67,12 +67,12 @@ export class MemoryProvider implements FilesystemProvider {
     return { ...child.stat };
   }
 
-  async getattr(ino: number): Promise<FileStat | null> {
+  async getattr(ino: number, _fh: number): Promise<FileStat | null> {
     const node = this.getNode(ino);
     return node ? { ...node.stat } : null;
   }
 
-  async readdir(ino: number, size: number, offset: number): Promise<DirEntry[]> {
+  async readdir(ino: number, _fh: number, size: number, offset: number): Promise<DirEntry[]> {
     const node = this.getNode(ino);
     if (!node?.children) return [];
 
@@ -135,7 +135,7 @@ export class MemoryProvider implements FilesystemProvider {
     return length;
   }
 
-  async create(parent: number, name: string, mode: number, _flags: number): Promise<FileStat> {
+  async create(parent: number, name: string, mode: number, _flags: number): Promise<{ stat: FileStat; fh: number }> {
     const parentNode = this.getNode(parent);
     if (!parentNode?.children) throw new Error("Directory not found");
 
@@ -167,11 +167,18 @@ export class MemoryProvider implements FilesystemProvider {
         this.openFiles.set(newNode.stat.ino, new Map());
       }
       this.openFiles.get(newNode.stat.ino)!.set(fh, newNode);
+      return { stat: { ...newNode.stat }, fh };
     }
 
     const node = parentNode.children.get(name);
     if (!node) throw new Error("Failed to create file");
-    return { ...node.stat };
+
+    const fh = this.nextFh++;
+    if (!this.openFiles.has(node.stat.ino)) {
+      this.openFiles.set(node.stat.ino, new Map());
+    }
+    this.openFiles.get(node.stat.ino)!.set(fh, node);
+    return { stat: { ...node.stat }, fh };
   }
 
   async unlink(parent: number, name: string): Promise<void> {
@@ -263,14 +270,32 @@ export class MemoryProvider implements FilesystemProvider {
     this.pathToIno.set(newPath, ino);
   }
 
-  async setattr(ino: number, length: number): Promise<void> {
+  async setattr(ino: number, _fh: number, to_set: number, attr: FileStat): Promise<void> {
     const node = this.getNode(ino);
     if (!node) throw new Error("File not found");
-    if (node.content) {
-      node.content = Buffer.from(node.content.subarray(0, length));
-      node.stat.size = length;
-      node.stat.mtime = Math.floor(Date.now() / 1000);
+    const FUSE_SET_ATTR_SIZE = 8;
+    const FUSE_SET_ATTR_MODE = 1;
+    const FUSE_SET_ATTR_UID = 2;
+    const FUSE_SET_ATTR_GID = 4;
+    const FUSE_SET_ATTR_ATIME = 16;
+    const FUSE_SET_ATTR_MTIME = 32;
+    if (to_set & FUSE_SET_ATTR_SIZE) {
+      const newSize = attr.size;
+      if (node.content) {
+        const newContent = Buffer.alloc(newSize);
+        node.content.copy(newContent, 0, 0, Math.min(node.content.length, newSize));
+        node.content = newContent;
+      } else {
+        node.content = Buffer.alloc(newSize);
+      }
+      node.stat.size = newSize;
     }
+    if (to_set & FUSE_SET_ATTR_MODE) node.stat.mode = attr.mode;
+    if (to_set & FUSE_SET_ATTR_UID) node.stat.uid = attr.uid;
+    if (to_set & FUSE_SET_ATTR_GID) node.stat.gid = attr.gid;
+    if (to_set & FUSE_SET_ATTR_ATIME) node.stat.atime = attr.atime;
+    if (to_set & FUSE_SET_ATTR_MTIME) node.stat.mtime = attr.mtime;
+    else node.stat.mtime = Math.floor(Date.now() / 1000);
   }
 
   async release(ino: number, fh: number): Promise<void> {
@@ -307,7 +332,7 @@ export class MemoryProvider implements FilesystemProvider {
   // Create operations
   async mknod(parent: number, name: string, mode: number, _rdev: number): Promise<FileStat> {
     // For regular files, use create
-    return this.create(parent, name, mode, 0);
+    return (await this.create(parent, name, mode, 0)).stat;
   }
 
   // Link operations
@@ -325,13 +350,13 @@ export class MemoryProvider implements FilesystemProvider {
 
   async symlink(link: string, parent: number, name: string): Promise<FileStat> {
     // Memory filesystem doesn't support symlinks - create a regular file with link content
-    const stat = await this.create(parent, name, 0o120644, 0);
-    const node = this.getNode(stat.ino);
+    const result = await this.create(parent, name, 0o120644, 0);
+    const node = this.getNode(result.stat.ino);
     if (node) {
       node.content = Buffer.from(link);
       node.stat.size = link.length;
     }
-    return stat;
+    return result.stat;
   }
 
   async readlink(ino: number): Promise<string> {
@@ -363,7 +388,7 @@ export class MemoryProvider implements FilesystemProvider {
     // Always allow access in memory filesystem
   }
 
-  async statfs(_ino: number): Promise<Statfs> {
+  async statfs(_ino: number, _fh: number): Promise<Statfs> {
     return {
       bsize: 4096,
       blocks: 1000000,
@@ -375,11 +400,11 @@ export class MemoryProvider implements FilesystemProvider {
   }
 
   // Locking
-  async getlk(_ino: number, _fh: number): Promise<Flock> {
-    throw new Error("File locking not supported");
+  async getlk(_ino: number, _fh: number, lock: Flock): Promise<Flock> {
+    return lock; // Default implementation returning the same lock (unsupported but consistent)
   }
 
-  async setlk(_ino: number, _fh: number, _sleep: number): Promise<void> {
+  async setlk(_ino: number, _fh: number, _lock: Flock, _sleep: number): Promise<void> {
     throw new Error("File locking not supported");
   }
 
@@ -392,7 +417,7 @@ export class MemoryProvider implements FilesystemProvider {
     throw new Error("Block mapping not supported");
   }
 
-  async ioctl(_ino: number, _cmd: number, _in_buf: Buffer | null, _in_bufsz: number, _out_bufsz: number): Promise<{ result: number; out_buf?: Buffer }> {
+  async ioctl(_ino: number, _fh: number, _cmd: number, _in_buf: Buffer | null, _in_bufsz: number, _out_bufsz: number, _flags: number): Promise<{ result: number; out_buf?: Buffer }> {
     throw new Error("IOCTL not supported");
   }
 
@@ -414,11 +439,11 @@ export class MemoryProvider implements FilesystemProvider {
     node.stat.size = newSize;
   }
 
-  async readdirplus(ino: number, size: number, off: number): Promise<DirEntry[]> {
-    return this.readdir(ino, size, off);
+  async readdirplus(ino: number, fh: number, size: number, off: number): Promise<DirEntry[]> {
+    return this.readdir(ino, fh, size, off);
   }
 
-  async copy_file_range(ino_in: number, off_in: number, ino_out: number, off_out: number, len: number, _flags: number): Promise<number> {
+  async copy_file_range(ino_in: number, fh_in: number, off_in: number, ino_out: number, fh_out: number, off_out: number, len: number, _flags: number): Promise<number> {
     const inNode = this.getNode(ino_in);
     const outNode = this.getNode(ino_out);
     if (!inNode?.content || !outNode) throw new Error("Invalid nodes");
@@ -443,7 +468,7 @@ export class MemoryProvider implements FilesystemProvider {
     return node.content?.length || 0;
   }
 
-  async tmpfile(parent: number, mode: number, flags: number): Promise<FileStat> {
+  async tmpfile(parent: number, mode: number, flags: number): Promise<{ stat: FileStat; fh: number }> {
     const name = `.tmp.${Date.now()}.${Math.random().toString(36).substring(7)}`;
     return this.create(parent, name, mode, flags);
   }
